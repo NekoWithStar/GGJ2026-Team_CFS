@@ -458,8 +458,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationCenter: {fileID: 1263024375}
-  pullSpeed: 15
-  reachThreshold: 1
+  pullSpeed: 20
+  reachThreshold: 1.1
   returnDelay: 0.03
   returnSpeed: 20
   enableTidalLock: 1
