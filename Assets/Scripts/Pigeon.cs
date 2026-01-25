@@ -45,6 +45,7 @@ public class Pigeon : MonoBehaviour
 
         _originalPosition = transform.position;
         _isPulling = true;
+        
     }
 
     void Update()
