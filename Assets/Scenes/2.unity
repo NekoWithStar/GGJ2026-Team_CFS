@@ -372,9 +372,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f84b2f1812073824082b495ff29708b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  centerTransform: {fileID: 1263024375}
   centerPosition: {x: 0, y: 0, z: 0}
   radius: 5
   speed: 60
+  debugLogs: 0
 --- !u!212 &236772520
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -541,9 +543,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f84b2f1812073824082b495ff29708b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  centerTransform: {fileID: 0}
   centerPosition: {x: 0, y: 0, z: 0}
   radius: 5
   speed: 120
+  debugLogs: 0
 --- !u!212 &526154443
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -643,9 +647,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f84b2f1812073824082b495ff29708b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  centerTransform: {fileID: 0}
   centerPosition: {x: 0, y: 0, z: 0}
   radius: 5
   speed: 120
+  debugLogs: 0
 --- !u!212 &787550665
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -946,8 +952,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300002, guid: b12d650db3a03fa44af7485c08c3ea8e, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 1210f9b192f3de04aaf9c1228711c3a9, type: 3}
-  m_Resource: {fileID: 8300000, guid: 1210f9b192f3de04aaf9c1228711c3a9, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 9410c977c80b4f2498a1b0c7e7196d5a, type: 3}
+  m_Resource: {fileID: 8300000, guid: 9410c977c80b4f2498a1b0c7e7196d5a, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

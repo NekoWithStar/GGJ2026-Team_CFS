@@ -24,7 +24,6 @@ public class Pigeon : MonoBehaviour
     public bool faceCenter = true;
 
     Vector3 _originalPosition;
-    float _originalRadius;
     bool _isPulling;
     bool _isReturning;
 
@@ -45,7 +44,6 @@ public class Pigeon : MonoBehaviour
         if (_isPulling || _isReturning) return;
 
         _originalPosition = transform.position;
-        _originalRadius = (transform.position - rotationCenter.position).magnitude;
         _isPulling = true;
     }
 
@@ -72,29 +70,15 @@ public class Pigeon : MonoBehaviour
         // 可选短暂停顿，再恢复
         if (returnDelay > 0f) yield return new WaitForSeconds(returnDelay);
 
-        // 计算基于当前角度的目标：当前位置方向 * 原始半径
-        Vector3 dir = transform.position - rotationCenter.position;
-        if (dir.sqrMagnitude <= 0.0001f)
+        // 平滑移动回点击前位置
+        while (Vector3.Distance(transform.position, _originalPosition) > 0.01f)
         {
-            // 如果当前在中心非常近，默认朝右
-            dir = Vector3.right;
-        }
-        else
-        {
-            dir = dir.normalized;
-        }
-
-        Vector3 target = rotationCenter.position + dir * _originalRadius;
-
-        // 平滑移动回轨道上的目标位置（保持当前角度、恢复原始半径）
-        while (Vector3.Distance(transform.position, target) > 0.01f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target, returnSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, _originalPosition, returnSpeed * Time.deltaTime);
             yield return null;
         }
 
-        // 确保精确复位到轨道点
-        transform.position = target;
+        // 确保精确复位
+        transform.position = _originalPosition;
         _isReturning = false;
         yield break;
     }
@@ -105,7 +89,6 @@ public class Pigeon : MonoBehaviour
         if (rotationCenter == null) return;
         if (_isPulling || _isReturning) return;
         _originalPosition = transform.position;
-        _originalRadius = (transform.position - rotationCenter.position).magnitude;
         _isPulling = true;
     }
 
