@@ -47,6 +47,7 @@ public class Pigeon : MonoBehaviour
         _originalPosition = transform.position;
         _originalRadius = (transform.position - rotationCenter.position).magnitude;
         _isPulling = true;
+        
     }
 
     void Update()
