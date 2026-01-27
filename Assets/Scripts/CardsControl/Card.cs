@@ -19,5 +19,6 @@ public class Card : ScriptableObject
     public int cardCost;     // ¿¨ÅÆ·ÑÓÃ
     public int cardRank;     // ¿¨ÅÆÇãÏòµÈ¼¶
     public string cardDescription; // ¿¨ÅÆÃèÊö
-    public Sprite cardPicture; // ¿¨ÅÆÍ¼Æ¬
+    public Image cardPicture; // ¿¨ÅÆÖĞĞÄÍ¼Æ¬
+    public GameObject back; // ¿¨ÅÆ±³ÃæÍ¼Æ¬
 }
