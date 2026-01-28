@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,9 @@ using UnityEngine.Events;
 
 public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    // 当卡牌被“确认”时广播该卡牌的数据（Card ScriptableObject）
+    public static event Action<Card> OnCardConfirmed;
+
     [Header("卡牌正反面 (Canvas UI 下的 GameObject)")]
     public GameObject frontFace; // 正面（包含 CardControl 等 UI 元素）
     public GameObject backFace; // 背面（默认显示）
@@ -55,7 +59,16 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // 如果启用了“再次点击为确认”且当前为正面朝上，则把再次点击视为确认而不是翻回去
         if (!isFaceDown && secondClickIsConfirm)
         {
+            // 先触发 inspector 绑定的 UnityEvent
             onConfirm?.Invoke();
+
+            // 查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
+            CardControl cc = GetComponentInChildren<CardControl>();
+            if (cc != null && cc.card_data != null)
+            {
+                OnCardConfirmed?.Invoke(cc.card_data);
+            }
+
             return;
         }
 
