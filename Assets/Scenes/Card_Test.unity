@@ -1054,7 +1054,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1340410846}
-  - component: {fileID: 1340410845}
   - component: {fileID: 1340410847}
   m_Layer: 0
   m_Name: Top_Control
@@ -1063,35 +1062,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1340410845
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1340410844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9358f3ddc9a7b343bd81e0c735e5d70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scrollBar_Ego: {fileID: 252957422}
-  text_EgoValue: {fileID: 801970715}
-  reasonCards:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  scrollBar_Id: {fileID: 177302198}
-  text_IdValue: {fileID: 1899665507}
-  feelCards: []
-  scrollBar_Superego: {fileID: 255331547}
-  text_SuperegoValue: {fileID: 1587415168}
-  dreamCards: []
-  maxTendencyValue: 30
-  applyRankToCards: 1
-  updateCostWithRank: 0
-  costBase: 0
-  costPerRank: 0
 --- !u!4 &1340410846
 Transform:
   m_ObjectHideFlags: 0
@@ -1116,12 +1086,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1340410844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83c07f486913cc44904574d7f37dec6, type: 3}
+  m_Script: {fileID: 11500000, guid: c6d00e2251b44dd469e1f54f2bd27a4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  availableCost: 10
-  defaultRankIncrease: 1
-  faceMove: {fileID: 0}
+  scrollBar_Ego: {fileID: 252957422}
+  text_EgoValue: {fileID: 801970715}
+  scrollBar_Id: {fileID: 177302198}
+  text_IdValue: {fileID: 1899665507}
+  scrollBar_Superego: {fileID: 255331547}
+  text_SuperegoValue: {fileID: 1587415168}
+  maxTendencyValue: 30
 --- !u!1 &1367343792
 GameObject:
   m_ObjectHideFlags: 0
@@ -1846,6 +1820,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: card_type3(3)
       objectReference: {fileID: 0}
+    - target: {fileID: 532476953649044656, guid: 3ea29ed3f17bae347a457f9385fc2f28, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4268092513714074828, guid: 3ea29ed3f17bae347a457f9385fc2f28, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1859,9 +1841,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1588772064}
     m_Modifications:
+    - target: {fileID: 536825003039698519, guid: cd5aa690746c72b47bbc4af55127fb1d, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7285754938594540614, guid: cd5aa690746c72b47bbc4af55127fb1d, type: 3}
       propertyPath: m_Name
       value: card_type1(3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7285754938594540614, guid: cd5aa690746c72b47bbc4af55127fb1d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8006601467151320036, guid: cd5aa690746c72b47bbc4af55127fb1d, type: 3}
       propertyPath: m_Pivot.x
@@ -1961,9 +1951,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1588772064}
     m_Modifications:
+    - target: {fileID: 540008341442177440, guid: 43967fec93d042f49a30f5819ebd0174, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1700993468506211618, guid: 43967fec93d042f49a30f5819ebd0174, type: 3}
       propertyPath: m_Name
       value: card_type2(2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1700993468506211618, guid: 43967fec93d042f49a30f5819ebd0174, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3792764126869735815, guid: 43967fec93d042f49a30f5819ebd0174, type: 3}
       propertyPath: m_Pivot.x
@@ -2063,6 +2061,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1588772064}
     m_Modifications:
+    - target: {fileID: 1102571474322366893, guid: 8db0dfce3762c304892dc4d353a499a1, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2865678295213535278, guid: 8db0dfce3762c304892dc4d353a499a1, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2160,9 +2162,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1588772064}
     m_Modifications:
+    - target: {fileID: 2669480087921958214, guid: ca270d3117cfe394b8f8a7cbd6588068, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2712786411915008399, guid: ca270d3117cfe394b8f8a7cbd6588068, type: 3}
       propertyPath: m_Name
       value: card_type3(2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2712786411915008399, guid: ca270d3117cfe394b8f8a7cbd6588068, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6528395124061119708, guid: ca270d3117cfe394b8f8a7cbd6588068, type: 3}
       propertyPath: m_Pivot.x
@@ -2261,6 +2271,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: card_type2(3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1222766926875274551, guid: be308978f4c029a4e8c3e7fabaec3653, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2306279708493364677, guid: be308978f4c029a4e8c3e7fabaec3653, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4338631857744356453, guid: be308978f4c029a4e8c3e7fabaec3653, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2354,6 +2372,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1588772064}
     m_Modifications:
+    - target: {fileID: 2604016789809282562, guid: 028a9380866eac84cb83e6ddf5dd4c30, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5695758425970045804, guid: 028a9380866eac84cb83e6ddf5dd4c30, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2535,6 +2557,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: card_type1(1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5646377492064052907, guid: 058fa946a51fb8e4f8257d2e47911a18, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2548,9 +2574,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1588772064}
     m_Modifications:
+    - target: {fileID: 2619706922470223621, guid: 978aa37e99452e14a974a722119ddfaf, type: 3}
+      propertyPath: secondClickIsConfirm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6260567452125982900, guid: 978aa37e99452e14a974a722119ddfaf, type: 3}
       propertyPath: m_Name
       value: card_type1(2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260567452125982900, guid: 978aa37e99452e14a974a722119ddfaf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7713575980187540690, guid: 978aa37e99452e14a974a722119ddfaf, type: 3}
       propertyPath: m_Pivot.x

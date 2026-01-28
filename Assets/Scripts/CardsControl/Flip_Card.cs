@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
@@ -13,6 +14,12 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public float hoverScale = 1.08f; // 鼠标悬停放大倍率
     public float scaleSpeed = 10f; // 缩放速度（越大越快）
     public float flipDuration = 0.4f; // 翻转总时长（秒）
+
+    [Header("确认设置")]
+    [Tooltip("如果为 true，则当卡牌正面朝上时再次点击视为确认：不会把卡牌翻回去。")]
+    public bool secondClickIsConfirm = false;
+    [Tooltip("当 secondClickIsConfirm 为 true 且用户在正面再次点击时触发的事件（可在 Inspector 中绑定）。")]
+    public UnityEvent onConfirm;
 
     private bool isFaceDown = true; // 默认背面朝上
     private bool isAnimating = false;
@@ -44,6 +51,14 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void OnPointerClick(PointerEventData eventData)
     {
         if (isAnimating) return;
+
+        // 如果启用了“再次点击为确认”且当前为正面朝上，则把再次点击视为确认而不是翻回去
+        if (!isFaceDown && secondClickIsConfirm)
+        {
+            onConfirm?.Invoke();
+            return;
+        }
+
         StartCoroutine(FlipCoroutine());
     }
 

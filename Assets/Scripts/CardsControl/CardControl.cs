@@ -24,4 +24,25 @@ public class CardControl : MonoBehaviour
         rank.text = card_data.cardRank.ToString();
         back = card_data.back;
     }
+
+    private void OnEnable()
+    {
+        SimpleScrollbar.OnRankChanged += HandleRankChanged;
+    }
+
+    private void OnDisable()
+    {
+        SimpleScrollbar.OnRankChanged -= HandleRankChanged;
+    }
+
+    // 当滚动条广播该类型 rank 改变时，更新 ScriptableObject 与 UI（最小入侵）
+    private void HandleRankChanged(Card.CARD_TYPE type, int newRank)
+    {
+        if (card_data == null) return;
+        if (card_data.cardType != type) return;
+
+        // 更新数据 并同步 UI 文本
+        card_data.cardRank = newRank;
+        if (rank != null) rank.text = newRank.ToString();
+    }
 }
