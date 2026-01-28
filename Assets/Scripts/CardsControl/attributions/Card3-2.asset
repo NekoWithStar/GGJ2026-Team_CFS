@@ -16,6 +16,6 @@ MonoBehaviour:
   cardName: Criticise
   cardCost: 2
   cardRank: 4
-  cardDescription: Humility helps me improve...
+  cardDescription: Humility at least helps me make progress...
   cardPicture: {fileID: 0}
   back: {fileID: 0}

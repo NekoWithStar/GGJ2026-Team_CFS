@@ -32,9 +32,14 @@ public class SimpleScrollbar : MonoBehaviour
     // 抑制 OnValueChanged 中的“写回卡牌”逻辑（用于程序化更新滚动条，不应覆盖卡牌原有 rank）
     private bool suppressOnValueChanged = false;
 
+    // 控制各栏目的并发协程引用，便于停止
+    private Coroutine egoCoroutine;
+    private Coroutine idCoroutine;
+    private Coroutine superegoCoroutine;
+
     void OnEnable()
     {
-        // 订阅卡牌确认广播
+        // 订阅卡牌确认广播（Flip_Card 需在确认时触发静态事件）
         Flip_Card.OnCardConfirmed += HandleCardConfirmed;
     }
 
@@ -74,7 +79,8 @@ public class SimpleScrollbar : MonoBehaviour
         if (scrollBar_Superego != null) scrollBar_Superego.onValueChanged.AddListener(OnSuperegoScrollChanged);
     }
     #endregion
-    #region 处理卡牌确认（Flip_Card 广播） - 使用 DOTween 平滑增加
+
+    #region 处理卡牌确认（Flip_Card 广播） - 使用协程平滑增加
     void HandleCardConfirmed(Card card)
     {
         if (card == null) return;
@@ -82,32 +88,121 @@ public class SimpleScrollbar : MonoBehaviour
         switch (card.cardType)
         {
             case Card.CARD_TYPE.Reason:
-                _egoValue = Mathf.Clamp(_egoValue + card.cardRank, 0, maxTendencyValue);
-                // 程序化更新滚动条时抑制写回卡牌的逻辑
-                suppressOnValueChanged = true;
-                if (scrollBar_Ego != null) scrollBar_Ego.value = Mathf.Clamp01((float)_egoValue / maxTendencyValue);
-                UpdateEgoText(_egoValue);
-                suppressOnValueChanged = false;
+                StartAddCoroutine(Card.CARD_TYPE.Reason, scrollBar_Ego, card.cardRank);
                 break;
 
             case Card.CARD_TYPE.Feel:
-                _idValue = Mathf.Clamp(_idValue + card.cardRank, 0, maxTendencyValue);
-                suppressOnValueChanged = true;
-                if (scrollBar_Id != null) scrollBar_Id.value = Mathf.Clamp01((float)_idValue / maxTendencyValue);
-                UpdateIdText(_idValue);
-                suppressOnValueChanged = false;
+                StartAddCoroutine(Card.CARD_TYPE.Feel, scrollBar_Id, card.cardRank);
                 break;
 
             case Card.CARD_TYPE.Dream:
-                _superegoValue = Mathf.Clamp(_superegoValue + card.cardRank, 0, maxTendencyValue);
-                suppressOnValueChanged = true;
-                if (scrollBar_Superego != null) scrollBar_Superego.value = Mathf.Clamp01((float)_superegoValue / maxTendencyValue);
-                UpdateSuperegoText(_superegoValue);
-                suppressOnValueChanged = false;
+                StartAddCoroutine(Card.CARD_TYPE.Dream, scrollBar_Superego, card.cardRank);
                 break;
         }
-        // 不把程序化变化写回到各卡牌（避免覆盖卡牌数据）
+
         Debug.Log($"Confirmed card '{card.cardName}' added {card.cardRank} to {card.cardType}, new values: Ego={_egoValue}, Id={_idValue}, Superego={_superegoValue}");
+    }
+
+    void StartAddCoroutine(Card.CARD_TYPE type, Scrollbar targetScrollbar, int addValue)
+    {
+        int maxValue = Mathf.Max(1, maxTendencyValue);
+
+        // 计算新的目标值并 clamp
+        int startValue;
+        int targetValue;
+        switch (type)
+        {
+            case Card.CARD_TYPE.Reason:
+                startValue = _egoValue;
+                targetValue = Mathf.Clamp(_egoValue + addValue, 0, maxValue);
+                if (egoCoroutine != null) StopCoroutine(egoCoroutine);
+                egoCoroutine = StartCoroutine(AnimateScrollbar(type, targetScrollbar, startValue, targetValue, maxValue));
+                break;
+            case Card.CARD_TYPE.Feel:
+                startValue = _idValue;
+                targetValue = Mathf.Clamp(_idValue + addValue, 0, maxValue);
+                if (idCoroutine != null) StopCoroutine(idCoroutine);
+                idCoroutine = StartCoroutine(AnimateScrollbar(type, targetScrollbar, startValue, targetValue, maxValue));
+                break;
+            case Card.CARD_TYPE.Dream:
+                startValue = _superegoValue;
+                targetValue = Mathf.Clamp(_superegoValue + addValue, 0, maxValue);
+                if (superegoCoroutine != null) StopCoroutine(superegoCoroutine);
+                superegoCoroutine = StartCoroutine(AnimateScrollbar(type, targetScrollbar, startValue, targetValue, maxValue));
+                break;
+        }
+    }
+
+    System.Collections.IEnumerator AnimateScrollbar(Card.CARD_TYPE type, Scrollbar targetScrollbar, int startValue, int targetValue, int maxValue)
+    {
+        // 如果没有 UI，直接写入并返回
+        if (targetScrollbar == null)
+        {
+            ApplyFinalValue(type, targetValue);
+            UpdateTextByType(type, targetValue);
+            yield break;
+        }
+
+        float startNormalized = (float)startValue / maxValue;
+        float endNormalized = (float)targetValue / maxValue;
+
+        // 设定抑制，避免程序设置 value 时触发写回
+        suppressOnValueChanged = true;
+
+        float elapsed = 0f;
+        float duration = Mathf.Max(0.0001f, confirmTweenDuration);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            // 使用 SmoothStep 可获得更自然的动画
+            float v = Mathf.Lerp(startNormalized, endNormalized, Mathf.SmoothStep(0f, 1f, t));
+            if (targetScrollbar != null) targetScrollbar.value = v;
+            int displayRank = Mathf.RoundToInt(v * maxValue);
+            UpdateTextByType(type, displayRank);
+            yield return null;
+        }
+
+        // 结束时设置最终值
+        if (targetScrollbar != null) targetScrollbar.value = endNormalized;
+        ApplyFinalValue(type, targetValue);
+        UpdateTextByType(type, targetValue);
+
+        // 解除抑制
+        suppressOnValueChanged = false;
+    }
+
+    void ApplyFinalValue(Card.CARD_TYPE type, int value)
+    {
+        switch (type)
+        {
+            case Card.CARD_TYPE.Reason:
+                _egoValue = value;
+                break;
+            case Card.CARD_TYPE.Feel:
+                _idValue = value;
+                break;
+            case Card.CARD_TYPE.Dream:
+                _superegoValue = value;
+                break;
+        }
+    }
+
+    void UpdateTextByType(Card.CARD_TYPE type, int displayValue)
+    {
+        switch (type)
+        {
+            case Card.CARD_TYPE.Reason:
+                UpdateEgoText(displayValue);
+                break;
+            case Card.CARD_TYPE.Feel:
+                UpdateIdText(displayValue);
+                break;
+            case Card.CARD_TYPE.Dream:
+                UpdateSuperegoText(displayValue);
+                break;
+        }
     }
     #endregion
 

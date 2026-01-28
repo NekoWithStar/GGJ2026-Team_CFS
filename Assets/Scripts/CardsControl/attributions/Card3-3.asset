@@ -16,6 +16,6 @@ MonoBehaviour:
   cardName: Perfect
   cardCost: 3
   cardRank: 7
-  cardDescription: Absolutely unique...
+  cardDescription: Absolutely unique in the heart...
   cardPicture: {fileID: 0}
   back: {fileID: 0}

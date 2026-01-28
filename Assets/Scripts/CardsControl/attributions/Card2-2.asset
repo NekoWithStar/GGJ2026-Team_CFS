@@ -16,6 +16,6 @@ MonoBehaviour:
   cardName: Instinct
   cardCost: 2
   cardRank: 4
-  cardDescription: '"Born this way..."'
+  cardDescription: People also said "born in this way..."
   cardPicture: {fileID: 0}
   back: {fileID: 0}

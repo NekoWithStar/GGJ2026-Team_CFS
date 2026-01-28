@@ -16,6 +16,6 @@ MonoBehaviour:
   cardName: Logic
   cardCost: 3
   cardRank: 7
-  cardDescription: Essence is more important...
+  cardDescription: Essence is more important to us...
   cardPicture: {fileID: 0}
   back: {fileID: 0}

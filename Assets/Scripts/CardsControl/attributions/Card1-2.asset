@@ -16,6 +16,6 @@ MonoBehaviour:
   cardName: Analysis
   cardCost: 2
   cardRank: 4
-  cardDescription: Think twice before you act...
+  cardDescription: Should think twice before you act...
   cardPicture: {fileID: 0}
   back: {fileID: 0}

@@ -602,6 +602,10 @@ MonoBehaviour:
   hoverScale: 1.08
   scaleSpeed: 8
   flipDuration: 0.4
+  secondClickIsConfirm: 0
+  onConfirm:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8754229728499247579
 GameObject:
   m_ObjectHideFlags: 0

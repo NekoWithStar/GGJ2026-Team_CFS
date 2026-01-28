@@ -16,6 +16,6 @@ MonoBehaviour:
   cardName: Being
   cardCost: 3
   cardRank: 7
-  cardDescription: '"I think, therefore I am..."'
+  cardDescription: Refresh my understanding of you...
   cardPicture: {fileID: 0}
   back: {fileID: 0}
