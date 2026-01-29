@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// 2D类幸存者玩家核心控制：WASD移动+鼠标朝向+基础属性/状态 + 近战攻击示例
+/// 2D类幸存者玩家核心控制：WASD移动+鼠标朝向+基础属性/状态
+/// 外置武器支持：可在检视面板指定预制体或运行时通过脚本更换，武器脚本可实现 IWeapon 接口以接收使用调用
 /// </summary>
 public class PlayerControl : MonoBehaviour
 {
@@ -17,19 +18,19 @@ public class PlayerControl : MonoBehaviour
     public int attack = 10;   // 攻击力（后续攻击用）
     public int coin = 0;      // 金币（后续升级用）
 
-    [Header("攻击配置")]
-    [Tooltip("近战攻击范围（单位：世界坐标）")]
-    public float attackRange = 2f;
-    [Tooltip("攻击冷却（秒）")]
-    public float attackCD = 0.6f;
-    [Tooltip("检测敌人的层（在Inspector中设置为Enemy层）")]
-    public LayerMask enemyLayer;
+    [Header("外置武器（可选）")]
+    [Tooltip("在Inspector指定外置武器预制体，启动时会实例化并挂载到 weaponAttachPoint")]
+    public GameObject externalWeaponPrefab;
+    [Tooltip("武器挂点（为空则使用玩家物体Transform作为挂点）")]
+    public Transform weaponAttachPoint;
 
     private Rigidbody2D rb;       // 2D刚体（核心移动组件）
     private Vector2 moveDir;      // 移动方向
     private Camera mainCam;       // 主相机（用于鼠标朝向计算）
-    private float lastAttackTime; // 上一次攻击时间
-    private Vector2 lastLookDir;  // 缓存朝向（用于攻击方向计算/调试）
+
+    // 外置武器实例与接口引用（可在运行时通过 API 更换）
+    private GameObject externalWeaponInstance;
+    private IWeapon externalWeaponScript;
 
     #region 初始化
     private void Awake()
@@ -43,8 +44,18 @@ public class PlayerControl : MonoBehaviour
     {
         // 初始化血量
         currentHp = maxHp;
-        // 初始化攻击冷却为可立刻攻击状态
-        lastAttackTime = -attackCD;
+
+        // 如果在Inspector中指定了武器预制体，自动装备
+        if (externalWeaponPrefab != null)
+        {
+            EquipExternalWeapon(externalWeaponPrefab);
+        }
+
+        // 如果没有指定挂点，则默认使用玩家自身Transform
+        if (weaponAttachPoint == null)
+        {
+            weaponAttachPoint = transform;
+        }
     }
     #endregion
 
@@ -57,12 +68,6 @@ public class PlayerControl : MonoBehaviour
         GetMoveInput();
         // 2. 计算鼠标朝向，让玩家始终面朝鼠标
         LookAtMouse();
-
-        // 3. 攻击输入（左键为示例）
-        if (Input.GetMouseButtonDown(0))
-        {
-            TryAttack();
-        }
     }
 
     // 固定帧更新：物理相关逻辑（Unity推荐，避免帧率波动导致移动卡顿）
@@ -73,12 +78,12 @@ public class PlayerControl : MonoBehaviour
             rb.velocity = Vector2.zero; // 不能移动时清空速度，防止飘移
             return;
         }
-        // 4. 刚体移动（2D物理标准写法，顺滑无穿模）
+        // 3. 刚体移动（2D物理标准写法，顺滑无穿模）
         MovePlayer();
     }
     #endregion
 
-    #region 核心操作：移动+朝向+攻击
+    #region 核心操作：移动+朝向
     /// <summary>
     /// 获取WASD移动输入
     /// </summary>
@@ -107,59 +112,14 @@ public class PlayerControl : MonoBehaviour
         Vector2 mouseWorldPos = mainCam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCam.orthographicSize));
         // 2. 计算玩家到鼠标的方向向量
         Vector2 lookDir = mouseWorldPos - rb.position;
-        lastLookDir = lookDir;
         // 3. 计算方向向量的角度（弧度转角度，2D绕Z轴旋转）
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
         // 4. 给玩家设置旋转角度（面朝鼠标）
         rb.rotation = angle;
     }
-
-    /// <summary>
-    /// 检查冷却并执行攻击（近战示例）
-    /// </summary>
-    private void TryAttack()
-    {
-        if (Time.time - lastAttackTime < attackCD) return; // 冷却中
-        lastAttackTime = Time.time;
-        PerformMeleeAttack();
-    }
-
-    /// <summary>
-    /// 近战攻击实现：以玩家面向方向前方为中心，使用OverlapCircle检测敌人并造成伤害
-    /// </summary>
-    private void PerformMeleeAttack()
-    {
-        // 攻击中心位于玩家位置沿朝向的前方（避免从玩家中间检测）
-        Vector2 dir = lastLookDir.normalized;
-        if (dir == Vector2.zero) dir = Vector2.right; // 默认向右，防止除零
-        Vector2 attackCenter = rb.position + dir * (attackRange * 0.5f);
-
-        // 检测敌人并造成伤害
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackCenter, attackRange, enemyLayer);
-        if (hits.Length == 0)
-        {
-            Debug.Log("玩家攻击，未命中敌人。");
-            return;
-        }
-
-        int hitCount = 0;
-        foreach (var col in hits)
-        {
-            // 尝试调用敌人的受击接口
-            var enemy = col.GetComponent<Enemy2DController>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(attack);
-                hitCount++;
-            }
-        }
-
-        Debug.Log($"玩家攻击，命中敌人数量：{hitCount}，造成攻击力：{attack}");
-        // 后续可加：攻击动画、击退、特效、音效等
-    }
     #endregion
 
-    #region 基础状态方法（后续扩展直接补逻辑，无需改核心） 
+    #region 基础状态方法（后续扩展直接补逻辑，无需改核心）
     /// <summary>
     /// 受击方法（敌人攻击时调用）
     /// </summary>
@@ -206,22 +166,77 @@ public class PlayerControl : MonoBehaviour
     }
     #endregion
 
-    
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+    #region 外置武器 API（可脚本化更改）
+    /// <summary>
+    /// 将武器预制体实例化并挂载到 weaponAttachPoint（若已有则替换）
+    /// 如果实例上存在实现 IWeapon 的组件，会缓存引用便于调用
+    /// </summary>
+    /// <param name="weaponPrefab">武器预制体</param>
+    public void EquipExternalWeapon(GameObject weaponPrefab)
     {
-        // 仅在编辑器中绘制攻击检测范围，便于调试
-        if (rb == null) rb = GetComponent<Rigidbody2D>();
-        if (rb == null) return;
+        if (weaponPrefab == null) return;
 
-        Vector2 dir = lastLookDir.normalized;
-        if (dir == Vector2.zero) dir = Vector2.right;
-        Vector2 center = rb.position + dir * (attackRange * 0.5f);
+        // 卸载旧武器
+        if (externalWeaponInstance != null)
+        {
+            Destroy(externalWeaponInstance);
+            externalWeaponInstance = null;
+            externalWeaponScript = null;
+        }
 
-        Gizmos.color = new Color(1f, 0.2f, 0.2f, 0.4f);
-        Gizmos.DrawSphere(center, 0.05f);
-        UnityEditor.Handles.color = new Color(1f, 0.2f, 0.2f, 0.15f);
-        UnityEditor.Handles.DrawSolidDisc(center, Vector3.forward, attackRange);
+        // 实例化并挂到挂点
+        externalWeaponInstance = Instantiate(weaponPrefab, weaponAttachPoint.position, weaponAttachPoint.rotation, weaponAttachPoint);
+        externalWeaponInstance.transform.localPosition = Vector3.zero;
+        externalWeaponInstance.transform.localRotation = Quaternion.identity;
+
+        // 查找实现 IWeapon 的脚本（若有）
+        externalWeaponScript = externalWeaponInstance.GetComponentInChildren<IWeapon>();
     }
-#endif
+
+    /// <summary>
+    /// 卸下当前外置武器（销毁实例）
+    /// </summary>
+    public void UnequipExternalWeapon()
+    {
+        if (externalWeaponInstance != null)
+        {
+            Destroy(externalWeaponInstance);
+            externalWeaponInstance = null;
+            externalWeaponScript = null;
+        }
+    }
+
+    /// <summary>
+    /// 使用已装备武器（由外部调用或动画事件触发）。
+    /// 武器脚本需实现 IWeapon 接口以响应 Use 调用；否则不会产生效果。
+    /// </summary>
+    public void UseEquippedWeapon()
+    {
+        if (externalWeaponScript != null)
+        {
+            externalWeaponScript.Use(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// 返回当前装备的 IWeapon（方便外部脚本控制）
+    /// </summary>
+    public IWeapon GetEquippedWeapon()
+    {
+        return externalWeaponScript;
+    }
+    #endregion
+}
+
+/// <summary>
+/// 武器行为接口（可由外置武器脚本实现），Use 方法接收使用者（玩家）对象
+/// 这样可以将具体攻击/发射/冷却等逻辑放在武器脚本中，PlayerControl 只负责挂载与调用
+/// </summary>
+public interface IWeapon
+{
+    /// <summary>
+    /// 使用武器（例如近战挥砍、发射子弹等）
+    /// </summary>
+    /// <param name="user">发起使用的物体（通常为玩家）</param>
+    void Use(GameObject user);
 }

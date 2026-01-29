@@ -30,14 +30,65 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private Vector3 originalScale;
     private Coroutine scaleCoroutine;
 
+    // 标记：当对象被禁用后再次启用时是否应重置为背面
+    private bool _resetToBackOnEnable = false;
+
+    private void Awake()
+    {
+        // 提前保存初始缩放，避免 OnEnable 在 Start 之前访问到未初始化的 originalScale
+        originalScale = transform.localScale;
+    }
+
+    private void OnEnable()
+    {
+        // 如果之前被禁用过（视为“关闭”），则在重新启用时重置为背面状态
+        if (_resetToBackOnEnable)
+        {
+            ResetToBack();
+            _resetToBackOnEnable = false;
+        }
+    }
+
+    private void OnDisable()
+    {
+        // 记录为“已关闭”状态，等待下次启用时重置为背面
+        _resetToBackOnEnable = true;
+    }
+
     private void Start()
     {
-        originalScale = transform.localScale;
         // 初始状态：背面可见，正面隐藏
         if (frontFace != null) frontFace.SetActive(!isFaceDown);
         if (backFace != null) backFace.SetActive(isFaceDown);
         // 保证初始旋转为 0 或 180，避免累积旋转问题
         transform.localEulerAngles = new Vector3(0f, isFaceDown ? 0f : 180f, 0f);
+    }
+
+    /// <summary>
+    /// 将卡牌强制重置为背面状态（停止动画、复位旋转、显示背面、还原缩放）
+    /// </summary>
+    private void ResetToBack()
+    {
+        // 停止缩放协程
+        if (scaleCoroutine != null)
+        {
+            StopCoroutine(scaleCoroutine);
+            scaleCoroutine = null;
+        }
+
+        // 停止翻转动画状态
+        isAnimating = false;
+
+        // 强制背面朝上
+        isFaceDown = true;
+
+        // 复位旋转与缩放
+        transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+        transform.localScale = originalScale;
+
+        // 显示/隐藏正反面
+        if (frontFace != null) frontFace.SetActive(false);
+        if (backFace != null) backFace.SetActive(true);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
