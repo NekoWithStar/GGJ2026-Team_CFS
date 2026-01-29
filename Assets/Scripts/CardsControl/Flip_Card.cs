@@ -5,13 +5,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
+/// <summary>
+/// 卡牌翻转交互（兼容 CardControl 与 WeaponCardControl）
+/// - 鼠标悬停放大、点击翻面、支持 secondClickIsConfirm 触发确认事件
+/// - 当确认时会广播对应类型的静态事件：OnCardConfirmed / OnWeaponConfirmed
+/// </summary>
 public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     // 当卡牌被“确认”时广播该卡牌的数据（Card ScriptableObject）
     public static event Action<Card> OnCardConfirmed;
+    // 当武器被“确认”时广播该武器的数据（Weapon ScriptableObject）
+    public static event Action<Weapon> OnWeaponConfirmed;
 
     [Header("卡牌正反面 (Canvas UI 下的 GameObject)")]
-    public GameObject frontFace; // 正面（包含 CardControl 等 UI 元素）
+    public GameObject frontFace; // 正面（包含 CardControl / WeaponCardControl 等 UI 元素）
     public GameObject backFace; // 背面（默认显示）
 
     [Header("交互设置")]
@@ -113,11 +120,20 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             // 先触发 inspector 绑定的 UnityEvent
             onConfirm?.Invoke();
 
-            // 查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
+            // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
             CardControl cc = GetComponentInChildren<CardControl>();
             if (cc != null && cc.card_data != null)
             {
                 OnCardConfirmed?.Invoke(cc.card_data);
+                return;
+            }
+
+            // 再查找 WeaponCardControl 并广播 Weapon（若存在）
+            WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
+            if (wc != null && wc.weapon_data != null)
+            {
+                OnWeaponConfirmed?.Invoke(wc.weapon_data);
+                return;
             }
 
             return;
