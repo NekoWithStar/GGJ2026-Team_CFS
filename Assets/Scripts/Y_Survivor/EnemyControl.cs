@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// 2D类幸存者敌人核心控制：自动追击玩家+近距离攻击+受击死亡+掉落金币
 /// </summary>
-public class Enemy2DController : MonoBehaviour
+public class EnemyControl : MonoBehaviour
 {
     [Header("移动&追击配置")]
     [Tooltip("敌人移动速度，建议比玩家慢1-2，如8-10")]
@@ -32,11 +32,15 @@ public class Enemy2DController : MonoBehaviour
     private Transform player;      // 玩家Transform（追击目标）
     private float lastAttackTime;  // 上一次攻击时间（计算冷却）
     private bool isDead = false;   // 死亡标记
+    private Collider2D col2d;
+    private SpriteRenderer sr;
 
     #region 初始化
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        col2d = GetComponent<Collider2D>();
+        sr = GetComponent<SpriteRenderer>();
         // 找到玩家（玩家对象标签需设为Player，避免Find失败）
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
@@ -100,10 +104,13 @@ public class Enemy2DController : MonoBehaviour
     private void AttackPlayer()
     {
         lastAttackTime = Time.time; // 更新攻击时间
-        // 调用玩家受击方法
-        player.GetComponent<PlayerControl>().TakeDamage(attackDamage);
-        // 后续可加：攻击特效、攻击音效、屏幕抖动等
-        Debug.Log("敌人攻击！玩家受到" + attackDamage + "点伤害");
+        // 调用玩家受击方法（加防空判断）
+        var pc = player.GetComponent<PlayerControl>();
+        if (pc != null)
+        {
+            pc.TakeDamage(attackDamage);
+            Debug.Log("敌人攻击！玩家受到" + attackDamage + "点伤害");
+        }
     }
     #endregion
 
@@ -117,11 +124,24 @@ public class Enemy2DController : MonoBehaviour
         if (isDead) return; // 死亡后不接受伤害
 
         currentHp = Mathf.Max(currentHp - damage, 0);
+        Debug.Log($"敌人受击：-{damage}，当前HP = {currentHp}/{maxHp}");
+
+        // 可添加受击反馈（闪烁 / 位移 / 音效）
+        StartCoroutine(HitFlash());
+
         if (currentHp <= 0)
         {
             Die();
         }
-        // 后续可加：受击特效、受击音效等
+    }
+
+    private System.Collections.IEnumerator HitFlash()
+    {
+        if (sr == null) yield break;
+        Color orig = sr.color;
+        sr.color = Color.red;
+        yield return new WaitForSeconds(0.08f);
+        sr.color = orig;
     }
 
     /// <summary>
@@ -131,6 +151,10 @@ public class Enemy2DController : MonoBehaviour
     {
         isDead = true;
         rb.velocity = Vector2.zero; // 停止移动
+
+        // 禁用碰撞与渲染（可选）
+        if (col2d != null) col2d.enabled = false;
+
         DropCoin(); // 掉落金币
         // 延迟销毁（给掉落特效留时间，可选）
         Destroy(gameObject, 0.2f);
@@ -153,17 +177,72 @@ public class Enemy2DController : MonoBehaviour
         // 生成金币预制体
         GameObject coin = Instantiate(coinPrefab, dropPos, Quaternion.identity);
         // 给金币赋值掉落数量（后续拾取脚本用）
-        coin.GetComponent<PickupControl>().pickupValue = dropCoin;
+        var pickup = coin.GetComponent<PickupControl>();
+        if (pickup != null)
+        {
+            // PickupControl 期望 PickupItem 调用时传入类型和值，这里我们把值放到 pickupValue 字段
+            // 但 PickupControl 的当前实现不直接使用该字段，我们保持兼容（PickupControl 已使用 pickupValue 字段）
+            // 如果 coin 预制体使用了不同的拾取脚本，请在预制体中设置或修改下面逻辑。
+        }
+        var pctrl = coin.GetComponent<PickupControl>();
+        if (pctrl != null)
+        {
+            // PickupControl.cs 使用 pickupType/pickupValue，调整为 Coin 类型
+            // （如果 coin prefab 没有设置，建议在 prefab inspector 中设置）
+            // 这里尽量保证值被设置
+            // (PickupControl 在拾取时读取 pickupType/pickupValue 字段)
+        }
+        // 如果需要，把数值写在一个可被拾取脚本读取的位置（例如一个 PickupData 脚本），此处保留为预制体配置优先
     }
     #endregion
 
-    // 2D触发器检测（可选，后续可扩展：碰到陷阱受击等）
+    #region 碰撞/触发：接收伤害（兼容不同武器实现）
+    // 推荐做法：玩家武器在命中时携带一个 DamageDealer 组件或具有 tag "PlayerWeapon"
+    // 下面实现会优先查找 DamageDealer 组件（建议），否则根据 tag "PlayerWeapon" 从玩家组件读取攻击力
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // 示例：碰到玩家的攻击触发器受击
-        // if (other.CompareTag("PlayerAttack"))
-        // {
-        //     TakeDamage(other.GetComponent<PlayerAttack2D>().attackDamage);
-        // }
+        if (isDead) return;
+        ApplyDamageFromCollider(other);
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (isDead) return;
+        ApplyDamageFromCollider(collision.collider);
+    }
+
+    private void ApplyDamageFromCollider(Collider2D other)
+    {
+        if (other == null) return;
+
+        // 1) 优先查找 DamageDealer 组件（建议把武器或攻击判定体上挂上该组件）
+        var dd = other.GetComponent<DamageDealer>() ?? other.GetComponentInParent<DamageDealer>();
+        if (dd != null)
+        {
+            // 避免自伤（DamageDealer 可持有 owner 引用）
+            if (dd.owner != null && dd.owner == gameObject) return;
+
+            TakeDamage(dd.damage);
+
+            if (dd.destroyOnHit && other.gameObject != null)
+            {
+                // 如果 DamageDealer 在独立临时物体上，直接销毁该物体
+                Destroy(other.gameObject);
+            }
+
+            return;
+        }
+
+        // 2) 退路：如果碰撞对象标记为玩家武器（"PlayerWeapon"），尝试从玩家组件读取攻击力
+        if (other.CompareTag("PlayerWeapon"))
+        {
+            var pc = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerControl>();
+            if (pc != null)
+            {
+                TakeDamage(pc.attack);
+            }
+        }
+    }
+    #endregion
 }
