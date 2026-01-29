@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - corn
+  - Enemy
+  - Ground
   layers:
   - Default
   - TransparentFX
