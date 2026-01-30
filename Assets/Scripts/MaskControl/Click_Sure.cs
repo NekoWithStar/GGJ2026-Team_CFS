@@ -35,7 +35,7 @@ public class Click_Sure : MonoBehaviour
     {
         try
         {
-            var all = Resources.FindObajectsOfTypeAll<Flip_Card>();
+            var all = Resources.FindObjectsOfTypeAll<Flip_Card>();
             int closedCount = 0;
 
             foreach (var f in all)
