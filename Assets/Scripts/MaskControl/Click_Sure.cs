@@ -10,10 +10,10 @@ public class Click_Sure : MonoBehaviour
         Destroy
     }
 
-    [Tooltip("Ñ¡Ôñ¹Ø±Õ¿¨ÅÆµÄ·½Ê½£ºÒş²Ø»¹ÊÇÏú»Ù¡£")]
+    [Tooltip("é€‰æ‹©å…³é—­å¡ç‰Œçš„æ–¹å¼ï¼šéšè—è¿˜æ˜¯é”€æ¯ã€‚")]
     public CloseAction closeAction = CloseAction.SetInactive;
 
-    [Tooltip("ÊÇ·ñ°üº¬Î´¼¤»î£¨inactive£©µÄ¿¨ÅÆ¡£")]
+    [Tooltip("æ˜¯å¦åŒ…å«æœªæ¿€æ´»ï¼ˆinactiveï¼‰çš„å¡ç‰Œã€‚")]
     public bool includeInactive = true;
 
     void OnEnable()
@@ -27,25 +27,25 @@ public class Click_Sure : MonoBehaviour
     }
 
     /// <summary>
-    /// µ±ÓĞ¿¨ÅÆ±»È·ÈÏÑ¡Ôñºó£¬¹Ø±Õ£¨»òÏú»Ù£©µ±Ç°³¡¾°ÖĞËùÓĞ Flip_Card ¶ÔÓ¦µÄ GameObject¡£
-    /// Ê¹ÓÃ Resources.FindObjectsOfTypeAll À´Í¬Ê±²éÕÒ inactive ¶ÔÏó£¬²¢¸ù¾İ scene.isLoaded ¹ıÂË³¡¾°ÄÚ¶ÔÏó£¬
-    /// ±ÜÃâÓ°ÏìÏîÄ¿ÄÚµÄ×ÖÌå/×ÊÔ´×Ê²ú»ò prefab ×Ê²ú¡£
+    /// å½“æœ‰å¡ç‰Œè¢«ç¡®è®¤é€‰æ‹©åï¼Œå…³é—­ï¼ˆæˆ–é”€æ¯ï¼‰å½“å‰åœºæ™¯ä¸­æ‰€æœ‰ Flip_Card å¯¹åº”çš„ GameObjectã€‚
+    /// ä½¿ç”¨ Resources.FindObjectsOfTypeAll æ¥åŒæ—¶æŸ¥æ‰¾ inactive å¯¹è±¡ï¼Œå¹¶æ ¹æ® scene.isLoaded è¿‡æ»¤åœºæ™¯å†…å¯¹è±¡ï¼Œ
+    /// é¿å…å½±å“é¡¹ç›®å†…çš„å­—ä½“/èµ„æºèµ„äº§æˆ– prefab èµ„äº§ã€‚
     /// </summary>
     void OnCardConfirmed(Card confirmedCard)
     {
         try
         {
-            var all = Resources.FindObjectsOfTypeAll<Flip_Card>();
+            var all = Resources.FindObajectsOfTypeAll<Flip_Card>();
             int closedCount = 0;
 
             foreach (var f in all)
             {
                 if (f == null || f.gameObject == null) continue;
 
-                // Ö»´¦ÀíÒÑ´æÔÚÓÚÄ³¸öÒÑ¼ÓÔØ³¡¾°ÖĞµÄÊµÀı£¨ÅÅ³ı×Ê²ú / Î´Èë³¡¾°µÄ prefab£©
+                // åªå¤„ç†å·²å­˜åœ¨äºæŸä¸ªå·²åŠ è½½åœºæ™¯ä¸­çš„å®ä¾‹ï¼ˆæ’é™¤èµ„äº§ / æœªå…¥åœºæ™¯çš„ prefabï¼‰
                 if (!f.gameObject.scene.isLoaded) continue;
 
-                // Èç¹û²»Ïë´¦Àí inactive µÄ¶ÔÏó£¬ÔòÌø¹ı
+                // å¦‚æœä¸æƒ³å¤„ç† inactive çš„å¯¹è±¡ï¼Œåˆ™è·³è¿‡
                 if (!includeInactive && !f.gameObject.activeInHierarchy) continue;
 
                 if (closeAction == CloseAction.SetInactive)

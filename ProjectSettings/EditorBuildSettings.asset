@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Card_Test.unity
     guid: 2edc2e6aeebfd3a4c9e50c78249c0351
+  - enabled: 1
+    path: Assets/Scenes/Survivor_Test.unity
+    guid: 7f4894d165c9bfb47a1eaa764b52d276
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
