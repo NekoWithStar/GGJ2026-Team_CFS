@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3671886951257483418
+--- !u!1 &5166428929447526534
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,40 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4195143704594672565}
-  - component: {fileID: 7905985808004484576}
-  - component: {fileID: 2163973368806634342}
-  - component: {fileID: 2259110077303159459}
+  - component: {fileID: 7253826697187324947}
+  - component: {fileID: 956556504601919372}
+  - component: {fileID: 1899730856222286994}
+  - component: {fileID: 4250014793988703164}
+  - component: {fileID: 8569721316815794329}
   m_Layer: 0
-  m_Name: Weapon1
+  m_Name: Weapon1_Ts
   m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4195143704594672565
+--- !u!4 &7253826697187324947
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3671886951257483418}
+  m_GameObject: {fileID: 5166428929447526534}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.39105248, w: 0.9203684}
+  m_LocalRotation: {x: 0, y: 0, z: -0.6822535, w: 0.7311157}
   m_LocalPosition: {x: 0.48, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -46.04}
---- !u!212 &7905985808004484576
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -86.04}
+--- !u!212 &956556504601919372
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3671886951257483418}
+  m_GameObject: {fileID: 5166428929447526534}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -88,13 +89,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!70 &2163973368806634342
+--- !u!70 &1899730856222286994
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3671886951257483418}
+  m_GameObject: {fileID: 5166428929447526534}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -125,13 +126,13 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 1}
   m_Direction: 0
---- !u!114 &2259110077303159459
+--- !u!114 &4250014793988703164
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3671886951257483418}
+  m_GameObject: {fileID: 5166428929447526534}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bbe51bc3443f5849a9ffba5d96ead0a, type: 3}
@@ -140,3 +141,22 @@ MonoBehaviour:
   damage: 10
   destroyOnHit: 0
   owner: {fileID: 0}
+--- !u!114 &8569721316815794329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5166428929447526534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3074b45ada0463e4bb286b729caf5d18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponData: {fileID: 11400000, guid: 6c21faf886dbe3c418ed31511f4b2e6d, type: 2}
+  icon: {fileID: 0}
+  weaponNameText: {fileID: 0}
+  damageText: {fileID: 0}
+  cooldownText: {fileID: 0}
+  rangeText: {fileID: 0}
+  muzzlePoint: {fileID: 0}

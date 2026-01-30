@@ -24,6 +24,12 @@ public class PlayerControl : MonoBehaviour
     [Tooltip("武器挂点（为空则使用玩家物体Transform作为挂点）")]
     public Transform weaponAttachPoint;
 
+    [Header("武器输入")]
+    [Tooltip("发射/使用武器按键，默认鼠标左键")]
+    public KeyCode fireKey = KeyCode.Mouse0;
+    [Tooltip("是否按住持续开火（对支持冷却的远程武器有效）")]
+    public bool holdToFire = false;
+
     private Rigidbody2D rb;       // 2D刚体（核心移动组件）
     private Vector2 moveDir;      // 移动方向
     private Camera mainCam;       // 主相机（用于鼠标朝向计算）
@@ -68,6 +74,17 @@ public class PlayerControl : MonoBehaviour
         GetMoveInput();
         // 2. 计算鼠标朝向，让玩家始终面朝鼠标
         LookAtMouse();
+
+        // 3. 攻击输入：直接在 PlayerControl 中处理已装备武器的触发
+        var equipped = GetEquippedWeapon();
+        if (equipped != null)
+        {
+            bool doFire = holdToFire ? Input.GetKey(fireKey) : Input.GetKeyDown(fireKey);
+            if (doFire)
+            {
+                UseEquippedWeapon();
+            }
+        }
     }
 
     // 固定帧更新：物理相关逻辑（Unity推荐，避免帧率波动导致移动卡顿）
@@ -83,7 +100,7 @@ public class PlayerControl : MonoBehaviour
     }
     #endregion
 
-    #region 核心操作：移动+朝向
+    #region 核心操作：移动+朝向+武器挂载API
     /// <summary>
     /// 获取WASD移动输入
     /// </summary>
@@ -117,56 +134,7 @@ public class PlayerControl : MonoBehaviour
         // 4. 给玩家设置旋转角度（面朝鼠标）
         rb.rotation = angle;
     }
-    #endregion
 
-    #region 基础状态方法（后续扩展直接补逻辑，无需改核心）
-    /// <summary>
-    /// 受击方法（敌人攻击时调用）
-    /// </summary>
-    /// <param name="damage">受到的伤害值</param>
-    public void TakeDamage(int damage)
-    {
-        currentHp = Mathf.Max(currentHp - damage, 0); // 血量不小于0
-        if (currentHp <= 0)
-        {
-            Die(); // 血量为0则死亡
-        }
-        // 后续可加：受击特效、无敌帧、屏幕抖动等
-    }
-
-    /// <summary>
-    /// 死亡方法
-    /// </summary>
-    private void Die()
-    {
-        canMove = false; // 死亡后禁止移动
-        // 后续可加：死亡特效、游戏结束UI、销毁玩家等
-        Debug.Log("玩家死亡！");
-    }
-
-    /// <summary>
-    /// 拾取道具方法（金币/血包，拾取脚本调用）
-    /// </summary>
-    /// <param name="type">道具类型：Coin/Hp</param>
-    /// <param name="value">道具数值</param>
-    public void PickupItem(string type, int value)
-    {
-        switch (type)
-        {
-            case "Coin":
-                coin += value;
-                Debug.Log("拾取金币：" + value + "，当前金币：" + coin);
-                break;
-            case "Hp":
-                currentHp = Mathf.Min(currentHp + value, maxHp); // 血量不超过最大值
-                Debug.Log("拾取血包：" + value + "，当前血量：" + currentHp);
-                break;
-        }
-        // 后续可加：拾取特效、拾取音效等
-    }
-    #endregion
-
-    #region 外置武器 API（可脚本化更改）
     /// <summary>
     /// 将武器预制体实例化并挂载到 weaponAttachPoint（若已有则替换）
     /// 如果实例上存在实现 IWeapon 的组件，会缓存引用便于调用
@@ -224,6 +192,53 @@ public class PlayerControl : MonoBehaviour
     public IWeapon GetEquippedWeapon()
     {
         return externalWeaponScript;
+    }
+    #endregion
+
+    #region 基础状态方法（后续扩展直接补逻辑，无需改核心）
+    /// <summary>
+    /// 受击方法（敌人攻击时调用）
+    /// </summary>
+    /// <param name="damage">受到的伤害值</param>
+    public void TakeDamage(int damage)
+    {
+        currentHp = Mathf.Max(currentHp - damage, 0); // 血量不小于0
+        if (currentHp <= 0)
+        {
+            Die(); // 血量为0则死亡
+        }
+        // 后续可加：受击特效、无敌帧、屏幕抖动等
+    }
+
+    /// <summary>
+    /// 死亡方法
+    /// </summary>
+    private void Die()
+    {
+        canMove = false; // 死亡后禁止移动
+        // 后续可加：死亡特效、游戏结束UI、销毁玩家等
+        Debug.Log("玩家死亡！");
+    }
+
+    /// <summary>
+    /// 拾取道具方法（金币/血包，拾取脚本调用）
+    /// </summary>
+    /// <param name="type">道具类型：Coin/Hp</param>
+    /// <param name="value">道具数值</param>
+    public void PickupItem(string type, int value)
+    {
+        switch (type)
+        {
+            case "Coin":
+                coin += value;
+                Debug.Log("拾取金币：" + value + "，当前金币：" + coin);
+                break;
+            case "Hp":
+                currentHp = Mathf.Min(currentHp + value, maxHp); // 血量不超过最大值
+                Debug.Log("拾取血包：" + value + "，当前血量：" + currentHp);
+                break;
+        }
+        // 后续可加：拾取特效、拾取音效等
     }
     #endregion
 }
