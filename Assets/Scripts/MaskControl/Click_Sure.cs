@@ -19,19 +19,38 @@ public class Click_Sure : MonoBehaviour
     void OnEnable()
     {
         Flip_Card.OnCardConfirmed += OnCardConfirmed;
+        Flip_Card.OnWeaponConfirmed += OnWeaponConfirmed;
     }
 
     void OnDisable()
     {
         Flip_Card.OnCardConfirmed -= OnCardConfirmed;
+        Flip_Card.OnWeaponConfirmed -= OnWeaponConfirmed;
     }
 
     /// <summary>
-    /// 当有卡牌被确认选择后，关闭（或销毁）当前场景中所有 Flip_Card 对应的 GameObject。
-    /// 使用 Resources.FindObjectsOfTypeAll 来同时查找 inactive 对象，并根据 scene.isLoaded 过滤场景内对象，
-    /// 避免影响项目内的字体/资源资产或 prefab 资产。
+    /// 当有“通用卡牌”被确认选择后，关闭（或销毁）当前场景中所有 Flip_Card 对应的 GameObject。
     /// </summary>
     void OnCardConfirmed(Card confirmedCard)
+    {
+        CloseFlipCards(onlyWeaponCards: false, confirmedName: confirmedCard != null ? confirmedCard.cardName : "null");
+    }
+
+    /// <summary>
+    /// 当有“武器卡”被确认选择后，关闭（或销毁）当前场景中所有“武器卡” Flip_Card（含 WeaponCardControl）。
+    /// </summary>
+    void OnWeaponConfirmed(Weapon confirmedWeapon)
+    {
+        CloseFlipCards(onlyWeaponCards: true, confirmedName: confirmedWeapon != null ? confirmedWeapon.name : "null");
+    }
+
+    /// <summary>
+    /// 关闭（或销毁）场景中的 Flip_Card。
+    /// - onlyWeaponCards 为 true 时，仅处理带有 WeaponCardControl 的 Flip_Card。
+    /// - 使用 Resources.FindObjectsOfTypeAll 来同时查找 inactive 对象，并根据 scene.isLoaded 过滤场景内对象，
+    ///   避免影响项目内的字体/资源资产或 prefab 资产。
+    /// </summary>
+    private void CloseFlipCards(bool onlyWeaponCards, string confirmedName)
     {
         try
         {
@@ -48,6 +67,9 @@ public class Click_Sure : MonoBehaviour
                 // 如果不想处理 inactive 的对象，则跳过
                 if (!includeInactive && !f.gameObject.activeInHierarchy) continue;
 
+                // 当仅关闭“武器卡”时，要求该 Flip_Card 下存在 WeaponCardControl
+                if (onlyWeaponCards && f.GetComponentInChildren<WeaponCardControl>() == null) continue;
+
                 if (closeAction == CloseAction.SetInactive)
                 {
                     f.gameObject.SetActive(false);
@@ -60,11 +82,11 @@ public class Click_Sure : MonoBehaviour
                 closedCount++;
             }
 
-            Debug.Log($"Click_Sure: confirmed '{(confirmedCard != null ? confirmedCard.cardName : "null")}', closed {closedCount} Flip_Card(s).");
+            Debug.Log($"Click_Sure: confirmed '{confirmedName}', closed {closedCount} Flip_Card(s). onlyWeaponCards={onlyWeaponCards}");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"Click_Sure: error while closing cards: {ex}");
+            Debug.LogError($"Click_Sure: error while closing cards (onlyWeaponCards={onlyWeaponCards}): {ex}");
         }
     }
 }
