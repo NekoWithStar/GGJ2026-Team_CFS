@@ -235,7 +235,7 @@ public class EnemyControl : MonoBehaviour
         }
 
         // 2) 退路：如果碰撞对象标记为玩家武器（"PlayerWeapon"），尝试从玩家组件读取攻击力
-        if (other.CompareTag("PlayerWeapon"))
+        if (other.CompareTag("Weapon"))
         {
             var pc = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerControl>();
             if (pc != null)
