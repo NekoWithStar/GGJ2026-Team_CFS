@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Atb_test2
   m_EditorClassIdentifier: 
   cardName: "\u6211\u662F\u8DD1\u7537"
-  description: "\u901F\u5EA6+500"
-  cardIcon: {fileID: 0}
-  rarity: 0
+  description: "\u901F\u5EA6+5"
+  cardPicture_Po: {fileID: 0}
+  rarity: 1
   modifiers:
   - targetProperty: 200
     modifierType: 1
-    value: 500
+    value: 5
     priority: 0
   hasCustomEffect: 0
   customEffectType: 0

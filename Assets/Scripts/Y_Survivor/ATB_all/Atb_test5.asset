@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
-  m_Name: Atb_test3
+  m_Name: Atb_test5
   m_EditorClassIdentifier: 
-  cardName: "\u5438\u8840\u9B3C"
-  description: "\u56DE500\u70B9\u8840"
+  cardName: "\u6210\u4ED9\u4E4B\u8DEF"
+  description: "\u611F\u89C9\u53D8\u6210\u4E86\u4E00\u53EA\u732B\n+100 Max HP"
   cardPicture_Po: {fileID: 0}
   rarity: 3
   modifiers:
-  - targetProperty: 201
+  - targetProperty: 202
     modifierType: 1
-    value: 500
-    priority: 1
+    value: 100
+    priority: 0
   hasCustomEffect: 0
   customEffectType: 0
   customEffectValue: 0

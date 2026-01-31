@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Atb_test4
   m_EditorClassIdentifier: 
   cardName: "\u96F6\u5BB9\u5FCD"
-  description: "\u6E05\u7A7A\u51B7\u5374\u6570\u503C"
+  description: "\u514B\u5236\u4E0D\u4F4F\u7684\u6012\u706B\n-1 Cooldown"
   cardPicture_Po: {fileID: 0}
   rarity: 2
   modifiers:
   - targetProperty: 100
     modifierType: 1
-    value: -10
-    priority: 0
+    value: -1
+    priority: 2
   hasCustomEffect: 0
   customEffectType: 0
   customEffectValue: 0

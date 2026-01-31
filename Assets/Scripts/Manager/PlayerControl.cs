@@ -20,6 +20,7 @@ public class PlayerControl : MonoBehaviour
     private float baseMoveSpeed = 100f; // 基础移动速度（改为 private，从 PropertyManager 获取）
     public int currentHp;     // 当前血量
     public int coin = 0;      // 金币（后续升级用）
+    public int totalCoinsSpent = 0; // 总消耗金币数（用于得分榜）
 
     [Header("外置武器（可选）")]
     [Tooltip("在Inspector指定外置武器预制体，启动时会实例化并挂载到 weaponAttachPoint")]
@@ -35,6 +36,7 @@ public class PlayerControl : MonoBehaviour
     private Vector2 moveDir;      // 移动方向
     private Camera mainCam;       // 主相机（用于鼠标朝向计算）
     private PlayerPropertyManager playerPropertyManager; // 玩家属性管理器（血量、移动速度等）
+    private SpriteRenderer spriteRenderer; // 玩家精灵渲染器（用于受击变红动画）
 
     [Header("HUD 显示（可选）")]
     [Tooltip("金币显示 Text（可选）")]
@@ -42,6 +44,14 @@ public class PlayerControl : MonoBehaviour
 
     [Tooltip("血量显示 Text（可选）")]
     public Text hpText;
+
+    [Header("死亡配置")]
+    [Tooltip("玩家死亡时启用的场景物体（游戏结束UI等）")]
+    public GameObject deathObjectToEnable;
+    [Tooltip("死亡后延迟暂停游戏的时间（秒）")]
+    public float deathPauseDelay = 2f;
+    [Tooltip("得分榜显示 Text（显示总消耗金币数）")]
+    public Text scoreBoardText;
 
     // 外置武器实例与接口引用（可在运行时通过 API 更换）
     private GameObject externalWeaponInstance;
@@ -59,10 +69,16 @@ public class PlayerControl : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
         playerPropertyManager = GetComponent<PlayerPropertyManager>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         
         if (playerPropertyManager == null)
         {
             Debug.LogWarning("[PlayerControl] 玩家未挂载 PlayerPropertyManager，属性修饰系统将不可用");
+        }
+        
+        if (spriteRenderer == null)
+        {
+            Debug.LogWarning("[PlayerControl] 玩家未找到 SpriteRenderer，受击变红动画将不可用");
         }
     }
 
@@ -512,6 +528,15 @@ public class PlayerControl : MonoBehaviour
             playerPropertyManager.SetCurrentHealth(currentHp);
         }
         
+        // 更新HUD显示（确保HP显示同步更新）
+        UpdateHUD();
+        
+        // 播放受击变红动画
+        if (spriteRenderer != null)
+        {
+            StartCoroutine(PlayDamageFlash());
+        }
+        
         if (currentHp <= 0)
         {
             Die(); // 血量为0则死亡
@@ -525,8 +550,70 @@ public class PlayerControl : MonoBehaviour
     private void Die()
     {
         canMove = false; // 死亡后禁止移动
-        // 后续可加：死亡特效、游戏结束UI、销毁玩家等
+        
+        // 启用指定的死亡物体（游戏结束UI等）
+        if (deathObjectToEnable != null)
+        {
+            deathObjectToEnable.SetActive(true);
+            Debug.Log($"[PlayerControl] 玩家死亡，启用物体: {deathObjectToEnable.name}");
+        }
+        
+        // 显示得分榜
+        ShowScoreBoard();
+        
+        // 延迟暂停游戏（但不停止音乐）
+        StartCoroutine(DelayedGamePause());
+        
         Debug.Log("玩家死亡！");
+    }
+
+    /// <summary>
+    /// 消耗指定数量的金币（用于统计总消耗）
+    /// </summary>
+    /// <param name="amount">消耗的金币数量</param>
+    /// <returns>是否消耗成功</returns>
+    public bool ConsumeCoin(int amount)
+    {
+        if (coin >= amount)
+        {
+            coin -= amount;
+            totalCoinsSpent += amount; // 统计总消耗金币数
+            UpdateHUD();
+            Debug.Log($"[PlayerControl] 消耗 {amount} 金币，剩余: {coin}，总消耗: {totalCoinsSpent}");
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning($"[PlayerControl] 金币不足！需要 {amount}，当前拥有 {coin}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 显示得分榜
+    /// </summary>
+    private void ShowScoreBoard()
+    {
+        if (scoreBoardText != null)
+        {
+            scoreBoardText.text = $"欢迎下次光临！\n总消耗金币: {totalCoinsSpent}";
+            scoreBoardText.gameObject.SetActive(true);
+            Debug.Log($"[PlayerControl] 显示得分榜：总消耗金币 {totalCoinsSpent}");
+        }
+        else
+        {
+            Debug.Log($"[PlayerControl] 得分榜Text未设置，总消耗金币: {totalCoinsSpent}");
+        }
+    }
+
+    /// <summary>
+    /// 延迟暂停游戏的协程
+    /// </summary>
+    private System.Collections.IEnumerator DelayedGamePause()
+    {
+        yield return new WaitForSeconds(deathPauseDelay);
+        Time.timeScale = 0f; // 暂停游戏，但不影响音频
+        Debug.Log($"[PlayerControl] 游戏已暂停（延迟{deathPauseDelay}秒），音乐继续播放");
     }
 
     // PickupItem is implemented above; duplicate removed to avoid CS0111
@@ -587,6 +674,7 @@ public class PlayerControl : MonoBehaviour
         {
             enemy.ResumeAI();
         }
+        Debug.Log($"[PlayerControl] ▶ ResumeGame called. Time.timeScale={Time.timeScale}, canMove={canMove}");
     }
 
     /// <summary>
@@ -726,6 +814,40 @@ public class PlayerControl : MonoBehaviour
         }
         
         Debug.Log("=" + "\n");
+    }
+    #endregion
+
+    #region 受击动画
+    /// <summary>
+    /// 播放受击变红动画协程
+    /// </summary>
+    private System.Collections.IEnumerator PlayDamageFlash()
+    {
+        if (spriteRenderer == null) yield break;
+
+        // 保存原始颜色
+        Color originalColor = spriteRenderer.color;
+        
+        // 设置为红色
+        spriteRenderer.color = Color.red;
+        
+        // 等待短暂时间（变红持续时间）
+        yield return new WaitForSeconds(0.1f);
+        
+        // 逐渐恢复到原始颜色
+        float fadeTime = 0.05f;
+        float elapsedTime = 0f;
+        
+        while (elapsedTime < fadeTime)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / fadeTime;
+            spriteRenderer.color = Color.Lerp(Color.red, originalColor, t);
+            yield return null;
+        }
+        
+        // 确保最终颜色正确
+        spriteRenderer.color = originalColor;
     }
     #endregion
 }
