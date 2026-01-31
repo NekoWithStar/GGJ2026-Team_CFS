@@ -15,8 +15,8 @@ namespace Y_Survivor
         [Tooltip("基础移动速度")]
         public float baseMoveSpeed = 5f;
         
-        [Tooltip("基础最大生命值")]
-        public float baseMaxHealth = 100f;
+        [Tooltip("基础当前生命值")]
+        public float baseHealth = 100f;
         
         // ===== 玩家属性 =====
         public GameProperty MoveSpeed { get; private set; }
@@ -45,17 +45,11 @@ namespace Y_Survivor
         public void InitializeProperties()
         {
             MoveSpeed = new GameProperty("Player.MoveSpeed", baseMoveSpeed);
-            MaxHealth = new GameProperty("Player.MaxHealth", baseMaxHealth);
-            CurrentHealth = new GameProperty("Player.CurrentHealth", baseMaxHealth);
+            // MaxHealth仅用于属性卡兼容性，不影响实际游戏逻辑
+            MaxHealth = new GameProperty("Player.MaxHealth", baseHealth);
+            CurrentHealth = new GameProperty("Player.CurrentHealth", baseHealth);
             
-            // 当最大生命值变化时，按比例调整当前生命值
-            CurrentHealth.AddDependency(MaxHealth, (dep, newMaxHealth) =>
-            {
-                float currentVal = CurrentHealth.GetBaseValue();
-                float oldMax = MaxHealth.GetBaseValue();
-                float ratio = oldMax > 0 ? currentVal / oldMax : 1f;
-                return newMaxHealth * ratio;
-            });
+            Debug.Log("[PlayerPropertyManager] 属性系统已初始化 - 仅使用HP，无最大血量限制");
         }
         
         /// <summary>
@@ -148,16 +142,17 @@ namespace Y_Survivor
         /// <summary>获取最终移动速度</summary>
         public float GetMoveSpeed() => Mathf.Max(0.1f, MoveSpeed.GetValue());
         
-        /// <summary>获取最终最大生命值</summary>
-        public float GetMaxHealth() => Mathf.Max(1f, MaxHealth.GetValue());
+        /// <summary>获取最终最大生命值（不再使用，仅保留用于属性卡兼容性）</summary>
+        [System.Obsolete("不再使用最大生命值概念")]
+        public float GetMaxHealth() => float.MaxValue;
         
         /// <summary>获取当前生命值</summary>
         public float GetCurrentHealth() => CurrentHealth.GetValue();
         
-        /// <summary>设置当前生命值</summary>
+        /// <summary>设置当前生命值（无上限限制）</summary>
         public void SetCurrentHealth(float value)
         {
-            CurrentHealth.SetBaseValue(Mathf.Clamp(value, 0f, GetMaxHealth()));
+            CurrentHealth.SetBaseValue(Mathf.Max(0f, value));
         }
         
         /// <summary>受到伤害</summary>

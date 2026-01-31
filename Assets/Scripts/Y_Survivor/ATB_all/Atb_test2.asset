@@ -15,7 +15,7 @@ MonoBehaviour:
   cardName: "\u6211\u662F\u8DD1\u7537"
   description: "+7 \u901F\u5EA6\n+5 \u751F\u547D"
   cardPicture_Po: {fileID: 0}
-  rarity: 1
+  rarity: 3
   modifiers:
   - targetProperty: 200
     modifierType: 1
@@ -28,3 +28,7 @@ MonoBehaviour:
   hasCustomEffect: 0
   customEffectType: 0
   customEffectValue: 0
+  customEffectValue2: 0
+  customEffectDuration: 3
+  replacementWeapon: {fileID: 0}
+  randomAudioClips: []

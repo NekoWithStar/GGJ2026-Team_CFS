@@ -25,9 +25,8 @@ MonoBehaviour:
   customEffectType: 3
   customEffectValue: 0
   customEffectValue2: 0
-  customEffectDuration: 5
+  customEffectDuration: 15
   replacementWeapon: {fileID: 0}
   randomAudioClips:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8300000, guid: e150928e046836f48b64b3062c8ff676, type: 3}
+  - {fileID: 8300000, guid: 235b3464907ff5947b0c9d70f53d7a96, type: 3}

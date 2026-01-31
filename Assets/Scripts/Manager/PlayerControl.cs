@@ -150,12 +150,11 @@ public class PlayerControl : MonoBehaviour
 
         if (hpText != null)
         {
-            // 从PlayerPropertyManager获取动态血量值
+            // 从PlayerPropertyManager获取动态血量值（仅显示当前HP）
             if (playerPropertyManager != null)
             {
                 float currentHp = playerPropertyManager.GetCurrentHealth();
-                float maxHp = playerPropertyManager.GetMaxHealth();
-                hpText.text = $"HP: {Mathf.RoundToInt(currentHp)}/{Mathf.RoundToInt(maxHp)}";
+                hpText.text = $"HP: {Mathf.RoundToInt(currentHp)}";
             }
             else
             {
@@ -226,6 +225,7 @@ public class PlayerControl : MonoBehaviour
         if (customEffectHandler != null && customEffectHandler.IsDirectionReversed())
         {
             finalMoveDir = -moveDir; // 颠倒方向
+            Debug.Log($"[PlayerControl] 失灵指南针激活 - 原始方向: {moveDir}, 颠倒后: {finalMoveDir}");
         }
         
         // 给刚体赋值速度，结合移动方向和速度，Time.fixedDeltaTime是固定帧时间

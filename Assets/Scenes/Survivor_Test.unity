@@ -580,6 +580,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseMoveSpeed: 100
   baseMaxHealth: 100
+  maxHealthCap: -1
 --- !u!1 &249074553
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,6 +647,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fd3755ac4550ccb459d1ed336381fda6, type: 2}
   - {fileID: 11400000, guid: 63cd2318dde93ac438ed8510b41428bd, type: 2}
   - {fileID: 11400000, guid: 3d8f7c10ebfcc9246b8dcf1938a30c56, type: 2}
+  - {fileID: 11400000, guid: 6114f113cf44a0149bdc3180916a83da, type: 2}
+  - {fileID: 11400000, guid: e1ae4ce646e3ead4780eb3fef79d749e, type: 2}
+  - {fileID: 11400000, guid: 0dec8f3a9ba643041b7d4dc36ec01629, type: 2}
+  - {fileID: 11400000, guid: ae9cb31770899654b88b7e36e56250bb, type: 2}
   cardsToShow: 4
   cardsToSelect: 1
   coinCostPerCard: 10

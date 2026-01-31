@@ -162,7 +162,7 @@ public class WeaponDebugger : MonoBehaviour
         {
             playerMoveSpeed = playerPropMgr.GetMoveSpeed();
             playerCurrentHealth = playerPropMgr.GetCurrentHealth();
-            playerMaxHealth = playerPropMgr.GetMaxHealth();
+            //playerMaxHealth = playerPropMgr.GetMaxHealth();
         }
         
         // 更新敌人属性

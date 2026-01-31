@@ -2,16 +2,22 @@ using UnityEngine;
 using Y_Survivor;
 using System.Collections.Generic;
 
-/// <summary>
-/// 自定义效果处理器 - 处理所有自定义效果的逻辑
-/// 与 WeaponPropertyManager 和 PlayerPropertyManager 配合使用
-/// </summary>
+// 检测Cinemachine命名空间是否存在
+using System;
+using System.Reflection;
+
 public class CustomEffectHandler : MonoBehaviour
 {
     private PlayerControl playerControl;
     private PlayerPropertyManager playerPropertyManager;
     private Camera mainCam;
     private AudioSource audioSource;
+    
+    // Cinemachine支持 - 动态检测
+    private Component virtualCamera;
+    private bool hasCinemachine;
+    private PropertyInfo lensProperty;
+    private PropertyInfo orthoSizeProperty;
     
     // 视野受限相关
     private float originalOrthographicSize;
@@ -35,6 +41,9 @@ public class CustomEffectHandler : MonoBehaviour
         mainCam = Camera.main;
         audioSource = GetComponent<AudioSource>();
         
+        // 动态检测Cinemachine
+        DetectCinemachine();
+        
         if (mainCam == null)
         {
             mainCam = FindAnyObjectByType<Camera>();
@@ -43,6 +52,34 @@ public class CustomEffectHandler : MonoBehaviour
         if (originalOrthographicSize == 0f && mainCam != null)
         {
             originalOrthographicSize = mainCam.orthographicSize;
+        }
+
+        Debug.Log($"[CustomEffectHandler] 初始化完成 - 相机: {(mainCam != null ? "找到" : "未找到")}, 原始正交尺寸: {originalOrthographicSize}, Cinemachine: {(hasCinemachine ? "检测到" : "未检测到")}");
+    }
+
+    /// <summary>
+    /// 动态检测Cinemachine是否存在并获取相关组件
+    /// </summary>
+    private void DetectCinemachine()
+    {
+        try
+        {
+            // 尝试查找CinemachineVirtualCamera
+            Type virtualCameraType = Type.GetType("Cinemachine.CinemachineVirtualCamera, Cinemachine");
+            if (virtualCameraType != null)
+            {
+                virtualCamera = FindAnyObjectByType(virtualCameraType) as Component;
+                if (virtualCamera != null)
+                {
+                    hasCinemachine = true;
+                    Debug.Log("[CustomEffectHandler] 检测到Cinemachine虚拟相机，将直接修改Lens.OrthographicSize");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[CustomEffectHandler] Cinemachine检测失败: {e.Message}");
+            hasCinemachine = false;
         }
     }
 
@@ -103,38 +140,103 @@ public class CustomEffectHandler : MonoBehaviour
         {
             StopCoroutine(limitedVisionCoroutine);
         }
-
-        float targetSize = originalOrthographicSize * card.customEffectValue;
-        limitedVisionCoroutine = StartCoroutine(LimitedVisionCoroutine(targetSize, card.customEffectDuration));
+        
+        Debug.Log($"[CustomEffectHandler] 应用视野受限 - 关闭摄像机，持续时间: {card.customEffectDuration}s");
+        
+        limitedVisionCoroutine = StartCoroutine(LimitedVisionCoroutine(card.customEffectDuration));
     }
 
-    private System.Collections.IEnumerator LimitedVisionCoroutine(float targetSize, float duration)
+    private System.Collections.IEnumerator LimitedVisionCoroutine(float duration)
     {
-        float elapsed = 0f;
-        float startSize = mainCam.orthographicSize;
+        // 关闭摄像机
+        mainCam.enabled = false;
+        Debug.Log("[CustomEffectHandler] 摄像机已关闭");
 
-        // 缩小视距
-        while (elapsed < duration)
+        // 等待持续时间
+        yield return new WaitForSeconds(duration);
+
+        // 恢复摄像机
+        if (mainCam != null)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            mainCam.orthographicSize = Mathf.Lerp(startSize, targetSize, t);
-            yield return null;
+            mainCam.enabled = true;
+            Debug.Log("[CustomEffectHandler] 摄像机已恢复");
         }
-
-        // 恢复视距
-        elapsed = 0f;
-        startSize = mainCam.orthographicSize;
-        while (elapsed < 0.5f)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / 0.5f;
-            mainCam.orthographicSize = Mathf.Lerp(startSize, originalOrthographicSize, t);
-            yield return null;
-        }
-
-        mainCam.orthographicSize = originalOrthographicSize;
+        
         Debug.Log("[CustomEffectHandler] 视野受限效果结束");
+    }
+
+    /// <summary>
+    /// 获取当前正交尺寸（优先使用Cinemachine，否则使用主相机）
+    /// </summary>
+    private float GetCurrentOrthographicSize()
+    {
+        // 优先尝试Cinemachine
+        if (hasCinemachine && virtualCamera != null)
+        {
+            try
+            {
+                // 通过反射获取 m_Lens.OrthographicSize
+                var lensProperty = virtualCamera.GetType().GetProperty("m_Lens");
+                if (lensProperty != null)
+                {
+                    var lens = lensProperty.GetValue(virtualCamera);
+                    var orthoSizeProperty = lens.GetType().GetProperty("OrthographicSize");
+                    if (orthoSizeProperty != null)
+                    {
+                        return (float)orthoSizeProperty.GetValue(lens);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[CustomEffectHandler] 获取Cinemachine OrthographicSize失败: {e.Message}");
+            }
+        }
+        
+        // 降级到标准相机
+        return mainCam != null ? mainCam.orthographicSize : 5f;
+    }
+
+    /// <summary>
+    /// 设置正交尺寸（优先使用Cinemachine，否则使用主相机）
+    /// </summary>
+    private void SetOrthographicSize(float size)
+    {
+        bool cinemachineSuccess = false;
+        
+        // 优先尝试Cinemachine
+        if (hasCinemachine && virtualCamera != null)
+        {
+            try
+            {
+                // 通过反射设置 m_Lens.OrthographicSize
+                var lensProperty = virtualCamera.GetType().GetProperty("m_Lens");
+                if (lensProperty != null)
+                {
+                    var lens = lensProperty.GetValue(virtualCamera);
+                    var orthoSizeProperty = lens.GetType().GetProperty("OrthographicSize");
+                    if (orthoSizeProperty != null)
+                    {
+                        orthoSizeProperty.SetValue(lens, size);
+                        // 由于Lens是结构体，需要重新赋值
+                        lensProperty.SetValue(virtualCamera, lens);
+                        Debug.Log($"[CustomEffectHandler] 设置Cinemachine OrthographicSize: {size}");
+                        cinemachineSuccess = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[CustomEffectHandler] 设置Cinemachine OrthographicSize失败: {e.Message}");
+            }
+        }
+        
+        // 如果Cinemachine失败或不存在，降级到标准相机
+        if (!cinemachineSuccess && mainCam != null)
+        {
+            mainCam.orthographicSize = size;
+            Debug.Log($"[CustomEffectHandler] 设置Camera OrthographicSize: {size}");
+        }
     }
 
     /// <summary>
@@ -214,7 +316,7 @@ public class CustomEffectHandler : MonoBehaviour
     private System.Collections.IEnumerator CatEarHeadsetCoroutine(PropertyCard card, float duration)
     {
         // 随机选择音频
-        AudioClip selectedClip = card.randomAudioClips[Random.Range(0, card.randomAudioClips.Count)];
+        AudioClip selectedClip = card.randomAudioClips[UnityEngine.Random.Range(0, card.randomAudioClips.Count)];
         
         // 设置循环播放
         audioSource.clip = selectedClip;
@@ -245,6 +347,7 @@ public class CustomEffectHandler : MonoBehaviour
             StopCoroutine(brokenCompassCoroutine);
         }
 
+        Debug.Log($"[CustomEffectHandler] 应用失灵指南针 - 颠倒方向，持续时间: {card.customEffectDuration}s");
         brokenCompassCoroutine = StartCoroutine(BrokenCompassCoroutine(card.customEffectDuration));
     }
 
@@ -349,10 +452,10 @@ public class CustomEffectHandler : MonoBehaviour
     /// </summary>
     public void ClearAllEffects()
     {
-        // 恢复视距
+        // 恢复摄像机
         if (mainCam != null)
         {
-            mainCam.orthographicSize = originalOrthographicSize;
+            mainCam.enabled = true;
         }
 
         // 恢复音量并停止猫耳耳机音频
@@ -388,5 +491,209 @@ public class CustomEffectHandler : MonoBehaviour
         directionReversed = false;
 
         Debug.Log("[CustomEffectHandler] 所有自定义效果已清理");
+    }
+
+    // ===== 直接调用方法（不使用PropertyCard）=====
+
+    /// <summary>
+    /// 直接应用猫耳耳机效果 - 无需PropertyCard
+    /// </summary>
+    public void ApplyCatEarHeadsetDirect(List<AudioClip> audioClips, float duration)
+    {
+        if (audioSource == null)
+        {
+            Debug.LogWarning("[CustomEffectHandler] 音频源未找到");
+            return;
+        }
+
+        if (audioClips == null || audioClips.Count == 0)
+        {
+            Debug.LogWarning("[CustomEffectHandler] 音频列表为空");
+            return;
+        }
+
+        if (catEarHeadsetCoroutine != null)
+        {
+            StopCoroutine(catEarHeadsetCoroutine);
+            audioSource.Stop();
+        }
+
+        AudioClip selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
+        audioSource.clip = selectedClip;
+        audioSource.loop = true;
+        audioSource.Play();
+        
+        Debug.Log($"[CustomEffectHandler] 直接启动猫耳耳机：{selectedClip.name}");
+
+        catEarHeadsetCoroutine = StartCoroutine(CatEarHeadsetCoroutineDirect(selectedClip, duration));
+    }
+
+    private System.Collections.IEnumerator CatEarHeadsetCoroutineDirect(AudioClip clip, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        
+        audioSource.Stop();
+        audioSource.loop = false;
+        audioSource.clip = null;
+        catEarHeadsetCoroutine = null;
+        
+        Debug.Log($"[CustomEffectHandler] 猫耳耳机效果结束：{clip.name}");
+    }
+
+    /// <summary>
+    /// 直接应用失灵指南针效果 - 无需PropertyCard
+    /// </summary>
+    public void ApplyBrokenCompassDirect(float duration)
+    {
+        if (brokenCompassCoroutine != null)
+        {
+            StopCoroutine(brokenCompassCoroutine);
+        }
+
+        Debug.Log($"[CustomEffectHandler] 直接启动失灵指南针效果，持续 {duration}s");
+        brokenCompassCoroutine = StartCoroutine(BrokenCompassCoroutineDirect(duration));
+    }
+
+    private System.Collections.IEnumerator BrokenCompassCoroutineDirect(float duration)
+    {
+        directionReversed = true;
+        Debug.Log("[CustomEffectHandler] 方向已颠倒");
+
+        yield return new WaitForSeconds(duration);
+
+        directionReversed = false;
+        Debug.Log("[CustomEffectHandler] 方向已恢复");
+    }
+
+    /// <summary>
+    /// 直接应用以旧换新效果 - 无需PropertyCard
+    /// </summary>
+    public void ApplyWeaponSwitchDirect(Weapon replacementWeapon)
+    {
+        if (replacementWeapon == null)
+        {
+            Debug.LogWarning("[CustomEffectHandler] 替换武器为空");
+            return;
+        }
+
+        if (playerControl == null)
+        {
+            Debug.LogError("[CustomEffectHandler] PlayerControl未找到");
+            return;
+        }
+
+        bool success = playerControl.SwitchWeaponData(replacementWeapon);
+        Debug.Log($"[CustomEffectHandler] 直接切换武器：{replacementWeapon.weaponName} - {(success ? "成功" : "失败")}");
+    }
+
+    /// <summary>
+    /// 直接应用耳机损耗效果 - 无需PropertyCard
+    /// </summary>
+    public void ApplyAudioDamageDirect(float volumeMultiplier, float duration)
+    {
+        if (audioSource == null)
+        {
+            Debug.LogWarning("[CustomEffectHandler] 音频源未找到");
+            return;
+        }
+
+        StartCoroutine(AudioDamageCoroutineDirect(volumeMultiplier, duration));
+    }
+
+    private System.Collections.IEnumerator AudioDamageCoroutineDirect(float volumeMultiplier, float duration)
+    {
+        float originalVolume = audioSource.volume;
+        float targetVolume = originalVolume * volumeMultiplier;
+        float elapsed = 0f;
+
+        // 降低音量
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            audioSource.volume = Mathf.Lerp(originalVolume, targetVolume, t);
+            yield return null;
+        }
+
+        // 恢复音量
+        elapsed = 0f;
+        float currentVolume = audioSource.volume;
+        while (elapsed < 0.5f)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / 0.5f;
+            audioSource.volume = Mathf.Lerp(currentVolume, originalVolume, t);
+            yield return null;
+        }
+
+        audioSource.volume = originalVolume;
+        Debug.Log("[CustomEffectHandler] 耳机损耗效果已结束");
+    }
+
+    /// <summary>
+    /// 直接应用视野受限效果 - 无需PropertyCard
+    /// </summary>
+    public void ApplyLimitedVisionDirect(float duration)
+    {
+        if (mainCam == null)
+        {
+            Debug.LogWarning("[CustomEffectHandler] 摄像机未找到");
+            return;
+        }
+
+        if (limitedVisionCoroutine != null)
+        {
+            StopCoroutine(limitedVisionCoroutine);
+        }
+
+        Debug.Log($"[CustomEffectHandler] 直接启动视野受限效果，持续 {duration}s");
+        limitedVisionCoroutine = StartCoroutine(LimitedVisionCoroutineDirect(duration));
+    }
+
+    private System.Collections.IEnumerator LimitedVisionCoroutineDirect(float duration)
+    {
+        mainCam.enabled = false;
+        Debug.Log("[CustomEffectHandler] 摄像机已关闭");
+
+        yield return new WaitForSeconds(duration);
+
+        if (mainCam != null)
+        {
+            mainCam.enabled = true;
+            Debug.Log("[CustomEffectHandler] 摄像机已恢复");
+        }
+        
+        Debug.Log("[CustomEffectHandler] 视野受限效果结束");
+    }
+
+    /// <summary>
+    /// 直接应用敌人修改效果 - 无需PropertyCard
+    /// </summary>
+    public void ApplyEnemyModifierDirect(float speedMultiplier, float damageMultiplier, float duration)
+    {
+        var enemies = FindObjectsByType<EnemyControl>(FindObjectsSortMode.None);
+        
+        Debug.Log($"[CustomEffectHandler] 直接应用敌人修改：速度×{speedMultiplier}，伤害×{damageMultiplier}，找到{enemies.Length}个敌人");
+
+        foreach (var enemy in enemies)
+        {
+            if (enemy == null) continue;
+
+            if (!modifiedEnemies.ContainsKey(enemy))
+            {
+                modifiedEnemies[enemy] = (enemy.moveSpeed, enemy.attackDamage);
+            }
+
+            enemy.moveSpeed *= speedMultiplier;
+            enemy.attackDamage *= damageMultiplier;
+        }
+        
+        StartCoroutine(EnemyModifierRestoreCoroutine(duration));
+    }
+
+    private System.Collections.IEnumerator EnemyModifierRestoreCoroutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        RestoreEnemyModifiers();
     }
 }
