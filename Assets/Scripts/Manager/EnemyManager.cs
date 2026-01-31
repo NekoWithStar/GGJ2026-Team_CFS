@@ -4,10 +4,22 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+    public static EnemyManager Instance { get; private set; }
     [SerializeField] private Transform enemyContainer;
-    private List<Enemy> activeEnemies = new List<Enemy>();
-
-    public void SpawnEnemy(Enemy type, Vector3 position)
+    private List<EnemyControl> activeEnemies = new List<EnemyControl>();
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    public void SpawnEnemy(EnemyControl type, Vector3 position)
     {
         // 对象池生成敌怪
     }

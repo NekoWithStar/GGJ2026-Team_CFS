@@ -2,13 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class SceneManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
-
-    [SerializeField] private GameState currentState;
-    private float gameTime;
-
+    // Start is called before the first frame update
+    public static SceneManager Instance { get; private set; }
     private void Awake()
     {
         if (Instance == null)
@@ -21,13 +18,14 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    public enum GameState
+    void Start()
     {
-        MainMenu,
-        Playing,
-        Paused,
-        LevelUp,
-        GameOver
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }
