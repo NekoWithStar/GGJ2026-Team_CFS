@@ -12,7 +12,7 @@ public class PropertyCardControl : MonoBehaviour
     public PropertyCard propertyCard; // 属性卡数据 ScriptableObject
 
     // UI 元素
-    public Image icon; // 卡牌图标
+    public Image cardPicture_Po; // 卡牌图标
     public Text cardName; // 卡牌名称
     public Text rarity; // 稀有度文本
     public Text description; // 卡牌描述
@@ -36,10 +36,10 @@ public class PropertyCardControl : MonoBehaviour
     {
         if (propertyCard == null) return;
 
-        if (icon != null && propertyCard.cardIcon != null)
+        if (cardPicture_Po != null && propertyCard.cardPicture_Po != null)
         {
-            icon.sprite = propertyCard.cardIcon;
-            icon.enabled = true;
+            cardPicture_Po = propertyCard.cardPicture_Po;
+            Debug.Log($"[PropertyCardControl] ✅ 图标已设置: {propertyCard.cardName}");
         }
 
         if (cardName != null) cardName.text = propertyCard.cardName;

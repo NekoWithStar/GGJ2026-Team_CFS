@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Y_Survivor
 {
@@ -19,7 +20,7 @@ namespace Y_Survivor
         public string description = "";
         
         [Tooltip("卡片图标")]
-        public Sprite cardIcon;
+        public Image cardPicture_Po; // 可在 Inspector 指定 UI Image
         
         [Tooltip("卡片稀有度（用于显示和筛选）")]
         public CardRarity rarity = CardRarity.Common;

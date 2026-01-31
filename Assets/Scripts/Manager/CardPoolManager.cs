@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Y_Survivor;
 
 /// <summary>
-/// 卡池管理器 - 统一管理武器卡和属性卡
+/// 卡池管理器 - 统一管理武器卡和属性卡，集中处理卡牌应用、金币消耗、游戏恢复和UI更新
 /// 支持从中随机选择指定数量的卡片供玩家选择
 /// </summary>
 public class CardPoolManager : MonoBehaviour
@@ -22,8 +23,15 @@ public class CardPoolManager : MonoBehaviour
     [Tooltip("玩家选择的卡牌数量")]
     public int cardsToSelect = 1;
 
+    [Header("消耗设置")]
+    [Tooltip("应用卡牌时消耗的金币数量")]
+    public int coinCostPerCard = 10;
+
+    // UI 映射已回退到 PlayerControl（由 PlayerControl 负责更新 HUD）
+
     // 单例
     public static CardPoolManager Instance { get; private set; }
+    private PlayerControl cachedPlayer;
 
     private void Awake()
     {
@@ -33,6 +41,7 @@ public class CardPoolManager : MonoBehaviour
             return;
         }
         Instance = this;
+        cachedPlayer = FindAnyObjectByType<PlayerControl>();
     }
 
     /// <summary>
@@ -115,6 +124,119 @@ public class CardPoolManager : MonoBehaviour
         if (card != null && !propertyCards.Contains(card))
         {
             propertyCards.Add(card);
+        }
+    }
+
+    /// <summary>
+    /// 应用卡牌选择 - 集中处理卡牌应用、金币消耗、游戏恢复和UI更新
+    /// 统一入口：被 CardSelectionManager 或其他模块调用
+    /// </summary>
+    /// <param name="card">要应用的卡牌（PropertyCard 或 Weapon）</param>
+    /// <returns>是否应用成功</returns>
+    public bool ApplyCard(ScriptableObject card)
+    {
+        if (card == null)
+        {
+            Debug.LogError("[CardPoolManager] ❌ 卡牌为空，无法应用");
+            return false;
+        }
+
+        if (cachedPlayer == null)
+            cachedPlayer = FindAnyObjectByType<PlayerControl>();
+
+        if (cachedPlayer == null)
+        {
+            Debug.LogError("[CardPoolManager] ❌ PlayerControl未找到，无法应用卡牌");
+            return false;
+        }
+
+        // 检查金币是否足够
+        if (cachedPlayer.coin < coinCostPerCard)
+        {
+            Debug.LogWarning($"[CardPoolManager] ⚠️ 金币不足！需要 {coinCostPerCard}，当前拥有 {cachedPlayer.coin}");
+            return false;
+        }
+
+        // 根据卡牌类型应用效果
+        bool applySuccess = false;
+
+        if (card is Weapon weapon)
+        {
+            cachedPlayer.ApplyWeaponCard(weapon);
+            Debug.Log($"[CardPoolManager] ✅ 应用武器卡: {weapon.weaponName}");
+            applySuccess = true;
+        }
+        else if (card is PropertyCard propertyCard)
+        {
+            cachedPlayer.ApplyPropertyCard(propertyCard);
+            Debug.Log($"[CardPoolManager] ✅ 应用属性卡: {propertyCard.cardName}");
+            applySuccess = true;
+        }
+        else
+        {
+            Debug.LogWarning($"[CardPoolManager] ⚠️ 未知卡牌类型: {card.GetType().Name}");
+            return false;
+        }
+
+        // 如果应用成功，消耗金币
+        if (applySuccess)
+        {
+            ConsumeCoin(coinCostPerCard);
+            ResumeGameplay();
+            // HUD 更新由 PlayerControl 负责
+            if (cachedPlayer != null)
+                cachedPlayer.UpdateHUD();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 消耗指定数量的金币
+    /// </summary>
+    /// <param name="amount">要消耗的金币数量</param>
+    /// <returns>是否消耗成功</returns>
+    private bool ConsumeCoin(int amount)
+    {
+        if (cachedPlayer == null)
+            cachedPlayer = FindAnyObjectByType<PlayerControl>();
+
+        if (cachedPlayer == null)
+        {
+            Debug.LogError("[CardPoolManager] ❌ PlayerControl未找到，无法消耗金币");
+            return false;
+        }
+
+        if (cachedPlayer.coin < amount)
+        {
+            Debug.LogWarning($"[CardPoolManager] ⚠️ 金币不足！需要 {amount}，当前拥有 {cachedPlayer.coin}");
+            return false;
+        }
+
+        cachedPlayer.coin -= amount;
+        if (cachedPlayer.coin < 0) cachedPlayer.coin = 0;
+
+        Debug.Log($"[CardPoolManager] 💰 消耗 {amount} 金币，剩余: {cachedPlayer.coin}");
+        return true;
+    }
+
+    /// <summary>
+    /// 恢复游戏（取消暂停）
+    /// </summary>
+    private void ResumeGameplay()
+    {
+        if (cachedPlayer == null)
+            cachedPlayer = FindAnyObjectByType<PlayerControl>();
+
+        if (cachedPlayer != null)
+        {
+            cachedPlayer.ResumeGame();
+            Debug.Log("[CardPoolManager] ▶️ 游戏已恢复");
+        }
+        else
+        {
+            Debug.LogError("[CardPoolManager] ❌ 无法恢复游戏，PlayerControl未找到");
         }
     }
 }

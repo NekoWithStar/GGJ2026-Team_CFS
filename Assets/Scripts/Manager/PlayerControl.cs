@@ -1,5 +1,6 @@
 using UnityEngine;
 using Y_Survivor;
+using UnityEngine.UI;
 
 /// <summary>
 /// 2D类幸存者玩家核心控制：WASD移动+鼠标朝向+基础属性/状态
@@ -34,6 +35,13 @@ public class PlayerControl : MonoBehaviour
     private Vector2 moveDir;      // 移动方向
     private Camera mainCam;       // 主相机（用于鼠标朝向计算）
     private PlayerPropertyManager playerPropertyManager; // 玩家属性管理器（血量、移动速度等）
+
+    [Header("HUD 显示（可选）")]
+    [Tooltip("金币显示 Text（可选）")]
+    public Text coinText;
+
+    [Tooltip("血量显示 Text（可选）")]
+    public Text hpText;
 
     // 外置武器实例与接口引用（可在运行时通过 API 更换）
     private GameObject externalWeaponInstance;
@@ -74,6 +82,9 @@ public class PlayerControl : MonoBehaviour
         {
             weaponAttachPoint = transform;
         }
+
+        // 初始化 HUD 显示（若已在 Inspector 指定 Text）
+        UpdateHUD();
 
         // 优先检查 weaponAttachPoint 下是否已经存在武器（场景中预先挂载）
         if (weaponAttachPoint.childCount > 0)
@@ -118,6 +129,23 @@ public class PlayerControl : MonoBehaviour
         }
     }
     #endregion
+
+    /// <summary>
+    /// 更新玩家HUD显示（由PlayerControl控制）
+    /// 可在拾取、消耗金币或血量改变时调用
+    /// </summary>
+    public void UpdateHUD()
+    {
+        if (coinText != null)
+        {
+            coinText.text = $"Coin: {coin}";
+        }
+
+        if (hpText != null)
+        {
+            hpText.text = $"HP: {currentHp}/{maxHp}";
+        }
+    }
 
     #region 帧更新：移动+朝向（核心逻辑）
     private void Update()
@@ -630,6 +658,8 @@ public class PlayerControl : MonoBehaviour
                 {
                     TriggerCardSelection();
                 }
+                // 更新 HUD 显示（回退到 PlayerControl 控制）
+                UpdateHUD();
                 break;
             case "Hp":
                 currentHp = Mathf.Min(currentHp + value, maxHp); // 血量不超过最大值
@@ -641,6 +671,7 @@ public class PlayerControl : MonoBehaviour
                 }
                 
                 Debug.Log("拾取血包：" + value + "，当前血量：" + currentHp);
+                UpdateHUD();
                 break;
         }
         // 后续可加：拾取特效、拾取音效等

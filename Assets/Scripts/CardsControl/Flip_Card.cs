@@ -134,6 +134,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void Confirm()
     {
+        Debug.Log("[Flip_Card] 🎯 Confirm() 方法被调用");
         onConfirm?.Invoke();
 
         // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）

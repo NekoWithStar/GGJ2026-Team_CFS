@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
-  m_Name: Atb_test1
+  m_Name: Atb_test3
   m_EditorClassIdentifier: 
-  cardName: "\u8D85\u7EA7\u529B\u91CF"
-  description: "\u6211\u7684\u8D85\u7EA7\u7535\u8111\u544A\u8BC9\u6211\u8BE5\u4F7F\u7528\u5B83\u4E86"
+  cardName: "\u5438\u8840\u9B3C"
+  description: "\u56DE500\u70B9\u8840"
   cardIcon: {fileID: 0}
-  rarity: 0
+  rarity: 2
   modifiers:
-  - targetProperty: 102
+  - targetProperty: 201
     modifierType: 1
     value: 500
-    priority: 0
+    priority: 1
   hasCustomEffect: 0
   customEffectType: 0
   customEffectValue: 0

@@ -173,50 +173,32 @@ public class CardSelectionManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 应用卡牌效果
+    /// 应用卡牌效果 - 现在委托给 CardPoolManager 统一处理
     /// </summary>
     private void ApplyCardEffect(ScriptableObject card)
     {
-        if (player == null)
+        if (cardPool == null)
         {
-            Debug.LogError("[CardSelectionManager] PlayerControl未找到，无法应用卡牌效果");
+            Debug.LogError("[CardSelectionManager] CardPoolManager未找到，无法应用卡牌");
+            HideCardSelection();
             return;
         }
 
-        if (card is Weapon weapon)
+        // 委托给 CardPoolManager.ApplyCard() - 它会处理：
+        // 1. 检查金币是否足够
+        // 2. 应用卡牌效果
+        // 3. 消耗金币
+        // 4. 恢复游戏
+        // 5. 更新UI
+        bool success = cardPool.ApplyCard(card);
+        
+        if (success)
         {
-            player.ApplyWeaponCard(weapon);
+            Debug.Log($"[CardSelectionManager] ✅ 卡牌应用成功: {(card is PropertyCard pc ? pc.cardName : card is Weapon w ? w.weaponName : "Unknown")}");
         }
-        else if (card is Y_Survivor.PropertyCard propertyCard)
+        else
         {
-            player.ApplyPropertyCard(propertyCard);
-        }
-        else if (card is Card basicCard)
-        {
-            Debug.Log($"[CardSelectionManager] 选择了普通卡牌: {basicCard.cardName}（暂无效果实现）");
-        }
-
-        // 应用效果后，消费金币并恢复游戏
-        ApplyCardSelection();
-    }
-
-    /// <summary>
-    /// 应用卡牌选择（消费coin并恢复游戏）
-    /// </summary>
-    private void ApplyCardSelection()
-    {
-        // 消费coin
-        if (player != null)
-        {
-            player.coin -= 10;
-            if (player.coin < 0) player.coin = 0;
-            Debug.Log($"消费100金币，剩余金币: {player.coin}");
-        }
-
-        // 恢复游戏
-        if (player != null)
-        {
-            player.ResumeGame();
+            Debug.LogWarning("[CardSelectionManager] ⚠️ 卡牌应用失败（可能金币不足）");
         }
 
         HideCardSelection();

@@ -300,17 +300,23 @@ public class WeaponControl : MonoBehaviour, IWeapon
 
     /// <summary>
     /// 将 ScriptableObject 的数据同步到 Inspector 指定的 UI 元素（最小侵入）
+    /// 直接复制 Image 组件的所有属性（仿照 CardControl 模式）
     /// </summary>
     private void SyncUI()
     {
         if (weaponData == null) return;
 
-        if (icon != null)
+        if (icon != null && weaponData.cardPicture_Wp != null)
         {
-            // Weapon.weaponIcon 在项目中以 Image 存储（与 Card 风格一致）。
-            // 在 UI 上显示时只读取其 sprite（避免直接引用 UI 组件）
-            icon.sprite = weaponData.weaponIcon != null ? weaponData.weaponIcon.sprite : null;
-            icon.enabled = icon.sprite != null;
+            // 仿照 CardControl 的方式，直接复制所有 Image 属性
+            icon.sprite = weaponData.cardPicture_Wp.sprite;
+            icon.color = weaponData.cardPicture_Wp.color;
+            icon.material = weaponData.cardPicture_Wp.material;
+            icon.enabled = true;
+        }
+        else if (icon != null)
+        {
+            icon.enabled = false;
         }
 
         if (weaponNameText != null) weaponNameText.text = weaponData.weaponName ?? "";

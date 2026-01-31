@@ -13,7 +13,7 @@ public class Weapon : ScriptableObject
     [Header("基础信息")]
     public WEAPON_TYPE weaponType;
     public string weaponName;
-    public Image weaponIcon; // 可在 Inspector 指定 UI Image
+    public Image cardPicture_Wp; // 可在 Inspector 指定 UI Image
 
     [Header("数值")]
     public int damage = 10;

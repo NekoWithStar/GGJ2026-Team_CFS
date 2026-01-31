@@ -12,7 +12,7 @@ public class WeaponCardControl : MonoBehaviour
     public Weapon weapon_data; // 武器数据 ScriptableObject
 
     // UI 元素
-    public Image icon; // 武器图标
+    public Image icon_Wp; // 武器图标
     public Text weapon_name; // 武器名称文本
     public Text damage; // 伤害文本
     public Text cooldown; // 冷却文本
@@ -39,10 +39,10 @@ public class WeaponCardControl : MonoBehaviour
     private void RefreshUI()
     {
         if (weapon_data == null) return;
-        if (icon != null && weapon_data.weaponIcon != null)
+        if (icon_Wp != null && weapon_data.cardPicture_Wp != null)
         {
-            icon.sprite = weapon_data.weaponIcon.sprite;
-            icon.enabled = true;
+            icon_Wp = weapon_data.cardPicture_Wp;
+            Debug.Log($"[WeaponCardControl] ✅ 图标已设置: {weapon_data.weaponName}");
         }
 
         if (weapon_name != null) weapon_name.text = weapon_data.weaponName;
