@@ -20,7 +20,6 @@ namespace Y_Survivor
         
         // ===== 玩家属性 =====
         public GameProperty MoveSpeed { get; private set; }
-        public GameProperty MaxHealth { get; private set; }
         public GameProperty CurrentHealth { get; private set; }
         
         // 已应用的卡片及其修饰符的映射
@@ -45,11 +44,9 @@ namespace Y_Survivor
         public void InitializeProperties()
         {
             MoveSpeed = new GameProperty("Player.MoveSpeed", baseMoveSpeed);
-            // MaxHealth仅用于属性卡兼容性，不影响实际游戏逻辑
-            MaxHealth = new GameProperty("Player.MaxHealth", baseHealth);
             CurrentHealth = new GameProperty("Player.CurrentHealth", baseHealth);
             
-            Debug.Log("[PlayerPropertyManager] 属性系统已初始化 - 仅使用HP，无最大血量限制");
+            Debug.Log("[PlayerPropertyManager] 属性系统已初始化 - 完全移除最大血量限制");
         }
         
         /// <summary>
@@ -122,8 +119,8 @@ namespace Y_Survivor
             return type switch
             {
                 PropertyType.PlayerMoveSpeed => MoveSpeed,
-                PropertyType.PlayerMaxHealth => MaxHealth,
                 PropertyType.PlayerHealth => CurrentHealth,
+                // PlayerMaxHealth 已完全移除，不再处理
                 _ => null
             };
         }
@@ -141,10 +138,6 @@ namespace Y_Survivor
         
         /// <summary>获取最终移动速度</summary>
         public float GetMoveSpeed() => Mathf.Max(0.1f, MoveSpeed.GetValue());
-        
-        /// <summary>获取最终最大生命值（不再使用，仅保留用于属性卡兼容性）</summary>
-        [System.Obsolete("不再使用最大生命值概念")]
-        public float GetMaxHealth() => float.MaxValue;
         
         /// <summary>获取当前生命值</summary>
         public float GetCurrentHealth() => CurrentHealth.GetValue();

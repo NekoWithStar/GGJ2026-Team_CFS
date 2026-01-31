@@ -348,21 +348,7 @@ public class WeaponDebugger : MonoBehaviour
                     }
                 }
                 break;
-            case PropertyType.PlayerMaxHealth:
-                {
-                    var playerPropMgr = playerControl.GetComponent<PlayerPropertyManager>();
-                    if (playerPropMgr != null)
-                    {
-                        property = playerPropMgr.MaxHealth;
-                        propertyName = "玩家最大血量";
-                    }
-                    else
-                    {
-                        Debug.LogError("[WeaponDebugger] 玩家未配置 PlayerPropertyManager！");
-                        return;
-                    }
-                }
-                break;
+            // case PropertyType.PlayerMaxHealth: // 已完全移除最大生命值概念
             
             // ===== 敌人属性 =====
             case PropertyType.SmallEnemyMoveSpeed:

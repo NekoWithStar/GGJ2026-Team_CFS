@@ -17,8 +17,8 @@ public class PlayerControl : MonoBehaviour
 
     [Header("玩家基础属性")]
     // 移除固定的maxHp和currentHp，使用PlayerPropertyManager的动态属性
-    public int coin = 0;      // 金币（后续升级用）
-    public int totalCoinsSpent = 0; // 总消耗金币数（用于得分榜）
+    public int coin = 0;      // 金币（用于最终得分计算）
+    public int totalCoinsSpent = 0; // 总消耗金币数（保留用于统计）
 
     [Header("外置武器（可选）")]
     [Tooltip("在Inspector指定外置武器预制体，启动时会实例化并挂载到 weaponAttachPoint")]
@@ -48,7 +48,7 @@ public class PlayerControl : MonoBehaviour
     public GameObject deathObjectToEnable;
     [Tooltip("死亡后延迟暂停游戏的时间（秒）")]
     public float deathPauseDelay = 2f;
-    [Tooltip("得分榜显示 Text（显示总消耗金币数）")]
+    [Tooltip("得分榜显示 Text（显示最终得分：血量+金币）")]
     public Text scoreBoardText;
 
     // 外置武器实例与接口引用（可在运行时通过 API 更换）
@@ -614,15 +614,19 @@ public class PlayerControl : MonoBehaviour
     /// </summary>
     private void ShowScoreBoard()
     {
+        // 计算最终得分：玩家血量 + 金币数量
+        float currentHealth = playerPropertyManager != null ? playerPropertyManager.GetCurrentHealth() : 0f;
+        int finalScore = Mathf.RoundToInt(currentHealth) + coin;
+        
         if (scoreBoardText != null)
         {
-            scoreBoardText.text = $"欢迎下次光临！\n总消耗金币: {totalCoinsSpent}";
+            scoreBoardText.text = $"欢迎下次光临！\n最终得分: {finalScore}\n(血量: {Mathf.RoundToInt(currentHealth)} + 金币: {coin})";
             scoreBoardText.gameObject.SetActive(true);
-            Debug.Log($"[PlayerControl] 显示得分榜：总消耗金币 {totalCoinsSpent}");
+            Debug.Log($"[PlayerControl] 显示得分榜：血量 {Mathf.RoundToInt(currentHealth)} + 金币 {coin} = 最终得分 {finalScore}");
         }
         else
         {
-            Debug.Log($"[PlayerControl] 得分榜Text未设置，总消耗金币: {totalCoinsSpent}");
+            Debug.Log($"[PlayerControl] 得分榜Text未设置，最终得分: {finalScore} (血量: {Mathf.RoundToInt(currentHealth)} + 金币: {coin})");
         }
     }
 

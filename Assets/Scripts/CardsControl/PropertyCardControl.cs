@@ -100,7 +100,7 @@ public class PropertyCardControl : MonoBehaviour
             PropertyType.MeleeAttackRange => "近战范围",
             PropertyType.PlayerMoveSpeed => "玩家移动速度",
             PropertyType.PlayerHealth => "玩家当前血量",
-            PropertyType.PlayerMaxHealth => "玩家最大血量",
+            // PropertyType.PlayerMaxHealth => "玩家最大血量", // 已完全移除
             PropertyType.SmallEnemyMoveSpeed => "小怪移速",
             PropertyType.MediumEnemyMoveSpeed => "中怪移速",
             PropertyType.LargeEnemyMoveSpeed => "大怪移速",

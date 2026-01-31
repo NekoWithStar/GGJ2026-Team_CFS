@@ -45,10 +45,10 @@ namespace Y_Survivor
         [Tooltip("自定义效果持续时间（秒）")]
         public float customEffectDuration = 3f;
         
-        [Tooltip("替换武器数据（用于以旧换新效果）")]
+        [Tooltip("替换武器数据（用于以旧换新效果）- 若为空则从Resources自动加载")]
         public Weapon replacementWeapon;
         
-        [Tooltip("随机播放的音频列表（用于猫耳耳机效果）")]
+        [Tooltip("随机播放的音频列表（用于猫耳耳机效果）- 若为空则从Resources/Audio/CatEarHeadset自动加载")]
         public List<AudioClip> randomAudioClips = new List<AudioClip>();
         
         /// <summary>
@@ -120,7 +120,7 @@ namespace Y_Survivor
                 PropertyType.MeleeAttackRange => "近战范围",
                 PropertyType.PlayerMoveSpeed => "移动速度",
                 PropertyType.PlayerHealth => "生命值",
-                PropertyType.PlayerMaxHealth => "最大生命值",
+                // PropertyType.PlayerMaxHealth => "最大生命值", // 已完全移除
                 PropertyType.SmallEnemyMoveSpeed => "小怪移速",
                 PropertyType.MediumEnemyMoveSpeed => "中怪移速",
                 PropertyType.LargeEnemyMoveSpeed => "大怪移速",
@@ -135,12 +135,46 @@ namespace Y_Survivor
                 CustomEffectType.None => "无",
                 CustomEffectType.LimitedVision => $"视野受限 ({customEffectDuration}s)",
                 CustomEffectType.AudioDamage => $"耳机损耗 ({customEffectDuration}s)",
-                CustomEffectType.CatEarHeadset => "猫耳耳机",
+                CustomEffectType.CatEarHeadset => GetCatEarHeadsetDisplayName(),
                 CustomEffectType.BrokenCompass => $"失灵指南针 ({customEffectDuration}s)",
-                CustomEffectType.WeaponSwitch => $"以旧换新 -> {(replacementWeapon != null ? replacementWeapon.weaponName : "未设置")}",
+                CustomEffectType.WeaponSwitch => GetWeaponSwitchDisplayName(),
                 CustomEffectType.EnemyModifier => "敌人控制",
                 _ => type.ToString()
             };
+        }
+
+        /// <summary>
+        /// 获取猫耳耳机效果的显示名称
+        /// </summary>
+        private string GetCatEarHeadsetDisplayName()
+        {
+            if (randomAudioClips != null && randomAudioClips.Count > 0)
+            {
+                return $"猫耳耳机 ({randomAudioClips.Count}首音乐)";
+            }
+            else
+            {
+                return "猫耳耳机 (自动加载)";
+            }
+        }
+
+        /// <summary>
+        /// 获取以旧换新效果的显示名称
+        /// </summary>
+        private string GetWeaponSwitchDisplayName()
+        {
+            if (replacementWeapon != null)
+            {
+                return $"以旧换新 -> {replacementWeapon.weaponName}";
+            }
+            else if (customEffectValue > 0)
+            {
+                return $"以旧换新 -> 武器ID:{Mathf.RoundToInt(customEffectValue)}";
+            }
+            else
+            {
+                return "以旧换新 (自动加载)";
+            }
         }
     }
     

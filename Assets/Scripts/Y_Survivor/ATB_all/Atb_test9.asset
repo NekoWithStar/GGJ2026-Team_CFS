@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: Atb_test9
   m_EditorClassIdentifier: 
   cardName: "\u6B66\u6797\u9AD8\u624B"
-  description: "-10 \u4F24\u5BB3\n-5  \u751F\u547D\n5s \u654C\u4EBA\u52A0\u901F\u6765\u88AD"
+  description: "+10 \u4F24\u5BB3\n-5  \u751F\u547D\n5s \u654C\u4EBA\u52A0\u901F\u6765\u88AD"
   cardPicture_Po: {fileID: 0}
   rarity: 2
   modifiers:
+  - targetProperty: 102
+    modifierType: 1
+    value: 10
+    priority: 2
   - targetProperty: 201
     modifierType: 1
     value: -5
-    priority: 2
-  - targetProperty: 102
-    modifierType: 1
-    value: -10
-    priority: 2
+    priority: 1
   hasCustomEffect: 1
   customEffectType: 6
   customEffectValue: 2

@@ -29,6 +29,7 @@ public class CustomEffectHandler : MonoBehaviour
     
     // 猫耳耳机相关
     private Coroutine catEarHeadsetCoroutine;
+    private AudioClip currentCatEarClip; // 当前播放的猫耳耳机音频
 
     // 敌人控制相关
     private Dictionary<EnemyControl, (float originalSpeed, float originalDamage)> modifiedEnemies 
@@ -40,6 +41,36 @@ public class CustomEffectHandler : MonoBehaviour
         playerPropertyManager = GetComponent<PlayerPropertyManager>();
         mainCam = Camera.main;
         audioSource = GetComponent<AudioSource>();
+        
+        // 如果组件上没有AudioSource，尝试查找场景中的AudioSource
+        if (audioSource == null)
+        {
+            AudioSource[] sceneAudioSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+            if (sceneAudioSources.Length > 0)
+            {
+                // 优先选择标记为"Music"或"Background"的AudioSource，否则选择第一个
+                foreach (AudioSource source in sceneAudioSources)
+                {
+                    if (source.gameObject.name.Contains("Music") || source.gameObject.name.Contains("Background") || source.gameObject.tag == "Music")
+                    {
+                        audioSource = source;
+                        Debug.Log($"[CustomEffectHandler] 找到场景音乐AudioSource: {source.gameObject.name}");
+                        break;
+                    }
+                }
+                
+                // 如果没找到标记的AudioSource，使用第一个可用的
+                if (audioSource == null)
+                {
+                    audioSource = sceneAudioSources[0];
+                    Debug.Log($"[CustomEffectHandler] 使用场景中第一个AudioSource: {audioSource.gameObject.name}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[CustomEffectHandler] 场景中未找到任何AudioSource，自定义音频效果将不可用");
+            }
+        }
         
         // 动态检测Cinemachine
         DetectCinemachine();
@@ -240,53 +271,43 @@ public class CustomEffectHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// 2. 耳机损耗 - 短暂降低音频音量
-    /// customEffectValue: 音量缩小倍数（例如 0.3 = 30% 音量）
+    /// 2. 耳机损耗 - 短暂关闭场景AudioListener（无需ScriptableObject参数）
+    /// customEffectValue参数可选，默认仅关闭Listener
     /// </summary>
     private void ApplyAudioDamage(PropertyCard card)
     {
-        if (audioSource == null)
+        // 尝试查找AudioListener
+        AudioListener audioListener = FindAnyObjectByType<AudioListener>();
+        if (audioListener == null)
         {
-            Debug.LogWarning("[CustomEffectHandler] 音频源未找到，无法应用耳机损耗");
+            Debug.LogWarning("[CustomEffectHandler] AudioListener未找到，无法应用耳机损耗");
             return;
         }
 
-        StartCoroutine(AudioDamageCoroutine(card.customEffectValue, card.customEffectDuration));
+        StartCoroutine(AudioDamageCoroutine(audioListener, card.customEffectDuration));
     }
 
-    private System.Collections.IEnumerator AudioDamageCoroutine(float volumeMultiplier, float duration)
+    private System.Collections.IEnumerator AudioDamageCoroutine(AudioListener audioListener, float duration)
     {
-        float originalVolume = audioSource.volume;
-        float targetVolume = originalVolume * volumeMultiplier;
-        float elapsed = 0f;
+        // 关闭AudioListener（使所有音频静音）
+        audioListener.enabled = false;
+        Debug.Log("[CustomEffectHandler] 耳机损耗激活 - AudioListener已关闭，所有音频静音");
 
-        // 降低音量
-        while (elapsed < duration)
+        // 等待持续时间
+        yield return new WaitForSeconds(duration);
+
+        // 恢复AudioListener
+        if (audioListener != null)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            audioSource.volume = Mathf.Lerp(originalVolume, targetVolume, t);
-            yield return null;
+            audioListener.enabled = true;
+            Debug.Log("[CustomEffectHandler] 耳机损耗效果结束 - AudioListener已恢复");
         }
-
-        // 恢复音量
-        elapsed = 0f;
-        float currentVolume = audioSource.volume;
-        while (elapsed < 0.5f)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / 0.5f;
-            audioSource.volume = Mathf.Lerp(currentVolume, originalVolume, t);
-            yield return null;
-        }
-
-        audioSource.volume = originalVolume;
-        Debug.Log("[CustomEffectHandler] 耳机损耗效果结束");
     }
 
     /// <summary>
-    /// 3. 猫耳耳机 - 随机播放列表中的音频
-    /// 从 randomAudioClips 中随机选择一个音频播放
+    /// 3. 猫耳耳机 - 随机播放音频（无需ScriptableObject引用）
+    /// 歌曲循环播放，直到再次抽到猫耳耳机卡牌时换歌
+    /// 自动从Resources/Audio/CatEarHeadset目录加载随机音频
     /// </summary>
     private void ApplyCatEarHeadset(PropertyCard card)
     {
@@ -296,45 +317,64 @@ public class CustomEffectHandler : MonoBehaviour
             return;
         }
 
-        if (card.randomAudioClips == null || card.randomAudioClips.Count == 0)
+        // 尝试从PropertyCard获取音频列表，如果为空则从Resources加载
+        List<AudioClip> audioClips = card.randomAudioClips;
+        if (audioClips == null || audioClips.Count == 0)
         {
-            Debug.LogWarning("[CustomEffectHandler] 猫耳耳机没有配置音频列表");
-            return;
+            // "假传入" - 从Resources目录动态加载
+            audioClips = new List<AudioClip>(Resources.LoadAll<AudioClip>("Audio/CatEarHeadset"));
+
+            if (audioClips.Count == 0)
+            {
+                Debug.LogWarning("[CustomEffectHandler] 猫耳耳机: 未在PropertyCard中设置音频列表，也未在Resources/Audio/CatEarHeadset找到音频");
+                return;
+            }
+
+            Debug.Log($"[CustomEffectHandler] 猫耳耳机: 从Resources加载 {audioClips.Count} 个音频");
         }
 
-        // 如果之前有协程在运行，先停止
+        // 如果已经在播放猫耳耳机音乐，停止当前协程准备换歌
         if (catEarHeadsetCoroutine != null)
         {
             StopCoroutine(catEarHeadsetCoroutine);
-            audioSource.Stop(); // 停止当前播放
+            audioSource.Stop();
+            Debug.Log($"[CustomEffectHandler] 停止当前猫耳耳机音频: {currentCatEarClip?.name ?? "无"}");
         }
 
-        // 随机选择音频并开始循环播放
-        catEarHeadsetCoroutine = StartCoroutine(CatEarHeadsetCoroutine(card, card.customEffectDuration));
+        catEarHeadsetCoroutine = StartCoroutine(CatEarHeadsetCoroutine(audioClips));
     }
 
-    private System.Collections.IEnumerator CatEarHeadsetCoroutine(PropertyCard card, float duration)
+    private System.Collections.IEnumerator CatEarHeadsetCoroutine(List<AudioClip> audioClips)
     {
-        // 随机选择音频
-        AudioClip selectedClip = card.randomAudioClips[UnityEngine.Random.Range(0, card.randomAudioClips.Count)];
-        
+        // 随机选择音频（避免重复播放同一首歌）
+        AudioClip selectedClip;
+        if (audioClips.Count > 1 && currentCatEarClip != null)
+        {
+            // 如果有多首歌且当前有播放记录，尝试选择不同的歌
+            do
+            {
+                selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
+            } while (selectedClip == currentCatEarClip);
+        }
+        else
+        {
+            selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
+        }
+
+        currentCatEarClip = selectedClip;
+
         // 设置循环播放
         audioSource.clip = selectedClip;
         audioSource.loop = true;
         audioSource.Play();
-        
-        Debug.Log($"[CustomEffectHandler] 开始循环播放猫耳耳机音频: {selectedClip.name}，持续时间: {duration}s");
 
-        // 等待持续时间
-        yield return new WaitForSeconds(duration);
+        Debug.Log($"[CustomEffectHandler] 开始循环播放猫耳耳机音频: {selectedClip.name}（持续循环直到下次换歌）");
 
-        // 停止播放并清理
-        audioSource.Stop();
-        audioSource.loop = false;
-        audioSource.clip = null;
-        catEarHeadsetCoroutine = null;
-        
-        Debug.Log($"[CustomEffectHandler] 停止猫耳耳机音频播放: {selectedClip.name}");
+        // 无限循环，等待协程被外部停止
+        while (true)
+        {
+            yield return null;
+        }
     }
 
     /// <summary>
@@ -371,26 +411,56 @@ public class CustomEffectHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// 5. 以旧换新 - 更改玩家手持武器数据源
+    /// 5. 以旧换新 - 更改玩家手持武器数据源（无需ScriptableObject引用）
+    /// 自动从Resources/Weapons目录根据customEffectValue加载武器
     /// </summary>
     private void ApplyWeaponSwitch(PropertyCard card)
     {
-        if (card.replacementWeapon == null)
-        {
-            Debug.LogWarning("[CustomEffectHandler] 以旧换新没有设置替换武器");
-            return;
-        }
-
         if (playerControl == null)
         {
             Debug.LogError("[CustomEffectHandler] PlayerControl未找到，无法更换武器");
             return;
         }
 
-        bool success = playerControl.SwitchWeaponData(card.replacementWeapon);
+        Weapon replacementWeapon = null;
+
+        // 优先使用PropertyCard中设置的武器
+        if (card.replacementWeapon != null)
+        {
+            replacementWeapon = card.replacementWeapon;
+            Debug.Log("[CustomEffectHandler] 以旧换新: 使用PropertyCard中设置的武器");
+        }
+        else
+        {
+            // "假传入" - 根据customEffectValue(武器ID)从Resources加载武器
+            int weaponId = Mathf.RoundToInt(card.customEffectValue);
+            if (weaponId > 0)
+            {
+                // 尝试从Resources加载
+                string weaponPath = $"Weapons/Weapon_{weaponId}";
+                replacementWeapon = Resources.Load<Weapon>(weaponPath);
+                
+                if (replacementWeapon != null)
+                {
+                    Debug.Log($"[CustomEffectHandler] 以旧换新: 从Resources加载武器 - {weaponPath}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[CustomEffectHandler] 以旧换新: 在Resources/{weaponPath}找不到武器");
+                    return;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[CustomEffectHandler] 以旧换新: 未设置replacementWeapon，且customEffectValue无效");
+                return;
+            }
+        }
+
+        bool success = playerControl.SwitchWeaponData(replacementWeapon);
         if (success)
         {
-            Debug.Log($"[CustomEffectHandler] 成功更换武器: {card.replacementWeapon.weaponName}");
+            Debug.Log($"[CustomEffectHandler] 成功更换武器: {replacementWeapon.weaponName}");
         }
         else
         {
@@ -467,6 +537,12 @@ public class CustomEffectHandler : MonoBehaviour
             audioSource.clip = null;
         }
 
+        // 清理猫耳耳机状态
+        currentCatEarClip = null;
+
+        // 清理猫耳耳机状态
+        currentCatEarClip = null;
+
         // 停止所有协程
         if (limitedVisionCoroutine != null)
         {
@@ -491,209 +567,5 @@ public class CustomEffectHandler : MonoBehaviour
         directionReversed = false;
 
         Debug.Log("[CustomEffectHandler] 所有自定义效果已清理");
-    }
-
-    // ===== 直接调用方法（不使用PropertyCard）=====
-
-    /// <summary>
-    /// 直接应用猫耳耳机效果 - 无需PropertyCard
-    /// </summary>
-    public void ApplyCatEarHeadsetDirect(List<AudioClip> audioClips, float duration)
-    {
-        if (audioSource == null)
-        {
-            Debug.LogWarning("[CustomEffectHandler] 音频源未找到");
-            return;
-        }
-
-        if (audioClips == null || audioClips.Count == 0)
-        {
-            Debug.LogWarning("[CustomEffectHandler] 音频列表为空");
-            return;
-        }
-
-        if (catEarHeadsetCoroutine != null)
-        {
-            StopCoroutine(catEarHeadsetCoroutine);
-            audioSource.Stop();
-        }
-
-        AudioClip selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
-        audioSource.clip = selectedClip;
-        audioSource.loop = true;
-        audioSource.Play();
-        
-        Debug.Log($"[CustomEffectHandler] 直接启动猫耳耳机：{selectedClip.name}");
-
-        catEarHeadsetCoroutine = StartCoroutine(CatEarHeadsetCoroutineDirect(selectedClip, duration));
-    }
-
-    private System.Collections.IEnumerator CatEarHeadsetCoroutineDirect(AudioClip clip, float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        
-        audioSource.Stop();
-        audioSource.loop = false;
-        audioSource.clip = null;
-        catEarHeadsetCoroutine = null;
-        
-        Debug.Log($"[CustomEffectHandler] 猫耳耳机效果结束：{clip.name}");
-    }
-
-    /// <summary>
-    /// 直接应用失灵指南针效果 - 无需PropertyCard
-    /// </summary>
-    public void ApplyBrokenCompassDirect(float duration)
-    {
-        if (brokenCompassCoroutine != null)
-        {
-            StopCoroutine(brokenCompassCoroutine);
-        }
-
-        Debug.Log($"[CustomEffectHandler] 直接启动失灵指南针效果，持续 {duration}s");
-        brokenCompassCoroutine = StartCoroutine(BrokenCompassCoroutineDirect(duration));
-    }
-
-    private System.Collections.IEnumerator BrokenCompassCoroutineDirect(float duration)
-    {
-        directionReversed = true;
-        Debug.Log("[CustomEffectHandler] 方向已颠倒");
-
-        yield return new WaitForSeconds(duration);
-
-        directionReversed = false;
-        Debug.Log("[CustomEffectHandler] 方向已恢复");
-    }
-
-    /// <summary>
-    /// 直接应用以旧换新效果 - 无需PropertyCard
-    /// </summary>
-    public void ApplyWeaponSwitchDirect(Weapon replacementWeapon)
-    {
-        if (replacementWeapon == null)
-        {
-            Debug.LogWarning("[CustomEffectHandler] 替换武器为空");
-            return;
-        }
-
-        if (playerControl == null)
-        {
-            Debug.LogError("[CustomEffectHandler] PlayerControl未找到");
-            return;
-        }
-
-        bool success = playerControl.SwitchWeaponData(replacementWeapon);
-        Debug.Log($"[CustomEffectHandler] 直接切换武器：{replacementWeapon.weaponName} - {(success ? "成功" : "失败")}");
-    }
-
-    /// <summary>
-    /// 直接应用耳机损耗效果 - 无需PropertyCard
-    /// </summary>
-    public void ApplyAudioDamageDirect(float volumeMultiplier, float duration)
-    {
-        if (audioSource == null)
-        {
-            Debug.LogWarning("[CustomEffectHandler] 音频源未找到");
-            return;
-        }
-
-        StartCoroutine(AudioDamageCoroutineDirect(volumeMultiplier, duration));
-    }
-
-    private System.Collections.IEnumerator AudioDamageCoroutineDirect(float volumeMultiplier, float duration)
-    {
-        float originalVolume = audioSource.volume;
-        float targetVolume = originalVolume * volumeMultiplier;
-        float elapsed = 0f;
-
-        // 降低音量
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            audioSource.volume = Mathf.Lerp(originalVolume, targetVolume, t);
-            yield return null;
-        }
-
-        // 恢复音量
-        elapsed = 0f;
-        float currentVolume = audioSource.volume;
-        while (elapsed < 0.5f)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / 0.5f;
-            audioSource.volume = Mathf.Lerp(currentVolume, originalVolume, t);
-            yield return null;
-        }
-
-        audioSource.volume = originalVolume;
-        Debug.Log("[CustomEffectHandler] 耳机损耗效果已结束");
-    }
-
-    /// <summary>
-    /// 直接应用视野受限效果 - 无需PropertyCard
-    /// </summary>
-    public void ApplyLimitedVisionDirect(float duration)
-    {
-        if (mainCam == null)
-        {
-            Debug.LogWarning("[CustomEffectHandler] 摄像机未找到");
-            return;
-        }
-
-        if (limitedVisionCoroutine != null)
-        {
-            StopCoroutine(limitedVisionCoroutine);
-        }
-
-        Debug.Log($"[CustomEffectHandler] 直接启动视野受限效果，持续 {duration}s");
-        limitedVisionCoroutine = StartCoroutine(LimitedVisionCoroutineDirect(duration));
-    }
-
-    private System.Collections.IEnumerator LimitedVisionCoroutineDirect(float duration)
-    {
-        mainCam.enabled = false;
-        Debug.Log("[CustomEffectHandler] 摄像机已关闭");
-
-        yield return new WaitForSeconds(duration);
-
-        if (mainCam != null)
-        {
-            mainCam.enabled = true;
-            Debug.Log("[CustomEffectHandler] 摄像机已恢复");
-        }
-        
-        Debug.Log("[CustomEffectHandler] 视野受限效果结束");
-    }
-
-    /// <summary>
-    /// 直接应用敌人修改效果 - 无需PropertyCard
-    /// </summary>
-    public void ApplyEnemyModifierDirect(float speedMultiplier, float damageMultiplier, float duration)
-    {
-        var enemies = FindObjectsByType<EnemyControl>(FindObjectsSortMode.None);
-        
-        Debug.Log($"[CustomEffectHandler] 直接应用敌人修改：速度×{speedMultiplier}，伤害×{damageMultiplier}，找到{enemies.Length}个敌人");
-
-        foreach (var enemy in enemies)
-        {
-            if (enemy == null) continue;
-
-            if (!modifiedEnemies.ContainsKey(enemy))
-            {
-                modifiedEnemies[enemy] = (enemy.moveSpeed, enemy.attackDamage);
-            }
-
-            enemy.moveSpeed *= speedMultiplier;
-            enemy.attackDamage *= damageMultiplier;
-        }
-        
-        StartCoroutine(EnemyModifierRestoreCoroutine(duration));
-    }
-
-    private System.Collections.IEnumerator EnemyModifierRestoreCoroutine(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        RestoreEnemyModifiers();
     }
 }
