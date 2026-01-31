@@ -191,7 +191,10 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      brokenglass2_0_0: -2109950928561360688
+      brokenglass2_0_1: -3886721106232723601
+      brokenglass2_0_2: -68711504590638672
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
