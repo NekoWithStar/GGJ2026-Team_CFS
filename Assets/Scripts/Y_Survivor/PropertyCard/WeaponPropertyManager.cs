@@ -26,7 +26,7 @@ namespace Y_Survivor
         public GameProperty MeleeAttackRange { get; private set; }
         
         // 已应用的卡片及其修饰符的映射
-        private Dictionary<PropertyCard, List<(PropertyType, IModifier)>> appliedCards 
+        public Dictionary<PropertyCard, List<(PropertyType, IModifier)>> appliedCards 
             = new Dictionary<PropertyCard, List<(PropertyType, IModifier)>>();
         
         private void Awake()

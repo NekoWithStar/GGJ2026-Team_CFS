@@ -110,6 +110,7 @@ namespace Y_Survivor
                 PropertyType.PlayerMaxHealth => "最大生命值",
                 PropertyType.SmallEnemyMoveSpeed => "小怪移速",
                 PropertyType.MediumEnemyMoveSpeed => "中怪移速",
+                PropertyType.LargeEnemyMoveSpeed => "大怪移速",
                 _ => type.ToString()
             };
         }

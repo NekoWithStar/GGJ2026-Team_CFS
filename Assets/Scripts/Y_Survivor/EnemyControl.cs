@@ -16,11 +16,11 @@ public class EnemyControl : MonoBehaviour
     public float attackRange = 2f;
     [Tooltip("攻击冷却时间（秒），避免连续攻击，建议1-1.5")]
     public float attackCD = 1f;
-    public int attackDamage = 5; // 攻击力
+    public float attackDamage = 5; // 攻击力
 
     [Header("敌人基础属性")]
-    public int maxHp = 30;   // 最大血量
-    public int currentHp;    // 当前血量
+    public float maxHp = 30;   // 最大血量
+    public float currentHp;    // 当前血量
     [Tooltip("死亡掉落金币数量")]
     public int dropCoin = 5;
 
@@ -119,11 +119,11 @@ public class EnemyControl : MonoBehaviour
     /// 受击方法（玩家攻击时调用）
     /// </summary>
     /// <param name="damage">受到的伤害值</param>
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         if (isDead) return; // 死亡后不接受伤害
 
-        currentHp = Mathf.Max(currentHp - damage, 0);
+        currentHp = Mathf.Max(currentHp - Mathf.RoundToInt(damage), 0);
         Debug.Log($"敌人受击：-{damage}，当前HP = {currentHp}/{maxHp}");
 
         // 可添加受击反馈（闪烁 / 位移 / 音效）
@@ -234,13 +234,24 @@ public class EnemyControl : MonoBehaviour
             return;
         }
 
-        // 2) 退路：如果碰撞对象标记为玩家武器（"PlayerWeapon"），尝试从玩家组件读取攻击力
+        // 2) 退路：如果碰撞对象标记为玩家武器（"Weapon"），尝试从玩家的已装备武器读取伤害值
         if (other.CompareTag("Weapon"))
         {
             var pc = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerControl>();
             if (pc != null)
             {
-                TakeDamage(pc.attack);
+                // 获取玩家已装备武器的伤害值
+                var equippedWeapon = pc.GetEquippedWeapon() as WeaponControl;
+                if (equippedWeapon != null && equippedWeapon.weaponData != null)
+                {
+                    float weaponDamage = equippedWeapon.GetEffectiveDamage();
+                    TakeDamage(weaponDamage);
+                }
+                else
+                {
+                    Debug.LogWarning("[EnemyControl] 玩家未装备武器或武器数据缺失，使用默认伤害（10）");
+                    TakeDamage(10f); // 默认伤害值
+                }
             }
         }
     }

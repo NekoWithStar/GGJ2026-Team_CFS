@@ -15,8 +15,8 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     // 当卡牌被“确认”时广播该卡牌的数据（Card ScriptableObject）
     public static event Action<Card> OnCardConfirmed;
     // 当武器被“确认”时广播该武器的数据（Weapon ScriptableObject）
-    public static event Action<Weapon> OnWeaponConfirmed;
-
+    public static event Action<Weapon> OnWeaponConfirmed;    // 当属性卡被"确认"时广播该属性卡的数据（PropertyCard ScriptableObject）
+    public static event Action<Y_Survivor.PropertyCard> OnPropertyCardConfirmed;
     [Header("卡牌正反面 (Canvas UI 下的 GameObject)")]
     public GameObject frontFace; // 正面（包含 CardControl / WeaponCardControl 等 UI 元素）
     public GameObject backFace; // 背面（默认显示）
@@ -118,28 +118,48 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         if (!isFaceDown && secondClickIsConfirm)
         {
             // 先触发 inspector 绑定的 UnityEvent
-            onConfirm?.Invoke();
-
-            // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
-            CardControl cc = GetComponentInChildren<CardControl>();
-            if (cc != null && cc.card_data != null)
-            {
-                OnCardConfirmed?.Invoke(cc.card_data);
-                return;
-            }
-
-            // 再查找 WeaponCardControl 并广播 Weapon（若存在）
-            WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
-            if (wc != null && wc.weapon_data != null)
-            {
-                OnWeaponConfirmed?.Invoke(wc.weapon_data);
-                return;
-            }
-
+            Confirm();
             return;
         }
 
         StartCoroutine(FlipCoroutine());
+    }
+
+    /// <summary>
+    /// 公开方法：确认当前卡片（供按钮等UI元素调用）
+    /// </summary>
+    public void Confirm()
+    {
+        onConfirm?.Invoke();
+
+        // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
+        CardControl cc = GetComponentInChildren<CardControl>();
+        if (cc != null && cc.card_data != null)
+        {
+            OnCardConfirmed?.Invoke(cc.card_data);
+            Debug.Log($"[Flip_Card] ✅ 确认普通卡片: {cc.card_data.cardName}");
+            return;
+        }
+
+        // 再查找 WeaponCardControl 并广播 Weapon（若存在）
+        WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
+        if (wc != null && wc.weapon_data != null)
+        {
+            OnWeaponConfirmed?.Invoke(wc.weapon_data);
+            Debug.Log($"[Flip_Card] ✅ 确认武器卡片: {wc.weapon_data.weaponName}");
+            return;
+        }
+
+        // 再查找 PropertyCardControl 并广播 PropertyCard（若存在）
+        PropertyCardControl pcc = GetComponentInChildren<PropertyCardControl>();
+        if (pcc != null && pcc.propertyCard != null)
+        {
+            OnPropertyCardConfirmed?.Invoke(pcc.propertyCard);
+            Debug.Log($"[Flip_Card] ✅ 确认属性卡片: {pcc.propertyCard.cardName}");
+            return;
+        }
+
+        Debug.LogWarning("[Flip_Card] ⚠️ Confirm() 被调用，但未找到 CardControl、WeaponCardControl 或 PropertyCardControl");
     }
 
     private IEnumerator ScaleTo(Vector3 target)

@@ -69,6 +69,20 @@ public class WeaponControl : MonoBehaviour, IWeapon
         SyncUI();
     }
 
+    private void Start()
+    {
+        // 自动开火武器在Start时需要找到Player并启动
+        if (weaponData != null && weaponData.continuousAutoFire)
+        {
+            var player = transform.root.GetComponentInParent<PlayerControl>();
+            if (player != null)
+            {
+                weaponUser = player.gameObject;
+                Debug.Log($"[WeaponControl.Start] 🔧 自动开火武器已初始化，将在首次Update时启动");
+            }
+        }
+    }
+
     private void OnValidate()
     {
         // 编辑器下实时同步显示，方便调试
@@ -81,13 +95,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
 
         UpdateWeaponState();
         
-        // 处理持续自动开火武器（无需玩家输入）
-        if (weaponData.continuousAutoFire && currentState == WeaponState.Idle)
-        {
-            StartContinuousAutoFiring();
-        }
-        
-        // 处理手动连续开火（按住开火键）
+        // 处理手动连续开火（按住开火键，非自动武器）
         if (isContinuousFiring && currentState == WeaponState.Firing)
         {
             HandleContinuousFiring();
@@ -104,6 +112,14 @@ public class WeaponControl : MonoBehaviour, IWeapon
         
         switch (currentState)
         {
+            case WeaponState.Idle:
+                // 持续自动开火武器在Idle状态时需要自动启动
+                if (weaponData.continuousAutoFire && weaponUser != null)
+                {
+                    StartContinuousAutoFiring();
+                }
+                break;
+                
             case WeaponState.Charging:
                 if (stateDuration >= GetEffectiveChargingTime())
                 {
@@ -368,9 +384,9 @@ public class WeaponControl : MonoBehaviour, IWeapon
     }
     
     /// <summary>
-    /// 获取当前伤害值（考虑属性卡加成）
+    /// 获取当前伤害值（考虑属性卡加成）- 公开方法供外部使用
     /// </summary>
-    private int GetEffectiveDamage()
+    public int GetEffectiveDamage()
     {
         if (propertyManager != null)
             return propertyManager.GetDamage();
@@ -437,15 +453,36 @@ public class WeaponControl : MonoBehaviour, IWeapon
     /// <param name="user">发起使用的物体（通常为玩家）</param>
     public void Use(GameObject user)
     {
-        if (weaponData == null) return;
+        if (weaponData == null)
+        {
+            Debug.LogError("[WeaponControl.Use] ❌ weaponData 为 null！无法开火");
+            return;
+        }
+
+        if (user == null)
+        {
+            Debug.LogError("[WeaponControl.Use] ❌ user 参数为 null！");
+            return;
+        }
 
         weaponUser = user;
-
+        
         // 持续自动开火武器由Update自动处理，不响应玩家输入
-        if (weaponData.continuousAutoFire) return;
+        if (weaponData.continuousAutoFire) 
+        {
+            // 确保已启动连续开火
+            if (currentState == WeaponState.Idle)
+            {
+                StartContinuousAutoFiring();
+            }
+            return;
+        }
         
         // 已经在开火或其他状态，忽略
-        if (currentState != WeaponState.Idle) return;
+        if (currentState != WeaponState.Idle)
+        {
+            return;
+        }
         
         // 标记为连续开火状态
         isContinuousFiring = true;
@@ -576,7 +613,11 @@ public class WeaponControl : MonoBehaviour, IWeapon
         GameObject prefab = weaponData.projectilePrefab != null ? weaponData.projectilePrefab : weaponData.weaponPrefab;
         if (prefab == null)
         {
-            Debug.LogWarning("[WeaponControl] Ranged weapon has no projectilePrefab or weaponPrefab assigned: " + (weaponData != null ? weaponData.weaponName : "null"));
+            Debug.LogError($"[WeaponControl] ❌ 远程武器无子弹配置！" +
+                          $"\n  - 武器: {(weaponData != null ? weaponData.weaponName : "null")}" +
+                          $"\n  - projectilePrefab: {(weaponData?.projectilePrefab != null ? "✅ 已设置" : "❌ 为null")}" +
+                          $"\n  - weaponPrefab: {(weaponData?.weaponPrefab != null ? "✅ 已设置" : "❌ 为null")}" +
+                          $"\n  - 请在 Weapon ScriptableObject 中配置子弹预制体");
             return;
         }
 
@@ -587,6 +628,12 @@ public class WeaponControl : MonoBehaviour, IWeapon
         int effectiveDamage = GetEffectiveDamage();
         float effectiveCritChance = GetEffectiveCritChance();
         float effectiveCritMultiplier = GetEffectiveCritDamageMultiplier();
+        
+        Debug.Log($"[WeaponControl] 🔫 发射子弹" +
+                 $"\n  - 位置: {spawnPos}" +
+                 $"\n  - 方向: {dir}" +
+                 $"\n  - 伤害: {effectiveDamage}" +
+                 $"\n  - 暴击率: {effectiveCritChance * 100:F1}%");
 
         // 实例化并朝向发射方向（便于视觉与旋转）
         GameObject proj = Instantiate(prefab, spawnPos, Quaternion.identity);
@@ -746,7 +793,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
             {
                 // 计算暴击
                 bool isCrit = Random.value < effectiveCritChance;
-                int finalDamage = isCrit ? Mathf.RoundToInt(effectiveDamage * effectiveCritMultiplier) : effectiveDamage;
+                float finalDamage = isCrit ? effectiveDamage * effectiveCritMultiplier : effectiveDamage;
                 enemy.TakeDamage(finalDamage);
                 hitCount++;
                 

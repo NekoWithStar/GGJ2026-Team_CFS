@@ -6,19 +6,19 @@ using UnityEngine.UI;
 [CreateAssetMenu(menuName =  "Card")]
 public class Card : ScriptableObject
 {
-    // ¿¨ÅÆÀàĞÍÊôĞÔ
+    // å¡ç‰Œç±»å‹å±æ€§
     public enum CARD_TYPE
     {
-        Reason, //ÀíĞÔ×é
-        Feel,   //¸ĞÊÜ×é
-        Dream   //ÃÎÏë×é
+        Reason, //ç†æ€§ç»„
+        Feel,   //æ„Ÿå—ç»„
+        Dream   //æ¢¦æƒ³ç»„
     }
 
-    public CARD_TYPE cardType; // ¿¨ÅÆÀàĞÍ
-    public string cardName;   // ¿¨ÅÆÃû³Æ
-    public int cardCost;     // ¿¨ÅÆ·ÑÓÃ
-    public int cardRank;     // ¿¨ÅÆÇãÏòµÈ¼¶
-    public string cardDescription; // ¿¨ÅÆÃèÊö
-    public Image cardPicture; // ¿¨ÅÆÖĞĞÄÍ¼Æ¬
-    public GameObject back; // ¿¨ÅÆ±³ÃæÍ¼Æ¬
+    public CARD_TYPE cardType; // å¡ç‰Œç±»å‹
+    public string cardName;   // å¡ç‰Œåç§°
+    public int cardCost;     // å¡ç‰Œè´¹ç”¨
+    public int cardRank;     // å¡ç‰Œå€¾å‘ç­‰çº§
+    public string cardDescription; // å¡ç‰Œæè¿°
+    public Image cardPicture; // å¡ç‰Œä¸­å¿ƒå›¾ç‰‡
+    public GameObject back; // å¡ç‰ŒèƒŒé¢å›¾ç‰‡
 }
