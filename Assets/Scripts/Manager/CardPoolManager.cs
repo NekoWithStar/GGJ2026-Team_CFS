@@ -135,6 +135,8 @@ public class CardPoolManager : MonoBehaviour
     /// <returns>是否应用成功</returns>
     public bool ApplyCard(ScriptableObject card)
     {
+        Debug.Log($"[CardPoolManager] ▶ ApplyCard called for: {(card!=null?card.GetType().Name:"null")} ");
+
         if (card == null)
         {
             Debug.LogError("[CardPoolManager] ❌ 卡牌为空，无法应用");
@@ -151,6 +153,7 @@ public class CardPoolManager : MonoBehaviour
         }
 
         // 检查金币是否足够
+        Debug.Log($"[CardPoolManager] 🔎 Player coin before apply: {cachedPlayer.coin} (need {coinCostPerCard})");
         if (cachedPlayer.coin < coinCostPerCard)
         {
             Debug.LogWarning($"[CardPoolManager] ⚠️ 金币不足！需要 {coinCostPerCard}，当前拥有 {cachedPlayer.coin}");
@@ -181,11 +184,15 @@ public class CardPoolManager : MonoBehaviour
         // 如果应用成功，消耗金币
         if (applySuccess)
         {
-            ConsumeCoin(coinCostPerCard);
+            bool consumed = ConsumeCoin(coinCostPerCard);
+            Debug.Log($"[CardPoolManager] 🔁 applySuccess={applySuccess} consumed={consumed}");
             ResumeGameplay();
             // HUD 更新由 PlayerControl 负责
             if (cachedPlayer != null)
+            {
                 cachedPlayer.UpdateHUD();
+                Debug.Log($"[CardPoolManager] 🔔 Called cachedPlayer.UpdateHUD() - coin now {cachedPlayer.coin}");
+            }
             return true;
         }
 
@@ -208,17 +215,8 @@ public class CardPoolManager : MonoBehaviour
             return false;
         }
 
-        if (cachedPlayer.coin < amount)
-        {
-            Debug.LogWarning($"[CardPoolManager] ⚠️ 金币不足！需要 {amount}，当前拥有 {cachedPlayer.coin}");
-            return false;
-        }
-
-        cachedPlayer.coin -= amount;
-        if (cachedPlayer.coin < 0) cachedPlayer.coin = 0;
-
-        Debug.Log($"[CardPoolManager] 💰 消耗 {amount} 金币，剩余: {cachedPlayer.coin}");
-        return true;
+        // 调用PlayerControl的ConsumeCoin方法来处理消耗和统计
+        return cachedPlayer.ConsumeCoin(amount);
     }
 
     /// <summary>

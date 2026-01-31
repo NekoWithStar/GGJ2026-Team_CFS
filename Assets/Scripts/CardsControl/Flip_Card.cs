@@ -38,7 +38,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private Coroutine scaleCoroutine;
 
     // 标记：当对象被禁用后再次启用时是否应重置为背面
-    private bool _resetToBackOnEnable = false;
+    private bool _resetToBackOnEnable = true;
 
     private void Awake()
     {
@@ -52,7 +52,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         if (_resetToBackOnEnable)
         {
             ResetToBack();
-            _resetToBackOnEnable = false;
+            _resetToBackOnEnable = false; // 重置标记，避免重复重置
         }
     }
 
@@ -74,7 +74,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// <summary>
     /// 将卡牌强制重置为背面状态（停止动画、复位旋转、显示背面、还原缩放）
     /// </summary>
-    private void ResetToBack()
+    public void ResetToBack()
     {
         // 停止缩放协程
         if (scaleCoroutine != null)
@@ -125,8 +125,17 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             return;
         }
 
-        Debug.Log($"[Flip_Card] 🔄 开始翻转动画");
-        StartCoroutine(FlipCoroutine());
+        // 如果是背面朝上，开始翻转到正面
+        if (isFaceDown)
+        {
+            Debug.Log($"[Flip_Card] 🔄 从背面翻转到正面");
+            StartCoroutine(FlipCoroutine());
+        }
+        else
+        {
+            Debug.Log($"[Flip_Card] 🔄 从正面翻转回背面");
+            StartCoroutine(FlipCoroutine());
+        }
     }
 
     /// <summary>

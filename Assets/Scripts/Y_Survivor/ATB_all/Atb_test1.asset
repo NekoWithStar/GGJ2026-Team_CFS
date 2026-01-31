@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Atb_test1
   m_EditorClassIdentifier: 
   cardName: "\u8D85\u7EA7\u529B\u91CF"
-  description: "\u6211\u7684\u8D85\u7EA7\u7535\u8111\u544A\u8BC9\u6211\u8BE5\u4F7F\u7528\u5B83\u4E86"
-  cardIcon: {fileID: 0}
+  description: "\u5DE6\u8FB9\u4F24\u5BB3\u9AD8\u7231\u4E0A\u53F3\u8FB9\u9AD8\u4F24\u5BB3\n+5 
+    Damage"
+  cardPicture_Po: {fileID: 0}
   rarity: 0
   modifiers:
   - targetProperty: 102
     modifierType: 1
-    value: 500
+    value: 5
     priority: 0
   hasCustomEffect: 0
   customEffectType: 0
