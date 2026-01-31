@@ -14,10 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 0
   weaponName: Crowbar
-  weaponIcon: {fileID: 0}
-  damage: 10
+  cardPicture_Wp: {fileID: 0}
+  damage: 20
+  continuousAutoFire: 0
+  continuousFireDuration: 5
+  firePattern: {fileID: 0}
+  requiresCharging: 0
+  chargingTime: 0.2
   cooldown: 0.1
-  range: 1.5
+  attackRate: 1
+  critChanceBase: 0
+  critDamageBase: 1.5
+  meleeRange: 2
+  fireSound: {fileID: 0}
+  chargingSound: {fileID: 0}
+  continuousFireEndSound: {fileID: 0}
+  cooldownEndSound: {fileID: 0}
   description: Pry open your skull... Using the Physics
   projectilePrefab: {fileID: 0}
   projectileSpeed: 12

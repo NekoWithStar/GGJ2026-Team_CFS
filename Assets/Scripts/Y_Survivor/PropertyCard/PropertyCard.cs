@@ -39,6 +39,18 @@ namespace Y_Survivor
         [Tooltip("自定义效果参数（根据效果类型使用）")]
         public float customEffectValue = 0f;
         
+        [Tooltip("自定义效果参数2（某些效果需要）")]
+        public float customEffectValue2 = 0f;
+        
+        [Tooltip("自定义效果持续时间（秒）")]
+        public float customEffectDuration = 3f;
+        
+        [Tooltip("替换武器数据（用于以旧换新效果）")]
+        public Weapon replacementWeapon;
+        
+        [Tooltip("随机播放的音频列表（用于猫耳耳机效果）")]
+        public List<AudioClip> randomAudioClips = new List<AudioClip>();
+        
         /// <summary>
         /// 获取指定属性类型的所有修饰符
         /// </summary>
@@ -121,6 +133,12 @@ namespace Y_Survivor
             return type switch
             {
                 CustomEffectType.None => "无",
+                CustomEffectType.LimitedVision => $"视野受限 ({customEffectDuration}s)",
+                CustomEffectType.AudioDamage => $"耳机损耗 ({customEffectDuration}s)",
+                CustomEffectType.CatEarHeadset => "猫耳耳机",
+                CustomEffectType.BrokenCompass => $"失灵指南针 ({customEffectDuration}s)",
+                CustomEffectType.WeaponSwitch => $"以旧换新 -> {(replacementWeapon != null ? replacementWeapon.weaponName : "未设置")}",
+                CustomEffectType.EnemyModifier => "敌人控制",
                 _ => type.ToString()
             };
         }

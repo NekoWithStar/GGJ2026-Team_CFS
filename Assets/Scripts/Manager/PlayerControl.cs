@@ -16,9 +16,7 @@ public class PlayerControl : MonoBehaviour
     public int cardsToShowOnLevelUp = 4; // 升级时显示的卡牌数量
 
     [Header("玩家基础属性")]
-    private int maxHp = 100;    // 最大血量（改为 private，从 PropertyManager 获取）
-    private float baseMoveSpeed = 100f; // 基础移动速度（改为 private，从 PropertyManager 获取）
-    public int currentHp;     // 当前血量
+    // 移除固定的maxHp和currentHp，使用PlayerPropertyManager的动态属性
     public int coin = 0;      // 金币（后续升级用）
     public int totalCoinsSpent = 0; // 总消耗金币数（用于得分榜）
 
@@ -84,14 +82,7 @@ public class PlayerControl : MonoBehaviour
 
     private void Start()
     {
-        // 初始化血量
-        currentHp = maxHp;
-        
-        // 如果有PropertyManager，将其基础值同步到当前值
-        if (playerPropertyManager != null)
-        {
-            playerPropertyManager.SetCurrentHealth(currentHp);
-        }
+        // 血量初始化由PlayerPropertyManager在Awake中处理
 
         // 如果没有指定挂点，则默认使用玩家自身Transform（必须先初始化）
         if (weaponAttachPoint == null)
@@ -159,7 +150,17 @@ public class PlayerControl : MonoBehaviour
 
         if (hpText != null)
         {
-            hpText.text = $"HP: {currentHp}/{maxHp}";
+            // 从PlayerPropertyManager获取动态血量值
+            if (playerPropertyManager != null)
+            {
+                float currentHp = playerPropertyManager.GetCurrentHealth();
+                float maxHp = playerPropertyManager.GetMaxHealth();
+                hpText.text = $"HP: {Mathf.RoundToInt(currentHp)}/{Mathf.RoundToInt(maxHp)}";
+            }
+            else
+            {
+                hpText.text = "HP: N/A";
+            }
         }
     }
 
@@ -212,15 +213,23 @@ public class PlayerControl : MonoBehaviour
     /// </summary>
     private void MovePlayer()
     {
-        // 获取最终移动速度（优先使用PropertyManager的修饰后值）
-        float finalMoveSpeed = baseMoveSpeed;
+        // 获取最终移动速度（从PlayerPropertyManager获取）
+        float finalMoveSpeed = 5f; // 默认移动速度
         if (playerPropertyManager != null)
         {
             finalMoveSpeed = playerPropertyManager.GetMoveSpeed();
         }
         
+        // 检查失灵指南针效果 - 如果激活则反转移动方向
+        Vector2 finalMoveDir = moveDir;
+        var customEffectHandler = GetComponent<CustomEffectHandler>();
+        if (customEffectHandler != null && customEffectHandler.IsDirectionReversed())
+        {
+            finalMoveDir = -moveDir; // 颠倒方向
+        }
+        
         // 给刚体赋值速度，结合移动方向和速度，Time.fixedDeltaTime是固定帧时间
-        rb.velocity = moveDir * finalMoveSpeed * Time.fixedDeltaTime;
+        rb.velocity = finalMoveDir * finalMoveSpeed * Time.fixedDeltaTime;
     }
 
     /// <summary>
@@ -520,12 +529,15 @@ public class PlayerControl : MonoBehaviour
     /// <param name="damage">受到的伤害值</param>
     public void TakeDamage(float damage)
     {
-        currentHp = Mathf.Max(currentHp - Mathf.RoundToInt(damage), 0); // 血量不小于0，伤害四舍五入
-        
-        // 同步到PropertyManager系统（用于属性修饰）
+        // 直接使用PlayerPropertyManager处理伤害
         if (playerPropertyManager != null)
         {
-            playerPropertyManager.SetCurrentHealth(currentHp);
+            playerPropertyManager.TakeDamage(damage);
+        }
+        else
+        {
+            Debug.LogError("[PlayerControl] PlayerPropertyManager不存在，无法处理伤害");
+            return;
         }
         
         // 更新HUD显示（确保HP显示同步更新）
@@ -537,7 +549,8 @@ public class PlayerControl : MonoBehaviour
             StartCoroutine(PlayDamageFlash());
         }
         
-        if (currentHp <= 0)
+        // 检查是否死亡
+        if (playerPropertyManager.IsDead)
         {
             Die(); // 血量为0则死亡
         }
@@ -550,6 +563,13 @@ public class PlayerControl : MonoBehaviour
     private void Die()
     {
         canMove = false; // 死亡后禁止移动
+        
+        // 清理所有自定义效果
+        var customEffectHandler = GetComponent<CustomEffectHandler>();
+        if (customEffectHandler != null)
+        {
+            customEffectHandler.ClearAllEffects();
+        }
         
         // 启用指定的死亡物体（游戏结束UI等）
         if (deathObjectToEnable != null)
@@ -750,15 +770,17 @@ public class PlayerControl : MonoBehaviour
                 UpdateHUD();
                 break;
             case "Hp":
-                currentHp = Mathf.Min(currentHp + value, maxHp); // 血量不超过最大值
-                
-                // 同步到PropertyManager系统（用于属性修饰）
+                // 使用PlayerPropertyManager处理血量恢复
                 if (playerPropertyManager != null)
                 {
-                    playerPropertyManager.SetCurrentHealth(currentHp);
+                    playerPropertyManager.Heal(value);
+                    float currentHp = playerPropertyManager.GetCurrentHealth();
+                    Debug.Log($"拾取血包：+{value}，当前血量：{Mathf.RoundToInt(currentHp)}");
                 }
-                
-                Debug.Log("拾取血包：" + value + "，当前血量：" + currentHp);
+                else
+                {
+                    Debug.LogError("[PlayerControl] PlayerPropertyManager不存在，无法恢复血量");
+                }
                 UpdateHUD();
                 break;
         }

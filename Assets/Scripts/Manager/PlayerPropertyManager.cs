@@ -27,9 +27,16 @@ namespace Y_Survivor
         private Dictionary<PropertyCard, List<(PropertyType, IModifier)>> appliedCards 
             = new Dictionary<PropertyCard, List<(PropertyType, IModifier)>>();
         
+        private CustomEffectHandler customEffectHandler;
+        
         private void Awake()
         {
             InitializeProperties();
+            customEffectHandler = GetComponent<CustomEffectHandler>();
+            if (customEffectHandler == null)
+            {
+                Debug.LogWarning("[PlayerPropertyManager] CustomEffectHandler未找到，自定义效果将不可用");
+            }
         }
         
         /// <summary>
@@ -73,6 +80,12 @@ namespace Y_Survivor
             }
             
             appliedCards[card] = appliedModifiers;
+            
+            // 处理自定义效果
+            if (customEffectHandler != null && card.hasCustomEffect)
+            {
+                customEffectHandler.HandleCustomEffect(card);
+            }
             
             Debug.Log($"[PlayerPropertyManager] Applied card: {card.cardName} with {appliedModifiers.Count} modifiers");
         }
@@ -133,10 +146,10 @@ namespace Y_Survivor
         // ===== 便捷访问器 =====
         
         /// <summary>获取最终移动速度</summary>
-        public float GetMoveSpeed() => MoveSpeed.GetValue();
+        public float GetMoveSpeed() => Mathf.Max(0.1f, MoveSpeed.GetValue());
         
         /// <summary>获取最终最大生命值</summary>
-        public float GetMaxHealth() => MaxHealth.GetValue();
+        public float GetMaxHealth() => Mathf.Max(1f, MaxHealth.GetValue());
         
         /// <summary>获取当前生命值</summary>
         public float GetCurrentHealth() => CurrentHealth.GetValue();

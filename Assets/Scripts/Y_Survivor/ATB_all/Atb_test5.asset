@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Atb_test5
   m_EditorClassIdentifier: 
   cardName: "\u6210\u4ED9\u4E4B\u8DEF"
-  description: "\u611F\u89C9\u53D8\u6210\u4E86\u4E00\u53EA\u732B\n+100 Max HP"
+  description: "+100 \u6700\u5927\u751F\u547D\u503C"
   cardPicture_Po: {fileID: 0}
   rarity: 3
   modifiers:

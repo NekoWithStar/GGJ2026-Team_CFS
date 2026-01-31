@@ -13,11 +13,15 @@ MonoBehaviour:
   m_Name: Atb_test2
   m_EditorClassIdentifier: 
   cardName: "\u6211\u662F\u8DD1\u7537"
-  description: "\u901F\u5EA6+5"
+  description: "+7 \u901F\u5EA6\n+5 \u751F\u547D"
   cardPicture_Po: {fileID: 0}
   rarity: 1
   modifiers:
   - targetProperty: 200
+    modifierType: 1
+    value: 7
+    priority: 0
+  - targetProperty: 201
     modifierType: 1
     value: 5
     priority: 0
