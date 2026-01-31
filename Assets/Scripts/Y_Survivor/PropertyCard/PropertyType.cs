@@ -41,5 +41,7 @@ namespace Y_Survivor
         SmallEnemyMoveSpeed = 300,
         /// <summary>中型怪物移动速度</summary>
         MediumEnemyMoveSpeed = 301,
+        /// <summary>大型怪物移动速度</summary>
+        LargeEnemyMoveSpeed = 302,
     }
 }

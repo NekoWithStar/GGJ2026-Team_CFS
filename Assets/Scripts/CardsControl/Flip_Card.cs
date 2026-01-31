@@ -118,28 +118,39 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         if (!isFaceDown && secondClickIsConfirm)
         {
             // 先触发 inspector 绑定的 UnityEvent
-            onConfirm?.Invoke();
-
-            // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
-            CardControl cc = GetComponentInChildren<CardControl>();
-            if (cc != null && cc.card_data != null)
-            {
-                OnCardConfirmed?.Invoke(cc.card_data);
-                return;
-            }
-
-            // 再查找 WeaponCardControl 并广播 Weapon（若存在）
-            WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
-            if (wc != null && wc.weapon_data != null)
-            {
-                OnWeaponConfirmed?.Invoke(wc.weapon_data);
-                return;
-            }
-
+            Confirm();
             return;
         }
 
         StartCoroutine(FlipCoroutine());
+    }
+
+    /// <summary>
+    /// 公开方法：确认当前卡片（供按钮等UI元素调用）
+    /// </summary>
+    public void Confirm()
+    {
+        onConfirm?.Invoke();
+
+        // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
+        CardControl cc = GetComponentInChildren<CardControl>();
+        if (cc != null && cc.card_data != null)
+        {
+            OnCardConfirmed?.Invoke(cc.card_data);
+            Debug.Log($"[Flip_Card] ✅ 确认普通卡片: {cc.card_data.cardName}");
+            return;
+        }
+
+        // 再查找 WeaponCardControl 并广播 Weapon（若存在）
+        WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
+        if (wc != null && wc.weapon_data != null)
+        {
+            OnWeaponConfirmed?.Invoke(wc.weapon_data);
+            Debug.Log($"[Flip_Card] ✅ 确认武器卡片: {wc.weapon_data.weaponName}");
+            return;
+        }
+
+        Debug.LogWarning("[Flip_Card] ⚠️ Confirm() 被调用，但未找到 CardControl 或 WeaponCardControl");
     }
 
     private IEnumerator ScaleTo(Vector3 target)

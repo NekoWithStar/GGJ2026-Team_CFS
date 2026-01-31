@@ -1,4 +1,5 @@
 using UnityEngine;
+using Y_Survivor;
 
 /// <summary>
 /// 2D类幸存者玩家核心控制：WASD移动+鼠标朝向+基础属性/状态
@@ -7,15 +8,13 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour
 {
     [Header("移动配置")]
-    [Tooltip("玩家移动速度，类幸存者建议8-12")]
-    public float moveSpeed = 10f;
     [Tooltip("是否限制移动（如死亡/升级时）")]
     public bool canMove = true;
 
     [Header("玩家基础属性")]
-    public int maxHp = 100;    // 最大血量
+    private int maxHp = 100;    // 最大血量（改为 private，从 PropertyManager 获取）
+    private float baseMoveSpeed = 100f; // 基础移动速度（改为 private，从 PropertyManager 获取）
     public int currentHp;     // 当前血量
-    public int attack = 10;   // 攻击力（后续攻击用）
     public int coin = 0;      // 金币（后续升级用）
 
     [Header("外置武器（可选）")]
@@ -31,6 +30,7 @@ public class PlayerControl : MonoBehaviour
     private Rigidbody2D rb;       // 2D刚体（核心移动组件）
     private Vector2 moveDir;      // 移动方向
     private Camera mainCam;       // 主相机（用于鼠标朝向计算）
+    private PlayerPropertyManager playerPropertyManager; // 玩家属性管理器（血量、移动速度等）
 
     // 外置武器实例与接口引用（可在运行时通过 API 更换）
     private GameObject externalWeaponInstance;
@@ -47,23 +47,71 @@ public class PlayerControl : MonoBehaviour
         // 获取核心组件，避免频繁Find（性能优化+简洁）
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
+        playerPropertyManager = GetComponent<PlayerPropertyManager>();
+        
+        if (playerPropertyManager == null)
+        {
+            Debug.LogWarning("[PlayerControl] 玩家未挂载 PlayerPropertyManager，属性修饰系统将不可用");
+        }
     }
 
     private void Start()
     {
         // 初始化血量
         currentHp = maxHp;
-
-        // 如果在Inspector中指定了武器预制体，自动装备
-        if (externalWeaponPrefab != null)
+        
+        // 如果有PropertyManager，将其基础值同步到当前值
+        if (playerPropertyManager != null)
         {
-            EquipExternalWeapon(externalWeaponPrefab);
+            playerPropertyManager.SetCurrentHealth(currentHp);
         }
 
-        // 如果没有指定挂点，则默认使用玩家自身Transform
+        // 如果没有指定挂点，则默认使用玩家自身Transform（必须先初始化）
         if (weaponAttachPoint == null)
         {
             weaponAttachPoint = transform;
+        }
+
+        // 优先检查 weaponAttachPoint 下是否已经存在武器（场景中预先挂载）
+        if (weaponAttachPoint.childCount > 0)
+        {
+            // 遍历子物体，查找带有 WeaponControl 组件的武器
+            foreach (Transform child in weaponAttachPoint)
+            {
+                var weaponControl = child.GetComponentInChildren<WeaponControl>();
+                if (weaponControl != null)
+                {
+                    externalWeaponInstance = child.gameObject;
+                    externalWeaponScript = weaponControl as IWeapon;
+                    
+                    Debug.Log($"[PlayerControl] ✅ 检测到场景中已存在的武器: {child.name}" +
+                             $"\n  - WeaponControl: 已找到" +
+                             $"\n  - weaponData: {(weaponControl.weaponData != null ? weaponControl.weaponData.weaponName : "❌ 未设置")}" +
+                             $"\n  - 如需更换武器数据，请在 Inspector 中设置 WeaponControl 的 weaponData 字段");
+                    
+                    // 如果 externalWeaponPrefab 也设置了，更新引用以保持一致
+                    if (externalWeaponPrefab == null)
+                    {
+                        externalWeaponPrefab = child.gameObject;
+                    }
+                    
+                    return; // 找到武器后直接返回
+                }
+            }
+        }
+
+        // 如果场景中没有武器，再检查 Inspector 中是否指定了武器预制体
+        if (externalWeaponPrefab != null)
+        {
+            Debug.Log($"[PlayerControl] 📋 场景中未找到武器，从 Prefab 实例化: {externalWeaponPrefab.name}");
+            EquipExternalWeapon(externalWeaponPrefab);
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerControl] ⚠️ 未检测到武器！" +
+                           $"\n  - 方式1：在场景中将武器作为子物体挂载到 {weaponAttachPoint.name} 下" +
+                           $"\n  - 方式2：在 Inspector 中设置 externalWeaponPrefab 字段" +
+                           $"\n  - 方式3：通过代码调用 EquipExternalWeapon()");
         }
     }
     #endregion
@@ -71,6 +119,12 @@ public class PlayerControl : MonoBehaviour
     #region 帧更新：移动+朝向（核心逻辑）
     private void Update()
     {
+        // 诊断快捷键：按 J 检查武器装备状态
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            DiagnoseWeaponStatus();
+        }
+        
         if (!canMove) return; // 不能移动则直接返回
 
         // 1. 获取WASD输入（二维向量，自动归一化避免斜向加速）
@@ -79,29 +133,7 @@ public class PlayerControl : MonoBehaviour
         LookAtMouse();
 
         // 3. 攻击输入：所有手动武器都是连续开火（按住持续射击）
-        var equipped = GetEquippedWeapon();
-        if (equipped != null)
-        {
-            var weaponData = GetEquippedWeaponData();
-            // 持续自动开火武器由WeaponControl自动处理，不响应玩家输入
-            if (weaponData != null && !weaponData.continuousAutoFire)
-            {
-                var wc = externalWeaponScript as WeaponControl;
-                if (wc != null)
-                {
-                    // 按下开火键：开始连续开火
-                    if (Input.GetKeyDown(fireKey))
-                    {
-                        equipped.Use(gameObject);
-                    }
-                    // 松开开火键：停止连续开火
-                    else if (Input.GetKeyUp(fireKey))
-                    {
-                        wc.StopFiring();
-                    }
-                }
-            }
-        }
+        HandleWeaponInput();
     }
 
     // 固定帧更新：物理相关逻辑（Unity推荐，避免帧率波动导致移动卡顿）
@@ -133,8 +165,15 @@ public class PlayerControl : MonoBehaviour
     /// </summary>
     private void MovePlayer()
     {
+        // 获取最终移动速度（优先使用PropertyManager的修饰后值）
+        float finalMoveSpeed = baseMoveSpeed;
+        if (playerPropertyManager != null)
+        {
+            finalMoveSpeed = playerPropertyManager.GetMoveSpeed();
+        }
+        
         // 给刚体赋值速度，结合移动方向和速度，Time.fixedDeltaTime是固定帧时间
-        rb.velocity = moveDir * moveSpeed * Time.fixedDeltaTime;
+        rb.velocity = moveDir * finalMoveSpeed * Time.fixedDeltaTime;
     }
 
     /// <summary>
@@ -153,13 +192,89 @@ public class PlayerControl : MonoBehaviour
     }
 
     /// <summary>
+    /// 处理武器输入并进行诊断
+    /// </summary>
+    private void HandleWeaponInput()
+    {
+        var equipped = GetEquippedWeapon();
+        
+        // 诊断检查1：检查是否有装备武器
+        if (equipped == null)
+        {
+            if (Input.GetKeyDown(fireKey))
+            {
+                Debug.LogWarning("[PlayerControl] ❌ 武器未装备！GetEquippedWeapon() 返回 null。" +
+                                 $"\n  - externalWeaponInstance: {(externalWeaponInstance != null ? "✅ 存在" : "❌ 为null")}" +
+                                 $"\n  - externalWeaponScript: {(externalWeaponScript != null ? "✅ 存在" : "❌ 为null")}");
+            }
+            return;
+        }
+        
+        var weaponData = GetEquippedWeaponData();
+        
+        // 诊断检查2：检查武器数据
+        if (weaponData == null)
+        {
+            if (Input.GetKeyDown(fireKey))
+            {
+                Debug.LogWarning("[PlayerControl] ⚠️ 武器数据丢失！GetEquippedWeaponData() 返回 null。" +
+                                 $"\n  - WeaponInstance: {externalWeaponInstance.name}" +
+                                 $"\n  - 请检查 WeaponControl 是否获取到 weaponData");
+            }
+            return;
+        }
+        
+        // 持续自动开火武器由WeaponControl自动处理，不响应玩家输入
+        if (weaponData.continuousAutoFire)
+        {
+            return;
+        }
+        
+        var wc = externalWeaponScript as WeaponControl;
+        
+        // 诊断检查3：检查WeaponControl组件
+        if (wc == null)
+        {
+            if (Input.GetKeyDown(fireKey))
+            {
+                Debug.LogError("[PlayerControl] ❌ WeaponControl 组件缺失！" +
+                               $"\n  - externalWeaponScript 类型: {externalWeaponScript?.GetType().Name ?? "null"}" +
+                               $"\n  - 武器预制体: {externalWeaponInstance.name}" +
+                               $"\n  - 请检查武器 Prefab 是否包含 WeaponControl 组件");
+            }
+            return;
+        }
+        
+        // 诊断检查4：检查按键输入
+        if (Input.GetKeyDown(fireKey))
+        {
+            equipped.Use(gameObject);
+        }
+        else if (Input.GetKeyUp(fireKey))
+        {
+            wc.StopFiring();
+        }
+    }
+
+    /// <summary>
     /// 将武器预制体实例化并挂载到 weaponAttachPoint（若已有则替换）
     /// 如果实例上存在实现 IWeapon 的组件，会缓存引用便于调用
     /// </summary>
     /// <param name="weaponPrefab">武器预制体</param>
     public void EquipExternalWeapon(GameObject weaponPrefab)
     {
-        if (weaponPrefab == null) return;
+        if (weaponPrefab == null)
+        {
+            Debug.LogError("[PlayerControl] ❌ EquipExternalWeapon: weaponPrefab 为 null！");
+            return;
+        }
+
+        // 检查挂点是否有效
+        if (weaponAttachPoint == null)
+        {
+            Debug.LogWarning("[PlayerControl] ⚠️ weaponAttachPoint 为 null，使用玩家自身作为挂点");
+            weaponAttachPoint = transform;
+        }
 
         // 卸载旧武器
         if (externalWeaponInstance != null)
@@ -169,6 +284,8 @@ public class PlayerControl : MonoBehaviour
             externalWeaponScript = null;
         }
 
+        Debug.Log($"[PlayerControl] 🔧 实例化武器预制体...\n  - Prefab: {weaponPrefab.name}\n  - 挂点: {weaponAttachPoint.name}");
+
         // 实例化并挂到挂点
         externalWeaponInstance = Instantiate(weaponPrefab, weaponAttachPoint.position, weaponAttachPoint.rotation, weaponAttachPoint);
         externalWeaponInstance.transform.localPosition = Vector3.zero;
@@ -176,6 +293,29 @@ public class PlayerControl : MonoBehaviour
 
         // 查找实现 IWeapon 的脚本（若有）
         externalWeaponScript = externalWeaponInstance.GetComponentInChildren<IWeapon>();
+        
+        // 诊断输出
+        Debug.Log($"[PlayerControl] ✅ 武器已装备: {weaponPrefab.name}" +
+                 $"\n  - Instance: {externalWeaponInstance.name}" +
+                 $"\n  - IWeapon 组件: {(externalWeaponScript != null ? "✅ 找到 (" + externalWeaponScript.GetType().Name + ")" : "❌ 未找到")}" +
+                 $"\n  - 检查 WeaponControl...");
+        
+        // 额外诊断：检查 WeaponControl 组件
+        var wc = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
+        if (wc != null)
+        {
+            Debug.Log($"[PlayerControl] ✅ WeaponControl 组件已找到" +
+                     $"\n  - weaponData: {(wc.weaponData != null ? "✅ " + wc.weaponData.weaponName : "❌ 为null")}" +
+                     $"\n  - propertyManager: {(wc.propertyManager != null ? "✅ 存在" : "⚠️ 缺失（可选，但推荐）")}" +
+                     $"\n  - muzzlePoint: {(wc.muzzlePoint != null ? "✅ 已设置" : "⚠️ 未设置（将使用武器位置）")}" +
+                     $"\n  - audioSource: {(wc.audioSource != null ? "✅ 已设置" : "⚠️ 未设置（音效将无法播放）")}");
+        }
+        else
+        {
+            Debug.LogError($"[PlayerControl] ❌ WeaponControl 组件未找到！" +
+                          $"\n  - 武器 Prefab: {weaponPrefab.name}" +
+                          $"\n  - 请检查 Prefab 是否包含 WeaponControl 脚本");
+        }
     }
 
     /// <summary>
@@ -185,21 +325,43 @@ public class PlayerControl : MonoBehaviour
     /// <param name="weaponData">Weapon ScriptableObject 数据</param>
     public void EquipExternalWeapon(GameObject weaponPrefab, Weapon weaponData)
     {
+        if (weaponData == null)
+        {
+            Debug.LogError("[PlayerControl] ❌ EquipExternalWeapon: weaponData 为 null！");
+            return;
+        }
+        
+        Debug.Log($"[PlayerControl] 📋 开始装备武器: {weaponData.weaponName}");
+        
         EquipExternalWeapon(weaponPrefab);
 
-        if (externalWeaponInstance != null && weaponData != null)
+        if (externalWeaponInstance == null)
         {
-            var wc = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
-            if (wc != null)
-            {
-                wc.SetWeaponData(weaponData);
-                
-                // 若为持续自动开火武器，启动自动开火（Use 会缓存使用者并使 WeaponControl 立刻开始按设定间隔开火）
-                if (weaponData.continuousAutoFire)
-                {
-                    wc.Use(gameObject);
-                }
-            }
+            Debug.LogError("[PlayerControl] ❌ 武器实例化失败！externalWeaponInstance 为 null");
+            return;
+        }
+        
+        var wc = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
+        if (wc == null)
+        {
+            Debug.LogError("[PlayerControl] ❌ WeaponControl 组件不存在！无法设置武器数据");
+            return;
+        }
+        
+        Debug.Log($"[PlayerControl] 🔧 设置武器数据...");
+        wc.SetWeaponData(weaponData);
+        
+        Debug.Log($"[PlayerControl] ✅ 武器数据已设置: {weaponData.weaponName}" +
+                 $"\n  - 伤害: {weaponData.damage}" +
+                 $"\n  - 攻速: {weaponData.attackRate}/s" +
+                 $"\n  - 类型: {weaponData.weaponType}" +
+                 $"\n  - 自动开火: {(weaponData.continuousAutoFire ? "是" : "否")}");
+        
+        // 若为持续自动开火武器，启动自动开火
+        if (weaponData.continuousAutoFire)
+        {
+            Debug.Log($"[PlayerControl] 🔥 启动持续自动开火...");
+            wc.Use(gameObject);
         }
     }
     
@@ -312,6 +474,13 @@ public class PlayerControl : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHp = Mathf.Max(currentHp - damage, 0); // 血量不小于0
+        
+        // 同步到PropertyManager系统（用于属性修饰）
+        if (playerPropertyManager != null)
+        {
+            playerPropertyManager.SetCurrentHealth(currentHp);
+        }
+        
         if (currentHp <= 0)
         {
             Die(); // 血量为0则死亡
@@ -344,10 +513,68 @@ public class PlayerControl : MonoBehaviour
                 break;
             case "Hp":
                 currentHp = Mathf.Min(currentHp + value, maxHp); // 血量不超过最大值
+                
+                // 同步到PropertyManager系统（用于属性修饰）
+                if (playerPropertyManager != null)
+                {
+                    playerPropertyManager.SetCurrentHealth(currentHp);
+                }
+                
                 Debug.Log("拾取血包：" + value + "，当前血量：" + currentHp);
                 break;
         }
         // 后续可加：拾取特效、拾取音效等
+    }
+    
+    /// <summary>
+    /// 诊断方法：检查武器装备状态（按 D 键调用）
+    /// </summary>
+    [ContextMenu("检查武器装备状态")]
+    public void DiagnoseWeaponStatus()
+    {
+        Debug.Log($"\n[PlayerControl] 🔍 武器装备诊断" +
+                 $"\n{'='} 基础配置" +
+                 $"\n  - externalWeaponPrefab: {(externalWeaponPrefab != null ? $"✅ {externalWeaponPrefab.name}" : "❌ 未设置")}" +
+                 $"\n  - weaponAttachPoint: {(weaponAttachPoint != null ? $"✅ {weaponAttachPoint.name}" : "❌ 为null")}" +
+                 $"\n  - fireKey: {fireKey}" +
+                 $"\n{'='} 运行时状态" +
+                 $"\n  - externalWeaponInstance: {(externalWeaponInstance != null ? $"✅ {externalWeaponInstance.name}" : "❌ 为null")}" +
+                 $"\n  - externalWeaponScript: {(externalWeaponScript != null ? $"✅ {externalWeaponScript.GetType().Name}" : "❌ 为null")}" +
+                 $"\n{'='} 武器数据");
+        
+        var weaponData = GetEquippedWeaponData();
+        if (weaponData != null)
+        {
+            Debug.Log($"  - 武器名称: ✅ {weaponData.weaponName}" +
+                     $"\n  - 武器类型: {weaponData.weaponType}" +
+                     $"\n  - 基础伤害: {weaponData.damage}" +
+                     $"\n  - 攻击速率: {weaponData.attackRate}/s" +
+                     $"\n  - 自动开火: {(weaponData.continuousAutoFire ? "是" : "否")}");
+        }
+        else
+        {
+            Debug.LogWarning("  - 武器数据: ❌ 无法获取");
+        }
+        
+        if (externalWeaponInstance != null)
+        {
+            var wc = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
+            if (wc != null)
+            {
+                Debug.Log($"{'='} WeaponControl 状态" +
+                         $"\n  - 组件: ✅ 已找到" +
+                         $"\n  - weaponData: {(wc.weaponData != null ? "✅ " + wc.weaponData.weaponName : "❌ 为null")}" +
+                         $"\n  - propertyManager: {(wc.propertyManager != null ? "✅ 已挂载" : "⚠️ 缺失（属性卡无效）")}" +
+                         $"\n  - muzzlePoint: {(wc.muzzlePoint != null ? "✅ 已设置" : "⚠️ 未设置")}" +
+                         $"\n  - audioSource: {(wc.audioSource != null ? "✅ 已设置" : "⚠️ 未设置")}");
+            }
+            else
+            {
+                Debug.LogError($"  - WeaponControl: ❌ 组件未找到！");
+            }
+        }
+        
+        Debug.Log("=" + "\n");
     }
     #endregion
 }

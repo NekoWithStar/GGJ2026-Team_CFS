@@ -10,7 +10,7 @@ public class DamageDealer : MonoBehaviour
 {
     [Header("基础伤害")]
     [Tooltip("基础伤害值")]
-    public int damage = 10;
+    public float damage = 10;
 
     [Tooltip("命中后是否销毁自己（子弹/一次性判定常用）")]
     public bool destroyOnHit = true;
@@ -56,7 +56,7 @@ public class DamageDealer : MonoBehaviour
         {
             return Mathf.RoundToInt(damage * critDamageMultiplier);
         }
-        return damage;
+        return Mathf.RoundToInt(damage);
     }
     
     /// <summary>

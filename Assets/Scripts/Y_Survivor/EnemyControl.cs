@@ -223,7 +223,7 @@ public class EnemyControl : MonoBehaviour
             // 避免自伤（DamageDealer 可持有 owner 引用）
             if (dd.owner != null && dd.owner == gameObject) return;
 
-            TakeDamage(dd.damage);
+            TakeDamage(Mathf.RoundToInt(dd.damage));
 
             if (dd.destroyOnHit && other.gameObject != null)
             {
@@ -234,13 +234,24 @@ public class EnemyControl : MonoBehaviour
             return;
         }
 
-        // 2) 退路：如果碰撞对象标记为玩家武器（"PlayerWeapon"），尝试从玩家组件读取攻击力
+        // 2) 退路：如果碰撞对象标记为玩家武器（"Weapon"），尝试从玩家的已装备武器读取伤害值
         if (other.CompareTag("Weapon"))
         {
             var pc = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerControl>();
             if (pc != null)
             {
-                TakeDamage(pc.attack);
+                // 获取玩家已装备武器的伤害值
+                var equippedWeapon = pc.GetEquippedWeapon() as WeaponControl;
+                if (equippedWeapon != null && equippedWeapon.weaponData != null)
+                {
+                    int weaponDamage = equippedWeapon.GetEffectiveDamage();
+                    TakeDamage(weaponDamage);
+                }
+                else
+                {
+                    Debug.LogWarning("[EnemyControl] 玩家未装备武器或武器数据缺失，使用默认伤害（10）");
+                    TakeDamage(10); // 默认伤害值
+                }
             }
         }
     }

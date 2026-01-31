@@ -20,9 +20,13 @@ namespace Y_Survivor
         [Tooltip("中型怪物基础移动速度")]
         public float baseMediumEnemySpeed = 1.5f;
         
+        [Tooltip("大型怪物基础移动速度")]
+        public float baseLargeEnemySpeed = 1f;
+        
         // ===== 敌人属性 =====
         public GameProperty SmallEnemyMoveSpeed { get; private set; }
         public GameProperty MediumEnemyMoveSpeed { get; private set; }
+        public GameProperty LargeEnemyMoveSpeed { get; private set; }
         
         // 已应用的卡片及其修饰符的映射
         private Dictionary<PropertyCard, List<(PropertyType, IModifier)>> appliedCards 
@@ -48,6 +52,7 @@ namespace Y_Survivor
         {
             SmallEnemyMoveSpeed = new GameProperty("Enemy.SmallMoveSpeed", baseSmallEnemySpeed);
             MediumEnemyMoveSpeed = new GameProperty("Enemy.MediumMoveSpeed", baseMediumEnemySpeed);
+            LargeEnemyMoveSpeed = new GameProperty("Enemy.LargeMoveSpeed", baseLargeEnemySpeed);
         }
         
         /// <summary>
@@ -115,6 +120,7 @@ namespace Y_Survivor
             {
                 PropertyType.SmallEnemyMoveSpeed => SmallEnemyMoveSpeed,
                 PropertyType.MediumEnemyMoveSpeed => MediumEnemyMoveSpeed,
+                PropertyType.LargeEnemyMoveSpeed => LargeEnemyMoveSpeed,
                 _ => null
             };
         }
@@ -135,5 +141,8 @@ namespace Y_Survivor
         
         /// <summary>获取中型怪物最终移动速度</summary>
         public float GetMediumEnemySpeed() => MediumEnemyMoveSpeed.GetValue();
+        
+        /// <summary>获取大型怪物最终移动速度</summary>
+        public float GetLargeEnemySpeed() => LargeEnemyMoveSpeed.GetValue();
     }
 }

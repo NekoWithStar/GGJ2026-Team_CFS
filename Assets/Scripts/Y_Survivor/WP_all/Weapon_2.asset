@@ -15,15 +15,15 @@ MonoBehaviour:
   weaponType: 1
   weaponName: Gun
   weaponIcon: {fileID: 0}
-  damage: 15
+  damage: 1
   continuousAutoFire: 1
   continuousFireDuration: 3
-  firePattern: {fileID: 11400000, guid: ebc962bebd067cb44801017741e11de0, type: 2}
+  firePattern: {fileID: 11400000, guid: 92e9ec088a12ca34aaf5122ce25abaa4, type: 2}
   requiresCharging: 0
   chargingTime: 0.2
-  cooldown: 0
-  attackRate: 295
-  critChanceBase: 0
+  cooldown: 0.2
+  attackRate: 10
+  critChanceBase: 1
   critDamageBase: 1.5
   meleeRange: 2
   fireSound: {fileID: 0}
