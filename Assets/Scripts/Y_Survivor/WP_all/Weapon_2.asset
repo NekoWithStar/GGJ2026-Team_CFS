@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponType: 1
   weaponName: Gun
   weaponIcon: {fileID: 0}
-  damage: 1
+  damage: 50
   continuousAutoFire: 1
   continuousFireDuration: 3
   firePattern: {fileID: 11400000, guid: 92e9ec088a12ca34aaf5122ce25abaa4, type: 2}

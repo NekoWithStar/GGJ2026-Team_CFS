@@ -11,6 +11,9 @@ public class PlayerControl : MonoBehaviour
     [Tooltip("是否限制移动（如死亡/升级时）")]
     public bool canMove = true;
 
+    [Header("卡牌选择配置")]
+    public int cardsToShowOnLevelUp = 4; // 升级时显示的卡牌数量
+
     [Header("玩家基础属性")]
     private int maxHp = 100;    // 最大血量（改为 private，从 PropertyManager 获取）
     private float baseMoveSpeed = 100f; // 基础移动速度（改为 private，从 PropertyManager 获取）
@@ -512,7 +515,7 @@ public class PlayerControl : MonoBehaviour
         var cardSelection = FindAnyObjectByType<CardSelectionManager>();
         if (cardSelection != null)
         {
-            cardSelection.ShowCardSelection(3); // 显示3张卡牌选择
+            cardSelection.ShowCardSelection(cardsToShowOnLevelUp); // 使用可配置的数量
         }
     }
 
@@ -559,8 +562,59 @@ public class PlayerControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 拾取道具方法（金币/血包，拾取脚本调用）
+    /// 应用属性卡效果
     /// </summary>
+    public void ApplyPropertyCard(PropertyCard card)
+    {
+        if (card == null)
+        {
+            Debug.LogWarning("[PlayerControl] 属性卡为空");
+            return;
+        }
+
+        if (playerPropertyManager == null)
+        {
+            Debug.LogError("[PlayerControl] PlayerPropertyManager不存在，无法应用属性卡");
+            return;
+        }
+
+        // 直接使用PlayerPropertyManager的ApplyPropertyCard方法
+        playerPropertyManager.ApplyPropertyCard(card);
+    }
+
+    /// <summary>
+    /// 应用武器卡效果（更换武器）
+    /// </summary>
+    public void ApplyWeaponCard(Weapon weapon)
+    {
+        if (weapon == null)
+        {
+            Debug.LogWarning("[PlayerControl] 武器卡为空");
+            return;
+        }
+
+        Debug.Log($"[PlayerControl] 📋 应用武器卡: {weapon.weaponName}");
+
+        // 如果当前有武器，使用SwitchWeaponData保持属性加成
+        if (externalWeaponInstance != null)
+        {
+            bool success = SwitchWeaponData(weapon);
+            if (success)
+            {
+                Debug.Log($"[PlayerControl] ✅ 成功切换到武器: {weapon.weaponName}");
+            }
+            else
+            {
+                Debug.LogError($"[PlayerControl] ❌ 切换武器失败: {weapon.weaponName}");
+            }
+        }
+        else
+        {
+            // 如果没有武器，需要武器预制体，这里先记录需求
+            Debug.LogWarning($"[PlayerControl] ⚠️ 当前没有装备武器，无法应用武器卡: {weapon.weaponName}");
+            Debug.LogWarning("[PlayerControl] 需要先装备基础武器，然后才能切换武器数据");
+        }
+    }
     /// <param name="type">道具类型：Coin/Hp</param>
     /// <param name="value">道具数值</param>
     public void PickupItem(string type, int value)
@@ -572,7 +626,7 @@ public class PlayerControl : MonoBehaviour
                 Debug.Log($"拾取金币 +{value}，当前金币: {coin}");
 
                 // 检查是否触发卡牌选择
-                if (coin >= 100)
+                if (coin >= 10)
                 {
                     TriggerCardSelection();
                 }

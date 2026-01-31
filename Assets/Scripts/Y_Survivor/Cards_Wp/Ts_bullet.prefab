@@ -139,9 +139,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bbe51bc3443f5849a9ffba5d96ead0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  damage: 5
   destroyOnHit: 1
   owner: {fileID: 0}
+  critChance: 0
+  critDamageMultiplier: 1.5
+  isCritical: 0
 --- !u!114 &1530344327486177012
 MonoBehaviour:
   m_ObjectHideFlags: 0

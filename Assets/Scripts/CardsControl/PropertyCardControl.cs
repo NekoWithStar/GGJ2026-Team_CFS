@@ -59,6 +59,7 @@ public class PropertyCardControl : MonoBehaviour
     public void SetupCard(PropertyCard card)
     {
         propertyCard = card;
+        Debug.Log($"[PropertyCardControl] 🔄 设置属性卡: {card?.cardName ?? "null"}");
         UpdateUI();
     }
 

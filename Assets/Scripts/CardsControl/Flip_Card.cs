@@ -112,16 +112,20 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log($"[Flip_Card] 🖱️ 卡牌被点击 - isFaceDown: {isFaceDown}, secondClickIsConfirm: {secondClickIsConfirm}, isAnimating: {isAnimating}");
+
         if (isAnimating) return;
 
-        // 如果启用了“再次点击为确认”且当前为正面朝上，则把再次点击视为确认而不是翻回去
+        // 如果启用了"再次点击为确认"且当前为正面朝上，则把再次点击视为确认而不是翻回去
         if (!isFaceDown && secondClickIsConfirm)
         {
+            Debug.Log($"[Flip_Card] ✅ 触发确认事件");
             // 先触发 inspector 绑定的 UnityEvent
             Confirm();
             return;
         }
 
+        Debug.Log($"[Flip_Card] 🔄 开始翻转动画");
         StartCoroutine(FlipCoroutine());
     }
 

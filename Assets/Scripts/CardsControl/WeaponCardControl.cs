@@ -58,6 +58,7 @@ public class WeaponCardControl : MonoBehaviour
     public void SetupCard(Weapon weapon)
     {
         weapon_data = weapon;
+        Debug.Log($"[WeaponCardControl] 🔄 设置武器卡: {weapon?.weaponName ?? "null"}");
         RefreshUI();
     }
 }
