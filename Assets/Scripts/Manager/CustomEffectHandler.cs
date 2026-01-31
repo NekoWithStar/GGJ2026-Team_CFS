@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 // 检测Cinemachine命名空间是否存在
 using System;
-using System.Reflection;
 
 public class CustomEffectHandler : MonoBehaviour
 {
@@ -13,14 +12,7 @@ public class CustomEffectHandler : MonoBehaviour
     private Camera mainCam;
     private AudioSource audioSource;
     
-    // Cinemachine支持 - 动态检测
-    private Component virtualCamera;
-    private bool hasCinemachine;
-    private PropertyInfo lensProperty;
-    private PropertyInfo orthoSizeProperty;
-    
     // 视野受限相关
-    private float originalOrthographicSize;
     private Coroutine limitedVisionCoroutine;
     
     // 失灵指南针相关
@@ -72,46 +64,12 @@ public class CustomEffectHandler : MonoBehaviour
             }
         }
         
-        // 动态检测Cinemachine
-        DetectCinemachine();
-        
         if (mainCam == null)
         {
             mainCam = FindAnyObjectByType<Camera>();
         }
-        
-        if (originalOrthographicSize == 0f && mainCam != null)
-        {
-            originalOrthographicSize = mainCam.orthographicSize;
-        }
 
-        Debug.Log($"[CustomEffectHandler] 初始化完成 - 相机: {(mainCam != null ? "找到" : "未找到")}, 原始正交尺寸: {originalOrthographicSize}, Cinemachine: {(hasCinemachine ? "检测到" : "未检测到")}");
-    }
-
-    /// <summary>
-    /// 动态检测Cinemachine是否存在并获取相关组件
-    /// </summary>
-    private void DetectCinemachine()
-    {
-        try
-        {
-            // 尝试查找CinemachineVirtualCamera
-            Type virtualCameraType = Type.GetType("Cinemachine.CinemachineVirtualCamera, Cinemachine");
-            if (virtualCameraType != null)
-            {
-                virtualCamera = FindAnyObjectByType(virtualCameraType) as Component;
-                if (virtualCamera != null)
-                {
-                    hasCinemachine = true;
-                    Debug.Log("[CustomEffectHandler] 检测到Cinemachine虚拟相机，将直接修改Lens.OrthographicSize");
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[CustomEffectHandler] Cinemachine检测失败: {e.Message}");
-            hasCinemachine = false;
-        }
+        Debug.Log($"[CustomEffectHandler] 初始化完成 - 相机: {(mainCam != null ? "找到" : "未找到")}");
     }
 
     /// <summary>
@@ -155,8 +113,8 @@ public class CustomEffectHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// 1. 视野受限 - 短暂减小摄像机视距
-    /// customEffectValue: 视距缩小倍数（例如 0.5 = 50% 视距）
+    /// 1. 视野受限 - 短暂关闭摄像机
+    /// customEffectDuration: 关闭持续时间（秒）
     /// </summary>
     private void ApplyLimitedVision(PropertyCard card)
     {
@@ -171,9 +129,9 @@ public class CustomEffectHandler : MonoBehaviour
         {
             StopCoroutine(limitedVisionCoroutine);
         }
-        
+
         Debug.Log($"[CustomEffectHandler] 应用视野受限 - 关闭摄像机，持续时间: {card.customEffectDuration}s");
-        
+
         limitedVisionCoroutine = StartCoroutine(LimitedVisionCoroutine(card.customEffectDuration));
     }
 
@@ -194,80 +152,6 @@ public class CustomEffectHandler : MonoBehaviour
         }
         
         Debug.Log("[CustomEffectHandler] 视野受限效果结束");
-    }
-
-    /// <summary>
-    /// 获取当前正交尺寸（优先使用Cinemachine，否则使用主相机）
-    /// </summary>
-    private float GetCurrentOrthographicSize()
-    {
-        // 优先尝试Cinemachine
-        if (hasCinemachine && virtualCamera != null)
-        {
-            try
-            {
-                // 通过反射获取 m_Lens.OrthographicSize
-                var lensProperty = virtualCamera.GetType().GetProperty("m_Lens");
-                if (lensProperty != null)
-                {
-                    var lens = lensProperty.GetValue(virtualCamera);
-                    var orthoSizeProperty = lens.GetType().GetProperty("OrthographicSize");
-                    if (orthoSizeProperty != null)
-                    {
-                        return (float)orthoSizeProperty.GetValue(lens);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[CustomEffectHandler] 获取Cinemachine OrthographicSize失败: {e.Message}");
-            }
-        }
-        
-        // 降级到标准相机
-        return mainCam != null ? mainCam.orthographicSize : 5f;
-    }
-
-    /// <summary>
-    /// 设置正交尺寸（优先使用Cinemachine，否则使用主相机）
-    /// </summary>
-    private void SetOrthographicSize(float size)
-    {
-        bool cinemachineSuccess = false;
-        
-        // 优先尝试Cinemachine
-        if (hasCinemachine && virtualCamera != null)
-        {
-            try
-            {
-                // 通过反射设置 m_Lens.OrthographicSize
-                var lensProperty = virtualCamera.GetType().GetProperty("m_Lens");
-                if (lensProperty != null)
-                {
-                    var lens = lensProperty.GetValue(virtualCamera);
-                    var orthoSizeProperty = lens.GetType().GetProperty("OrthographicSize");
-                    if (orthoSizeProperty != null)
-                    {
-                        orthoSizeProperty.SetValue(lens, size);
-                        // 由于Lens是结构体，需要重新赋值
-                        lensProperty.SetValue(virtualCamera, lens);
-                        Debug.Log($"[CustomEffectHandler] 设置Cinemachine OrthographicSize: {size}");
-                        cinemachineSuccess = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[CustomEffectHandler] 设置Cinemachine OrthographicSize失败: {e.Message}");
-            }
-        }
-        
-        // 如果Cinemachine失败或不存在，降级到标准相机
-        if (!cinemachineSuccess && mainCam != null)
-        {
-            mainCam.orthographicSize = size;
-            Debug.Log($"[CustomEffectHandler] 设置Camera OrthographicSize: {size}");
-        }
     }
 
     /// <summary>
@@ -412,7 +296,7 @@ public class CustomEffectHandler : MonoBehaviour
 
     /// <summary>
     /// 5. 以旧换新 - 更改玩家手持武器数据源（无需ScriptableObject引用）
-    /// 自动从Resources/Weapons目录根据customEffectValue加载武器
+    /// 自动从CardPoolManager的weaponCards列表中选择武器
     /// </summary>
     private void ApplyWeaponSwitch(PropertyCard card)
     {
@@ -432,27 +316,37 @@ public class CustomEffectHandler : MonoBehaviour
         }
         else
         {
-            // "假传入" - 根据customEffectValue(武器ID)从Resources加载武器
+            // "假传入" - 从CardPoolManager获取武器
             int weaponId = Mathf.RoundToInt(card.customEffectValue);
-            if (weaponId > 0)
+            if (weaponId > 0 && CardPoolManager.Instance != null)
             {
-                // 尝试从Resources加载
-                string weaponPath = $"Weapons/Weapon_{weaponId}";
-                replacementWeapon = Resources.Load<Weapon>(weaponPath);
-                
-                if (replacementWeapon != null)
+                // 从CardPoolManager的weaponCards列表中选择武器
+                var weaponCards = CardPoolManager.Instance.weaponCards;
+                if (weaponCards != null && weaponCards.Count > 0)
                 {
-                    Debug.Log($"[CustomEffectHandler] 以旧换新: 从Resources加载武器 - {weaponPath}");
+                    // 使用weaponId作为索引（从1开始，所以要减1）
+                    int weaponIndex = weaponId - 1;
+                    if (weaponIndex >= 0 && weaponIndex < weaponCards.Count)
+                    {
+                        replacementWeapon = weaponCards[weaponIndex];
+                        Debug.Log($"[CustomEffectHandler] 以旧换新: 从CardPoolManager选择武器 - 索引{weaponIndex}: {replacementWeapon.weaponName}");
+                    }
+                    else
+                    {
+                        // 如果索引超出范围，随机选择一个武器
+                        replacementWeapon = weaponCards[UnityEngine.Random.Range(0, weaponCards.Count)];
+                        Debug.Log($"[CustomEffectHandler] 以旧换新: 索引超出范围，随机选择武器: {replacementWeapon.weaponName}");
+                    }
                 }
                 else
                 {
-                    Debug.LogWarning($"[CustomEffectHandler] 以旧换新: 在Resources/{weaponPath}找不到武器");
+                    Debug.LogWarning("[CustomEffectHandler] 以旧换新: CardPoolManager.weaponCards为空");
                     return;
                 }
             }
             else
             {
-                Debug.LogWarning("[CustomEffectHandler] 以旧换新: 未设置replacementWeapon，且customEffectValue无效");
+                Debug.LogWarning("[CustomEffectHandler] 以旧换新: 未设置replacementWeapon，且CardPoolManager不可用或customEffectValue无效");
                 return;
             }
         }

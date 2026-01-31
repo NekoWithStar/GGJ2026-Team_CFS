@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -779.35, y: -428}
+  m_AnchoredPosition: {x: -779.35, y: -435}
   m_SizeDelta: {x: 266.4535, y: 113.5249}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &53080807
@@ -327,6 +327,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Weapon
       objectReference: {fileID: 0}
+    - target: {fileID: 4632441823310291357, guid: eb9402c91a1936d46a8602de7941ce3f, type: 3}
+      propertyPath: weaponData
+      value: 
+      objectReference: {fileID: 11400000, guid: 6c21faf886dbe3c418ed31511f4b2e6d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -545,7 +549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c023f58a7c73954282ab188ad57ce91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerControl: {fileID: 0}
+  playerControl: {fileID: 158854560}
   currentWeaponName: "\u65E0\u6B66\u5668"
   weaponType: N/A
   weaponState: N/A
@@ -604,6 +608,8 @@ GameObject:
   - component: {fileID: 249074556}
   - component: {fileID: 249074555}
   - component: {fileID: 249074554}
+  - component: {fileID: 249074557}
+  - component: {fileID: 249074558}
   m_Layer: 0
   m_Name: Card_Manager
   m_TagString: Untagged
@@ -626,11 +632,6 @@ MonoBehaviour:
   cardSelectionPanel: {fileID: 1030214894}
   cardContainer: {fileID: 1189534843}
   cardPrefab: {fileID: 1421748536297895998, guid: a7f25b61522d4694aab5e8233abb0546, type: 3}
-  confirmButton1: {fileID: 0}
-  confirmButton2: {fileID: 0}
-  confirmButton3: {fileID: 0}
-  confirmButton4: {fileID: 0}
-  cancelButton: {fileID: 0}
   cardPositions:
   - {fileID: 1674819452}
   - {fileID: 415567906}
@@ -651,7 +652,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3189ca278176c6b4680f4133436fac52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponCards: []
+  weaponCards:
+  - {fileID: 11400000, guid: 6c21faf886dbe3c418ed31511f4b2e6d, type: 2}
+  - {fileID: 11400000, guid: 1361fa67c28c1284f915d7151a3f111b, type: 2}
   propertyCards:
   - {fileID: 11400000, guid: 995a009cd8a352b4cbfa7a404b8ca0d8, type: 2}
   - {fileID: 11400000, guid: 2f1a49069ce80d9409d016ba5b5bd501, type: 2}
@@ -659,13 +662,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fd3755ac4550ccb459d1ed336381fda6, type: 2}
   - {fileID: 11400000, guid: 63cd2318dde93ac438ed8510b41428bd, type: 2}
   - {fileID: 11400000, guid: 6114f113cf44a0149bdc3180916a83da, type: 2}
+  - {fileID: 11400000, guid: 3d8f7c10ebfcc9246b8dcf1938a30c56, type: 2}
   - {fileID: 11400000, guid: e1ae4ce646e3ead4780eb3fef79d749e, type: 2}
   - {fileID: 11400000, guid: 0dec8f3a9ba643041b7d4dc36ec01629, type: 2}
   - {fileID: 11400000, guid: ae9cb31770899654b88b7e36e56250bb, type: 2}
   - {fileID: 11400000, guid: df1c8cb98bf6e9a499a503d2f6b703ed, type: 2}
   cardsToShow: 4
   cardsToSelect: 1
-  coinCostPerCard: 10
+  coinCostPerCard: 30
+  debugMode: 0
+  skipCoinCheck: 0
 --- !u!4 &249074556
 Transform:
   m_ObjectHideFlags: 0
@@ -681,6 +687,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &249074557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249074553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ac9a5f8ffa65524fb993fda34e9a8a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  testCardCount: 4
+  testCoinCost: 30
+--- !u!114 &249074558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249074553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28266638169489345b50715d8836c4e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinThresholdForCardSelection: 30
+  coinCostPerCard: 30
+  coinDropPerEnemy: 5
+  debugMode: 0
+  skipCoinCheck: 0
 --- !u!1 &415567905
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,7 +750,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -200, y: 0}
+  m_AnchoredPosition: {x: -215, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &512896955
@@ -743,12 +780,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 512896955}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 541165413}
+  m_Father: {fileID: 894060656}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -957,7 +994,6 @@ RectTransform:
   m_Children:
   - {fileID: 894060656}
   - {fileID: 1460712209}
-  - {fileID: 512896956}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1416,6 +1452,7 @@ RectTransform:
   m_Children:
   - {fileID: 1129913506}
   - {fileID: 53080806}
+  - {fileID: 512896956}
   m_Father: {fileID: 541165413}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1880,7 +1917,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -756, y: -341}
+  m_AnchoredPosition: {x: -756, y: -348}
   m_SizeDelta: {x: 346.703, y: 113.5249}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1129913507
@@ -2094,7 +2131,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -114}
+  m_AnchoredPosition: {x: 0, y: -80}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1292231632
@@ -2296,7 +2333,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 220, y: 0}
+  m_AnchoredPosition: {x: 215, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1406338159 stripped
@@ -2392,7 +2429,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.14901961}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

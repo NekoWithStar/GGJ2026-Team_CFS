@@ -13,13 +13,6 @@ public class CardSelectionManager : MonoBehaviour
     public Transform cardContainer; // 卡牌容器（需要设置合适的尺寸和锚点）
     public GameObject cardPrefab; // 卡牌UI预制体（Flip_Card或简化版）
 
-    [Header("确认按钮（可选）")]
-    public Button confirmButton1; // 确认第一张卡牌的按钮
-    public Button confirmButton2; // 确认第二张卡牌的按钮
-    public Button confirmButton3; // 确认第三张卡牌的按钮
-    public Button confirmButton4; // 确认第四张卡牌的按钮
-    public Button cancelButton; // 取消按钮
-
     [Header("布局配置")]
     public List<Transform> cardPositions; // 指定卡牌位置点（可选，如果为空则使用自动布局）
     public float cardSpacing = 200f; // 卡牌之间的间距（自动布局时使用）
@@ -48,40 +41,6 @@ public class CardSelectionManager : MonoBehaviour
         Flip_Card.OnCardConfirmed += OnCardSelected;
         Flip_Card.OnWeaponConfirmed += OnWeaponSelected;
         Flip_Card.OnPropertyCardConfirmed += OnPropertyCardSelected;
-
-        // 设置确认按钮监听器
-        SetupConfirmButtons();
-    }
-
-    /// <summary>
-    /// 设置确认按钮的监听器
-    /// </summary>
-    private void SetupConfirmButtons()
-    {
-        if (confirmButton1 != null)
-            confirmButton1.onClick.AddListener(() => ConfirmCardByIndex(0));
-        if (confirmButton2 != null)
-            confirmButton2.onClick.AddListener(() => ConfirmCardByIndex(1));
-        if (confirmButton3 != null)
-            confirmButton3.onClick.AddListener(() => ConfirmCardByIndex(2));
-        if (confirmButton4 != null)
-            confirmButton4.onClick.AddListener(() => ConfirmCardByIndex(3));
-        if (cancelButton != null)
-            cancelButton.onClick.AddListener(CancelSelection);
-    }
-
-    /// <summary>
-    /// 取消卡牌选择
-    /// </summary>
-    private void CancelSelection()
-    {
-        Debug.Log("[CardSelectionManager] ❌ 取消卡牌选择");
-        HideCardSelection();
-        // 恢复游戏但不消耗金币
-        if (player != null)
-        {
-            player.ResumeGame();
-        }
     }
 
     /// <summary>
@@ -164,7 +123,16 @@ public class CardSelectionManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogError($"[CardSelectionManager] ❌ 武器卡 {weapon.weaponName} 缺少 WeaponCardControl 组件");
+                    // 查找场景中现有的 WeaponCardControl 实例
+                    WeaponCardControl[] sceneWeaponControls = FindObjectsByType<WeaponCardControl>(FindObjectsSortMode.None);
+                    if (sceneWeaponControls.Length > 0)
+                    {
+                        // 使用第一个找到的 WeaponCardControl
+                        weaponControl = sceneWeaponControls[0];
+                        weaponControl.SetupCard(weapon);
+                        currentCardData.Add(weapon);
+                        Debug.Log($"[CardSelectionManager] ✅ 使用场景中的 WeaponCardControl 配置武器卡: {weapon.weaponName}");
+                    }
                 }
             }
             else
@@ -187,38 +155,6 @@ public class CardSelectionManager : MonoBehaviour
     {
         cardSelectionPanel.SetActive(false);
         ClearCurrentCards();
-    }
-
-    /// <summary>
-    /// 手动确认选择第一张卡牌（临时解决方案，绕过Flip_Card确认问题）
-    /// </summary>
-    public void ConfirmFirstCard()
-    {
-        if (currentCardData.Count > 0 && currentCardData[0] != null)
-        {
-            Debug.Log($"[CardSelectionManager] 🎯 手动确认第一张卡牌: {currentCardData[0].GetType().Name}");
-            ApplyCardEffect(currentCardData[0]);
-        }
-        else
-        {
-            Debug.LogWarning("[CardSelectionManager] ⚠️ 没有可确认的卡牌");
-        }
-    }
-
-    /// <summary>
-    /// 手动确认选择指定索引的卡牌
-    /// </summary>
-    public void ConfirmCardByIndex(int index)
-    {
-        if (index >= 0 && index < currentCardData.Count && currentCardData[index] != null)
-        {
-            Debug.Log($"[CardSelectionManager] 🎯 手动确认第{index+1}张卡牌: {currentCardData[index].GetType().Name}");
-            ApplyCardEffect(currentCardData[index]);
-        }
-        else
-        {
-            Debug.LogWarning($"[CardSelectionManager] ⚠️ 无效的卡牌索引: {index}");
-        }
     }
 
     /// <summary>
@@ -277,40 +213,12 @@ public class CardSelectionManager : MonoBehaviour
         HideCardSelection();
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        // 卡牌选择期间的快捷键
-        if (cardSelectionPanel != null && cardSelectionPanel.activeSelf)
-        {
-            // 数字键1-3确认对应卡牌
-            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
-            {
-                ConfirmCardByIndex(0);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-            {
-                ConfirmCardByIndex(1);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
-            {
-                ConfirmCardByIndex(2);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
-            {
-                ConfirmCardByIndex(3);
-            }
-            // ESC键取消选择
-            else if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Debug.Log("[CardSelectionManager] ❌ 取消卡牌选择");
-                HideCardSelection();
-                // 恢复游戏但不消耗金币
-                if (player != null)
-                {
-                    player.ResumeGame();
-                }
-            }
-        }
+        // 取消事件监听
+        Flip_Card.OnCardConfirmed -= OnCardSelected;
+        Flip_Card.OnWeaponConfirmed -= OnWeaponSelected;
+        Flip_Card.OnPropertyCardConfirmed -= OnPropertyCardSelected;
     }
 
     /// <summary>

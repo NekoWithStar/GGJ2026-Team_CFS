@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: "\u5C0F\u98DE\u68CD"
   description: "+5 \u79FB\u901F\n\u66F4\u6362\u201C\u64AC\u68CD\u201D\uFF08\u8FD1\u6218\uFF09"
-  cardPicture_Po: {fileID: 0}
+  cardIcon: {fileID: 21300000, guid: 8ec025d33caabd94e9bb159fd6794478, type: 3}
   rarity: 0
   modifiers:
   - targetProperty: 200

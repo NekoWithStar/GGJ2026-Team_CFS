@@ -620,7 +620,7 @@ public class PlayerControl : MonoBehaviour
         
         if (scoreBoardText != null)
         {
-            scoreBoardText.text = $"欢迎下次光临！\n最终得分: {finalScore}\n(血量: {Mathf.RoundToInt(currentHealth)} + 金币: {coin})";
+            scoreBoardText.text = $"欢迎下次光临！\n本次共消费: {finalScore}\n(血量: {Mathf.RoundToInt(currentHealth)} + 金币: {coin})";
             scoreBoardText.gameObject.SetActive(true);
             Debug.Log($"[PlayerControl] 显示得分榜：血量 {Mathf.RoundToInt(currentHealth)} + 金币 {coin} = 最终得分 {finalScore}");
         }
@@ -647,21 +647,31 @@ public class PlayerControl : MonoBehaviour
     /// </summary>
     private void TriggerCardSelection()
     {
-        // 暂停游戏逻辑
-        PauseGameForCardSelection();
-
-        // 显示卡牌选择UI（需要CardSelectionManager）
-        var cardSelection = FindAnyObjectByType<CardSelectionManager>();
-        if (cardSelection != null)
+        // 使用CardPoolManager的统一金币升级流程
+        if (CardPoolManager.Instance != null)
         {
-            cardSelection.ShowCardSelection(cardsToShowOnLevelUp); // 使用可配置的数量
+            bool success = CardPoolManager.Instance.ProcessCoinUpgrade(cardsToShowOnLevelUp);
+            if (!success)
+            {
+                Debug.LogWarning("[PlayerControl] 金币升级流程启动失败，可能是金币不足");
+                // 如果失败，不暂停游戏，直接返回
+                return;
+            }
         }
+        else
+        {
+            Debug.LogError("[PlayerControl] CardPoolManager未找到，无法触发卡牌选择");
+            return;
+        }
+
+        // 注意：游戏暂停和UI显示现在由CardPoolManager.ProcessCoinUpgrade()处理
+        Debug.Log($"[PlayerControl] ✅ 卡牌选择流程已启动，显示 {cardsToShowOnLevelUp} 张卡牌");
     }
 
     /// <summary>
     /// 暂停游戏用于卡牌选择
     /// </summary>
-    private void PauseGameForCardSelection()
+    public void PauseGameForCardSelection()
     {
         canMove = false;
         // 暂停武器
@@ -765,8 +775,8 @@ public class PlayerControl : MonoBehaviour
                 coin += value;
                 Debug.Log($"拾取金币 +{value}，当前金币: {coin}");
 
-                // 检查是否触发卡牌选择
-                if (coin >= 10)
+                // 检查是否触发卡牌选择（使用统一的金币配置）
+                if (CoinSystemConfig.Instance != null && CoinSystemConfig.Instance.ShouldTriggerCardSelection(coin))
                 {
                     TriggerCardSelection();
                 }

@@ -71,23 +71,17 @@ Assets/Resources/Audio/CatEarHeadset/
 - `replacementWeapon`: 拖入要切换到的Weapon ScriptableObject
 
 #### 方案B：自动加载（推荐 - 无需ScriptableObject）
-1. 在项目中创建文件夹：`Assets/Resources/Weapons/`
-2. 将武器文件放入该文件夹，命名为：`Weapon_1.asset`、`Weapon_2.asset` 等
-3. PropertyCard中`replacementWeapon`保持为空
-4. 设置`customEffectValue`为武器ID（如1、2、3...）
-5. 游戏时会自动加载`Resources/Weapons/Weapon_{ID}.asset`
-
-**示例目录结构**：
-```
-Assets/Resources/Weapons/
-├── Weapon_1.asset (弓)
-├── Weapon_2.asset (剑)
-├── Weapon_3.asset (法杖)
-└── Weapon_4.asset (锤子)
-```
+1. 在CardPoolManager中配置weaponCards列表
+2. PropertyCard中`replacementWeapon`保持为空
+3. 设置`customEffectValue`为武器索引（如1、2、3...对应weaponCards[0]、weaponCards[1]等）
+4. 游戏时会自动从CardPoolManager.weaponCards[ID-1]选择武器
 
 **配置示例**：
-- 武器ID 1 → customEffectValue = 1.0
+- CardPoolManager.weaponCards[0] → customEffectValue = 1.0
+- CardPoolManager.weaponCards[1] → customEffectValue = 2.0
+- CardPoolManager.weaponCards[2] → customEffectValue = 3.0
+
+**注意**：如果设置的ID超出weaponCards范围，会随机选择一个可用武器
 - 武器ID 2 → customEffectValue = 2.0
 - 武器ID 3 → customEffectValue = 3.0
 

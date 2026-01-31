@@ -25,7 +25,7 @@ MonoBehaviour:
   attackRate: 1
   critChanceBase: 0
   critDamageBase: 1.5
-  meleeRange: 2
+  meleeRange: 2.1
   fireSound: {fileID: 0}
   chargingSound: {fileID: 0}
   continuousFireEndSound: {fileID: 0}
@@ -33,4 +33,4 @@ MonoBehaviour:
   description: Pry open your skull... Using the Physics
   projectilePrefab: {fileID: 0}
   projectileSpeed: 12
-  weaponPrefab: {fileID: 3671886951257483418, guid: 5fb0d4130277f924f8ef141f662fc70b, type: 3}
+  weaponPrefab: {fileID: 0}

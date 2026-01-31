@@ -23,9 +23,9 @@ MonoBehaviour:
   chargingTime: 0.2
   cooldown: 0.2
   attackRate: 10
-  critChanceBase: 1
+  critChanceBase: 0
   critDamageBase: 1.5
-  meleeRange: 2
+  meleeRange: 2.1
   fireSound: {fileID: 0}
   chargingSound: {fileID: 0}
   continuousFireEndSound: {fileID: 0}

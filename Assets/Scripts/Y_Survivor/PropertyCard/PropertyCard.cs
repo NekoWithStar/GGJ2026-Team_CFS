@@ -19,8 +19,8 @@ namespace Y_Survivor
         [TextArea(2, 4)]
         public string description = "";
         
-        [Tooltip("卡片图标")]
-        public Image cardPicture_Po; // 可在 Inspector 指定 UI Image
+        [Tooltip("卡片图标 - 用于卡牌展示的Sprite")]
+        public Sprite cardIcon; // 卡牌展示用的Sprite图标
         
         [Tooltip("卡片稀有度（用于显示和筛选）")]
         public CardRarity rarity = CardRarity.Common;

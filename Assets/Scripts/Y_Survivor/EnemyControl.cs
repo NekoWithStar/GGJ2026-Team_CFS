@@ -21,8 +21,8 @@ public class EnemyControl : MonoBehaviour
     [Header("敌人基础属性")]
     public float maxHp = 30;   // 最大血量
     public float currentHp;    // 当前血量
-    [Tooltip("死亡掉落金币数量")]
-    public int dropCoin = 5;
+    [Tooltip("死亡掉落金币数量（如果为0，会使用 CoinSystemConfig 中的配置）")]
+    public int dropCoin = 0;
 
     [Header("掉落配置")]
     public GameObject coinPrefab; // 金币预制体（后续创建，挂拾取脚本）
@@ -164,11 +164,14 @@ public class EnemyControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 死亡掉落金币
+    /// 死亡掉落金币（使用统一的金币配置）
     /// </summary>
     private void DropCoin()
     {
         if (coinPrefab == null) return;
+
+        // 使用配置中的掉落金币数，如果没有配置就使用本地的 dropCoin
+        int coinAmount = dropCoin > 0 ? dropCoin : (CoinSystemConfig.Instance != null ? CoinSystemConfig.Instance.GetCoinDropPerEnemy() : 5);
 
         // 计算掉落位置（敌人位置+随机偏移，避免卡在原地）
         Vector2 dropPos = new Vector2(
