@@ -471,9 +471,9 @@ public class PlayerControl : MonoBehaviour
     /// 受击方法（敌人攻击时调用）
     /// </summary>
     /// <param name="damage">受到的伤害值</param>
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
-        currentHp = Mathf.Max(currentHp - damage, 0); // 血量不小于0
+        currentHp = Mathf.Max(currentHp - Mathf.RoundToInt(damage), 0); // 血量不小于0，伤害四舍五入
         
         // 同步到PropertyManager系统（用于属性修饰）
         if (playerPropertyManager != null)

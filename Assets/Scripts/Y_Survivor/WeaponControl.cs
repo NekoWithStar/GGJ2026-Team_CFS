@@ -793,7 +793,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
             {
                 // 计算暴击
                 bool isCrit = Random.value < effectiveCritChance;
-                int finalDamage = isCrit ? Mathf.RoundToInt(effectiveDamage * effectiveCritMultiplier) : effectiveDamage;
+                float finalDamage = isCrit ? effectiveDamage * effectiveCritMultiplier : effectiveDamage;
                 enemy.TakeDamage(finalDamage);
                 hitCount++;
                 
