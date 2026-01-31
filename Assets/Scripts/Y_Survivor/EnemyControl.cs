@@ -1,132 +1,132 @@
 using UnityEngine;
 
 /// <summary>
-/// 2DÀàĞÒ´æÕßµĞÈËºËĞÄ¿ØÖÆ£º×Ô¶¯×·»÷Íæ¼Ò+½ü¾àÀë¹¥»÷+ÊÜ»÷ËÀÍö+µôÂä½ğ±Ò
+/// 2Dç±»å¹¸å­˜è€…æ•Œäººæ ¸å¿ƒæ§åˆ¶ï¼šè‡ªåŠ¨è¿½å‡»ç©å®¶+è¿‘è·ç¦»æ”»å‡»+å—å‡»æ­»äº¡+æ‰è½é‡‘å¸
 /// </summary>
 public class EnemyControl : MonoBehaviour
 {
-    [Header("ÒÆ¶¯&×·»÷ÅäÖÃ")]
-    [Tooltip("µĞÈËÒÆ¶¯ËÙ¶È£¬½¨Òé±ÈÍæ¼ÒÂı1-2£¬Èç8-10")]
+    [Header("ç§»åŠ¨&è¿½å‡»é…ç½®")]
+    [Tooltip("æ•Œäººç§»åŠ¨é€Ÿåº¦ï¼Œå»ºè®®æ¯”ç©å®¶æ…¢1-2ï¼Œå¦‚8-10")]
     public float moveSpeed = 8f;
-    [Tooltip("×·»÷·¶Î§£º³¬³ö¸Ã·¶Î§²»×·Íæ¼Ò£¬½¨Òé15-20")]
+    [Tooltip("è¿½å‡»èŒƒå›´ï¼šè¶…å‡ºè¯¥èŒƒå›´ä¸è¿½ç©å®¶ï¼Œå»ºè®®15-20")]
     public float chaseRange = 18f;
 
-    [Header("¹¥»÷ÅäÖÃ")]
-    [Tooltip("¹¥»÷·¶Î§£º½øÈë¸Ã·¶Î§´¥·¢¹¥»÷£¬½¨Òé1.5-2")]
+    [Header("æ”»å‡»é…ç½®")]
+    [Tooltip("æ”»å‡»èŒƒå›´ï¼šè¿›å…¥è¯¥èŒƒå›´è§¦å‘æ”»å‡»ï¼Œå»ºè®®1.5-2")]
     public float attackRange = 2f;
-    [Tooltip("¹¥»÷ÀäÈ´Ê±¼ä£¨Ãë£©£¬±ÜÃâÁ¬Ğø¹¥»÷£¬½¨Òé1-1.5")]
+    [Tooltip("æ”»å‡»å†·å´æ—¶é—´ï¼ˆç§’ï¼‰ï¼Œé¿å…è¿ç»­æ”»å‡»ï¼Œå»ºè®®1-1.5")]
     public float attackCD = 1f;
-    public int attackDamage = 5; // ¹¥»÷Á¦
+    public int attackDamage = 5; // æ”»å‡»åŠ›
 
-    [Header("µĞÈË»ù´¡ÊôĞÔ")]
-    public int maxHp = 30;   // ×î´óÑªÁ¿
-    public int currentHp;    // µ±Ç°ÑªÁ¿
-    [Tooltip("ËÀÍöµôÂä½ğ±ÒÊıÁ¿")]
+    [Header("æ•ŒäººåŸºç¡€å±æ€§")]
+    public int maxHp = 30;   // æœ€å¤§è¡€é‡
+    public int currentHp;    // å½“å‰è¡€é‡
+    [Tooltip("æ­»äº¡æ‰è½é‡‘å¸æ•°é‡")]
     public int dropCoin = 5;
 
-    [Header("µôÂäÅäÖÃ")]
-    public GameObject coinPrefab; // ½ğ±ÒÔ¤ÖÆÌå£¨ºóĞø´´½¨£¬¹ÒÊ°È¡½Å±¾£©
-    public float dropOffset = 0.5f; // µôÂäÆ«ÒÆÁ¿£¨±ÜÃâ¿¨ÔÚµĞÈËÎ»ÖÃ£©
+    [Header("æ‰è½é…ç½®")]
+    public GameObject coinPrefab; // é‡‘å¸é¢„åˆ¶ä½“ï¼ˆåç»­åˆ›å»ºï¼ŒæŒ‚æ‹¾å–è„šæœ¬ï¼‰
+    public float dropOffset = 0.5f; // æ‰è½åç§»é‡ï¼ˆé¿å…å¡åœ¨æ•Œäººä½ç½®ï¼‰
 
     private Rigidbody2D rb;
-    private Transform player;      // Íæ¼ÒTransform£¨×·»÷Ä¿±ê£©
-    private float lastAttackTime;  // ÉÏÒ»´Î¹¥»÷Ê±¼ä£¨¼ÆËãÀäÈ´£©
-    private bool isDead = false;   // ËÀÍö±ê¼Ç
+    private Transform player;      // ç©å®¶Transformï¼ˆè¿½å‡»ç›®æ ‡ï¼‰
+    private float lastAttackTime;  // ä¸Šä¸€æ¬¡æ”»å‡»æ—¶é—´ï¼ˆè®¡ç®—å†·å´ï¼‰
+    private bool isDead = false;   // æ­»äº¡æ ‡è®°
     private Collider2D col2d;
     private SpriteRenderer sr;
 
-    #region ³õÊ¼»¯
+    #region åˆå§‹åŒ–
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         col2d = GetComponent<Collider2D>();
         sr = GetComponent<SpriteRenderer>();
-        // ÕÒµ½Íæ¼Ò£¨Íæ¼Ò¶ÔÏó±êÇ©ĞèÉèÎªPlayer£¬±ÜÃâFindÊ§°Ü£©
+        // æ‰¾åˆ°ç©å®¶ï¼ˆç©å®¶å¯¹è±¡æ ‡ç­¾éœ€è®¾ä¸ºPlayerï¼Œé¿å…Findå¤±è´¥ï¼‰
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
 
     private void Start()
     {
         currentHp = maxHp;
-        lastAttackTime = -attackCD; // ³õÊ¼ÎŞÀäÈ´£¬¿ÉÖ±½Ó¹¥»÷
+        lastAttackTime = -attackCD; // åˆå§‹æ— å†·å´ï¼Œå¯ç›´æ¥æ”»å‡»
     }
     #endregion
 
-    #region Ö¡¸üĞÂ£º×·»÷+¹¥»÷£¨ºËĞÄÂß¼­£©
+    #region å¸§æ›´æ–°ï¼šè¿½å‡»+æ”»å‡»ï¼ˆæ ¸å¿ƒé€»è¾‘ï¼‰
     private void FixedUpdate()
     {
         if (isDead || player == null)
         {
-            rb.velocity = Vector2.zero; // ËÀÍö/ÎŞÍæ¼ÒÊ±Í£Ö¹ÒÆ¶¯
+            rb.velocity = Vector2.zero; // æ­»äº¡/æ— ç©å®¶æ—¶åœæ­¢ç§»åŠ¨
             return;
         }
 
-        // ¼ÆËãµĞÈËµ½Íæ¼ÒµÄ¾àÀë
+        // è®¡ç®—æ•Œäººåˆ°ç©å®¶çš„è·ç¦»
         float distanceToPlayer = Vector2.Distance(rb.position, player.position);
 
-        // 1. ³¬³ö×·»÷·¶Î§£ºÍ£Ö¹ÒÆ¶¯
+        // 1. è¶…å‡ºè¿½å‡»èŒƒå›´ï¼šåœæ­¢ç§»åŠ¨
         if (distanceToPlayer > chaseRange)
         {
             rb.velocity = Vector2.zero;
             return;
         }
 
-        // 2. ÔÚ¹¥»÷·¶Î§£º´¥·¢¹¥»÷£¨´øÀäÈ´£©
+        // 2. åœ¨æ”»å‡»èŒƒå›´ï¼šè§¦å‘æ”»å‡»ï¼ˆå¸¦å†·å´ï¼‰
         if (distanceToPlayer <= attackRange && Time.time - lastAttackTime >= attackCD)
         {
             AttackPlayer();
             return;
         }
 
-        // 3. ÔÚ×·»÷·¶Î§µ«³¬³ö¹¥»÷·¶Î§£º×·»÷Íæ¼Ò
+        // 3. åœ¨è¿½å‡»èŒƒå›´ä½†è¶…å‡ºæ”»å‡»èŒƒå›´ï¼šè¿½å‡»ç©å®¶
         ChasePlayer(distanceToPlayer);
     }
     #endregion
 
-    #region ºËĞÄĞĞÎª£º×·»÷+¹¥»÷
+    #region æ ¸å¿ƒè¡Œä¸ºï¼šè¿½å‡»+æ”»å‡»
     /// <summary>
-    /// ×·»÷Íæ¼Ò£¨2DÆ½¶¯£¬Ãæ³¯Íæ¼Ò£©
+    /// è¿½å‡»ç©å®¶ï¼ˆ2Då¹³åŠ¨ï¼Œé¢æœç©å®¶ï¼‰
     /// </summary>
     private void ChasePlayer(float distance)
     {
-        // 1. ¼ÆËã×·»÷·½Ïò£¨¹éÒ»»¯£¬±ÜÃâĞ±Ïò¼ÓËÙ£©
+        // 1. è®¡ç®—è¿½å‡»æ–¹å‘ï¼ˆå½’ä¸€åŒ–ï¼Œé¿å…æ–œå‘åŠ é€Ÿï¼‰
         Vector2 chaseDir = (player.position - transform.position).normalized;
-        // 2. ¸ÕÌåÒÆ¶¯£¨ÓëÍæ¼ÒÍ¬Ğ´·¨£¬±£Ö¤ÎïÀíË³»¬£©
+        // 2. åˆšä½“ç§»åŠ¨ï¼ˆä¸ç©å®¶åŒå†™æ³•ï¼Œä¿è¯ç‰©ç†é¡ºæ»‘ï¼‰
         rb.velocity = chaseDir * moveSpeed * Time.fixedDeltaTime;
-        // 3. µĞÈËÃæ³¯Íæ¼Ò£¨ÓëÍæ¼ÒÃæ³¯Êó±êÍ¬Âß¼­£©
+        // 3. æ•Œäººé¢æœç©å®¶ï¼ˆä¸ç©å®¶é¢æœé¼ æ ‡åŒé€»è¾‘ï¼‰
         float angle = Mathf.Atan2(chaseDir.y, chaseDir.x) * Mathf.Rad2Deg;
         rb.rotation = angle;
     }
 
     /// <summary>
-    /// ¹¥»÷Íæ¼Ò
+    /// æ”»å‡»ç©å®¶
     /// </summary>
     private void AttackPlayer()
     {
-        lastAttackTime = Time.time; // ¸üĞÂ¹¥»÷Ê±¼ä
-        // µ÷ÓÃÍæ¼ÒÊÜ»÷·½·¨£¨¼Ó·À¿ÕÅĞ¶Ï£©
+        lastAttackTime = Time.time; // æ›´æ–°æ”»å‡»æ—¶é—´
+        // è°ƒç”¨ç©å®¶å—å‡»æ–¹æ³•ï¼ˆåŠ é˜²ç©ºåˆ¤æ–­ï¼‰
         var pc = player.GetComponent<PlayerControl>();
         if (pc != null)
         {
             pc.TakeDamage(attackDamage);
-            Debug.Log("µĞÈË¹¥»÷£¡Íæ¼ÒÊÜµ½" + attackDamage + "µãÉËº¦");
+            Debug.Log("æ•Œäººæ”»å‡»ï¼ç©å®¶å—åˆ°" + attackDamage + "ç‚¹ä¼¤å®³");
         }
     }
     #endregion
 
-    #region ÊÜ»÷+ËÀÍö+µôÂä
+    #region å—å‡»+æ­»äº¡+æ‰è½
     /// <summary>
-    /// ÊÜ»÷·½·¨£¨Íæ¼Ò¹¥»÷Ê±µ÷ÓÃ£©
+    /// å—å‡»æ–¹æ³•ï¼ˆç©å®¶æ”»å‡»æ—¶è°ƒç”¨ï¼‰
     /// </summary>
-    /// <param name="damage">ÊÜµ½µÄÉËº¦Öµ</param>
+    /// <param name="damage">å—åˆ°çš„ä¼¤å®³å€¼</param>
     public void TakeDamage(int damage)
     {
-        if (isDead) return; // ËÀÍöºó²»½ÓÊÜÉËº¦
+        if (isDead) return; // æ­»äº¡åä¸æ¥å—ä¼¤å®³
 
         currentHp = Mathf.Max(currentHp - damage, 0);
-        Debug.Log($"µĞÈËÊÜ»÷£º-{damage}£¬µ±Ç°HP = {currentHp}/{maxHp}");
+        Debug.Log($"æ•Œäººå—å‡»ï¼š-{damage}ï¼Œå½“å‰HP = {currentHp}/{maxHp}");
 
-        // ¿ÉÌí¼ÓÊÜ»÷·´À¡£¨ÉÁË¸ / Î»ÒÆ / ÒôĞ§£©
+        // å¯æ·»åŠ å—å‡»åé¦ˆï¼ˆé—ªçƒ / ä½ç§» / éŸ³æ•ˆï¼‰
         StartCoroutine(HitFlash());
 
         if (currentHp <= 0)
@@ -145,60 +145,60 @@ public class EnemyControl : MonoBehaviour
     }
 
     /// <summary>
-    /// ËÀÍö·½·¨£ºÍ£Ö¹ĞĞÎª+µôÂä½ğ±Ò+Ïú»Ù×ÔÉí
+    /// æ­»äº¡æ–¹æ³•ï¼šåœæ­¢è¡Œä¸º+æ‰è½é‡‘å¸+é”€æ¯è‡ªèº«
     /// </summary>
     private void Die()
     {
         isDead = true;
-        rb.velocity = Vector2.zero; // Í£Ö¹ÒÆ¶¯
+        rb.velocity = Vector2.zero; // åœæ­¢ç§»åŠ¨
 
-        // ½ûÓÃÅö×²ÓëäÖÈ¾£¨¿ÉÑ¡£©
+        // ç¦ç”¨ç¢°æ’ä¸æ¸²æŸ“ï¼ˆå¯é€‰ï¼‰
         if (col2d != null) col2d.enabled = false;
 
-        DropCoin(); // µôÂä½ğ±Ò
-        // ÑÓ³ÙÏú»Ù£¨¸øµôÂäÌØĞ§ÁôÊ±¼ä£¬¿ÉÑ¡£©
+        DropCoin(); // æ‰è½é‡‘å¸
+        // å»¶è¿Ÿé”€æ¯ï¼ˆç»™æ‰è½ç‰¹æ•ˆç•™æ—¶é—´ï¼Œå¯é€‰ï¼‰
         Destroy(gameObject, 0.2f);
-        // ºóĞø¿É¼Ó£ºËÀÍöÌØĞ§¡¢ËÀÍöÒôĞ§¡¢Í¨Öª²¨´Î¹ÜÀíÆ÷¹ÖÎïËÀÍöµÈ
-        Debug.Log("µĞÈËËÀÍö£¬µôÂä" + dropCoin + "½ğ±Ò");
+        // åç»­å¯åŠ ï¼šæ­»äº¡ç‰¹æ•ˆã€æ­»äº¡éŸ³æ•ˆã€é€šçŸ¥æ³¢æ¬¡ç®¡ç†å™¨æ€ªç‰©æ­»äº¡ç­‰
+        Debug.Log("æ•Œäººæ­»äº¡ï¼Œæ‰è½" + dropCoin + "é‡‘å¸");
     }
 
     /// <summary>
-    /// ËÀÍöµôÂä½ğ±Ò
+    /// æ­»äº¡æ‰è½é‡‘å¸
     /// </summary>
     private void DropCoin()
     {
         if (coinPrefab == null) return;
 
-        // ¼ÆËãµôÂäÎ»ÖÃ£¨µĞÈËÎ»ÖÃ+Ëæ»úÆ«ÒÆ£¬±ÜÃâ¿¨ÔÚÔ­µØ£©
+        // è®¡ç®—æ‰è½ä½ç½®ï¼ˆæ•Œäººä½ç½®+éšæœºåç§»ï¼Œé¿å…å¡åœ¨åŸåœ°ï¼‰
         Vector2 dropPos = new Vector2(
             transform.position.x + Random.Range(-dropOffset, dropOffset),
             transform.position.y + Random.Range(-dropOffset, dropOffset)
         );
-        // Éú³É½ğ±ÒÔ¤ÖÆÌå
+        // ç”Ÿæˆé‡‘å¸é¢„åˆ¶ä½“
         GameObject coin = Instantiate(coinPrefab, dropPos, Quaternion.identity);
-        // ¸ø½ğ±Ò¸³ÖµµôÂäÊıÁ¿£¨ºóĞøÊ°È¡½Å±¾ÓÃ£©
+        // ç»™é‡‘å¸èµ‹å€¼æ‰è½æ•°é‡ï¼ˆåç»­æ‹¾å–è„šæœ¬ç”¨ï¼‰
         var pickup = coin.GetComponent<PickupControl>();
         if (pickup != null)
         {
-            // PickupControl ÆÚÍû PickupItem µ÷ÓÃÊ±´«ÈëÀàĞÍºÍÖµ£¬ÕâÀïÎÒÃÇ°ÑÖµ·Åµ½ pickupValue ×Ö¶Î
-            // µ« PickupControl µÄµ±Ç°ÊµÏÖ²»Ö±½ÓÊ¹ÓÃ¸Ã×Ö¶Î£¬ÎÒÃÇ±£³Ö¼æÈİ£¨PickupControl ÒÑÊ¹ÓÃ pickupValue ×Ö¶Î£©
-            // Èç¹û coin Ô¤ÖÆÌåÊ¹ÓÃÁË²»Í¬µÄÊ°È¡½Å±¾£¬ÇëÔÚÔ¤ÖÆÌåÖĞÉèÖÃ»òĞŞ¸ÄÏÂÃæÂß¼­¡£
+            // PickupControl æœŸæœ› PickupItem è°ƒç”¨æ—¶ä¼ å…¥ç±»å‹å’Œå€¼ï¼Œè¿™é‡Œæˆ‘ä»¬æŠŠå€¼æ”¾åˆ° pickupValue å­—æ®µ
+            // ä½† PickupControl çš„å½“å‰å®ç°ä¸ç›´æ¥ä½¿ç”¨è¯¥å­—æ®µï¼Œæˆ‘ä»¬ä¿æŒå…¼å®¹ï¼ˆPickupControl å·²ä½¿ç”¨ pickupValue å­—æ®µï¼‰
+            // å¦‚æœ coin é¢„åˆ¶ä½“ä½¿ç”¨äº†ä¸åŒçš„æ‹¾å–è„šæœ¬ï¼Œè¯·åœ¨é¢„åˆ¶ä½“ä¸­è®¾ç½®æˆ–ä¿®æ”¹ä¸‹é¢é€»è¾‘ã€‚
         }
         var pctrl = coin.GetComponent<PickupControl>();
         if (pctrl != null)
         {
-            // PickupControl.cs Ê¹ÓÃ pickupType/pickupValue£¬µ÷ÕûÎª Coin ÀàĞÍ
-            // £¨Èç¹û coin prefab Ã»ÓĞÉèÖÃ£¬½¨ÒéÔÚ prefab inspector ÖĞÉèÖÃ£©
-            // ÕâÀï¾¡Á¿±£Ö¤Öµ±»ÉèÖÃ
-            // (PickupControl ÔÚÊ°È¡Ê±¶ÁÈ¡ pickupType/pickupValue ×Ö¶Î)
+            // PickupControl.cs ä½¿ç”¨ pickupType/pickupValueï¼Œè°ƒæ•´ä¸º Coin ç±»å‹
+            // ï¼ˆå¦‚æœ coin prefab æ²¡æœ‰è®¾ç½®ï¼Œå»ºè®®åœ¨ prefab inspector ä¸­è®¾ç½®ï¼‰
+            // è¿™é‡Œå°½é‡ä¿è¯å€¼è¢«è®¾ç½®
+            // (PickupControl åœ¨æ‹¾å–æ—¶è¯»å– pickupType/pickupValue å­—æ®µ)
         }
-        // Èç¹ûĞèÒª£¬°ÑÊıÖµĞ´ÔÚÒ»¸ö¿É±»Ê°È¡½Å±¾¶ÁÈ¡µÄÎ»ÖÃ£¨ÀıÈçÒ»¸ö PickupData ½Å±¾£©£¬´Ë´¦±£ÁôÎªÔ¤ÖÆÌåÅäÖÃÓÅÏÈ
+        // å¦‚æœéœ€è¦ï¼ŒæŠŠæ•°å€¼å†™åœ¨ä¸€ä¸ªå¯è¢«æ‹¾å–è„šæœ¬è¯»å–çš„ä½ç½®ï¼ˆä¾‹å¦‚ä¸€ä¸ª PickupData è„šæœ¬ï¼‰ï¼Œæ­¤å¤„ä¿ç•™ä¸ºé¢„åˆ¶ä½“é…ç½®ä¼˜å…ˆ
     }
     #endregion
 
-    #region Åö×²/´¥·¢£º½ÓÊÕÉËº¦£¨¼æÈİ²»Í¬ÎäÆ÷ÊµÏÖ£©
-    // ÍÆ¼ö×ö·¨£ºÍæ¼ÒÎäÆ÷ÔÚÃüÖĞÊ±Ğ¯´øÒ»¸ö DamageDealer ×é¼ş»ò¾ßÓĞ tag "PlayerWeapon"
-    // ÏÂÃæÊµÏÖ»áÓÅÏÈ²éÕÒ DamageDealer ×é¼ş£¨½¨Òé£©£¬·ñÔò¸ù¾İ tag "PlayerWeapon" ´ÓÍæ¼Ò×é¼ş¶ÁÈ¡¹¥»÷Á¦
+    #region ç¢°æ’/è§¦å‘ï¼šæ¥æ”¶ä¼¤å®³ï¼ˆå…¼å®¹ä¸åŒæ­¦å™¨å®ç°ï¼‰
+    // æ¨èåšæ³•ï¼šç©å®¶æ­¦å™¨åœ¨å‘½ä¸­æ—¶æºå¸¦ä¸€ä¸ª DamageDealer ç»„ä»¶æˆ–å…·æœ‰ tag "PlayerWeapon"
+    // ä¸‹é¢å®ç°ä¼šä¼˜å…ˆæŸ¥æ‰¾ DamageDealer ç»„ä»¶ï¼ˆå»ºè®®ï¼‰ï¼Œå¦åˆ™æ ¹æ® tag "PlayerWeapon" ä»ç©å®¶ç»„ä»¶è¯»å–æ”»å‡»åŠ›
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -216,25 +216,25 @@ public class EnemyControl : MonoBehaviour
     {
         if (other == null) return;
 
-        // 1) ÓÅÏÈ²éÕÒ DamageDealer ×é¼ş£¨½¨Òé°ÑÎäÆ÷»ò¹¥»÷ÅĞ¶¨ÌåÉÏ¹ÒÉÏ¸Ã×é¼ş£©
+        // 1) ä¼˜å…ˆæŸ¥æ‰¾ DamageDealer ç»„ä»¶ï¼ˆå»ºè®®æŠŠæ­¦å™¨æˆ–æ”»å‡»åˆ¤å®šä½“ä¸ŠæŒ‚ä¸Šè¯¥ç»„ä»¶ï¼‰
         var dd = other.GetComponent<DamageDealer>() ?? other.GetComponentInParent<DamageDealer>();
         if (dd != null)
         {
-            // ±ÜÃâ×ÔÉË£¨DamageDealer ¿É³ÖÓĞ owner ÒıÓÃ£©
+            // é¿å…è‡ªä¼¤ï¼ˆDamageDealer å¯æŒæœ‰ owner å¼•ç”¨ï¼‰
             if (dd.owner != null && dd.owner == gameObject) return;
 
             TakeDamage(dd.damage);
 
             if (dd.destroyOnHit && other.gameObject != null)
             {
-                // Èç¹û DamageDealer ÔÚ¶ÀÁ¢ÁÙÊ±ÎïÌåÉÏ£¬Ö±½ÓÏú»Ù¸ÃÎïÌå
+                // å¦‚æœ DamageDealer åœ¨ç‹¬ç«‹ä¸´æ—¶ç‰©ä½“ä¸Šï¼Œç›´æ¥é”€æ¯è¯¥ç‰©ä½“
                 Destroy(other.gameObject);
             }
 
             return;
         }
 
-        // 2) ÍËÂ·£ºÈç¹ûÅö×²¶ÔÏó±ê¼ÇÎªÍæ¼ÒÎäÆ÷£¨"PlayerWeapon"£©£¬³¢ÊÔ´ÓÍæ¼Ò×é¼ş¶ÁÈ¡¹¥»÷Á¦
+        // 2) é€€è·¯ï¼šå¦‚æœç¢°æ’å¯¹è±¡æ ‡è®°ä¸ºç©å®¶æ­¦å™¨ï¼ˆ"PlayerWeapon"ï¼‰ï¼Œå°è¯•ä»ç©å®¶ç»„ä»¶è¯»å–æ”»å‡»åŠ›
         if (other.CompareTag("Weapon"))
         {
             var pc = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerControl>();

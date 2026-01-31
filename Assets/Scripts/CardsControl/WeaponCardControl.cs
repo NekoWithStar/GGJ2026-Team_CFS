@@ -5,20 +5,20 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 
 /// <summary>
-/// ½« Weapon£¨ScriptableObject£©Êı¾İ°ó¶¨µ½ UI£¬·ç¸ñ·ÂÕÕ CardControl£¬¹© Flip_Card Ê¹ÓÃ
+/// å°† Weaponï¼ˆScriptableObjectï¼‰æ•°æ®ç»‘å®šåˆ° UIï¼Œé£æ ¼ä»¿ç…§ CardControlï¼Œä¾› Flip_Card ä½¿ç”¨
 /// </summary>
 public class WeaponCardControl : MonoBehaviour
 {
-    public Weapon weapon_data; // ÎäÆ÷Êı¾İ ScriptableObject
+    public Weapon weapon_data; // æ­¦å™¨æ•°æ® ScriptableObject
 
-    // UI ÔªËØ
-    public Image icon; // ÎäÆ÷Í¼±ê
-    public Text weapon_name; // ÎäÆ÷Ãû³ÆÎÄ±¾
-    public Text damage; // ÉËº¦ÎÄ±¾
-    public Text cooldown; // ÀäÈ´ÎÄ±¾
-    public Text range; // ·¶Î§ÎÄ±¾
-    public Text describe; // ÃèÊöÎÄ±¾
-    public GameObject back; // ±³Ãæ¶ÔÏó£¨¿ÉÑ¡£©
+    // UI å…ƒç´ 
+    public Image icon; // æ­¦å™¨å›¾æ ‡
+    public Text weapon_name; // æ­¦å™¨åç§°æ–‡æœ¬
+    public Text damage; // ä¼¤å®³æ–‡æœ¬
+    public Text cooldown; // å†·å´æ–‡æœ¬
+    public Text range; // èŒƒå›´æ–‡æœ¬
+    public Text describe; // æè¿°æ–‡æœ¬
+    public GameObject back; // èƒŒé¢å¯¹è±¡ï¼ˆå¯é€‰ï¼‰
 
     private void Awake()
     {
@@ -37,13 +37,13 @@ public class WeaponCardControl : MonoBehaviour
         if (describe != null) describe.text = weapon_data.description;
         if (back == null && weapon_data.weaponPrefab != null)
         {
-            // ¿ÉÑ¡£º²»Ç¿ÖÆ¸³Öµ£¬½ö±£Áô×Ö¶Î·½±ã Inspector °ó¶¨
+            // å¯é€‰ï¼šä¸å¼ºåˆ¶èµ‹å€¼ï¼Œä»…ä¿ç•™å­—æ®µæ–¹ä¾¿ Inspector ç»‘å®š
         }
     }
 
     private void OnValidate()
     {
-        // ±à¼­Æ÷ÏÂÊµÊ±Í¬²½ÏÔÊ¾£¬·½±ãµ÷ÊÔ
+        // ç¼–è¾‘å™¨ä¸‹å®æ—¶åŒæ­¥æ˜¾ç¤ºï¼Œæ–¹ä¾¿è°ƒè¯•
         if (weapon_data == null) return;
         if (weapon_name != null) weapon_name.text = weapon_data.weaponName;
         if (damage != null) damage.text = weapon_data.damage.ToString();

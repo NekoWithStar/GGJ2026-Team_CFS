@@ -6,49 +6,49 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
 /// <summary>
-/// ¿¨ÅÆ·­×ª½»»¥£¨¼æÈİ CardControl Óë WeaponCardControl£©
-/// - Êó±êĞüÍ£·Å´ó¡¢µã»÷·­Ãæ¡¢Ö§³Ö secondClickIsConfirm ´¥·¢È·ÈÏÊÂ¼ş
-/// - µ±È·ÈÏÊ±»á¹ã²¥¶ÔÓ¦ÀàĞÍµÄ¾²Ì¬ÊÂ¼ş£ºOnCardConfirmed / OnWeaponConfirmed
+/// å¡ç‰Œç¿»è½¬äº¤äº’ï¼ˆå…¼å®¹ CardControl ä¸ WeaponCardControlï¼‰
+/// - é¼ æ ‡æ‚¬åœæ”¾å¤§ã€ç‚¹å‡»ç¿»é¢ã€æ”¯æŒ secondClickIsConfirm è§¦å‘ç¡®è®¤äº‹ä»¶
+/// - å½“ç¡®è®¤æ—¶ä¼šå¹¿æ’­å¯¹åº”ç±»å‹çš„é™æ€äº‹ä»¶ï¼šOnCardConfirmed / OnWeaponConfirmed
 /// </summary>
 public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    // µ±¿¨ÅÆ±»¡°È·ÈÏ¡±Ê±¹ã²¥¸Ã¿¨ÅÆµÄÊı¾İ£¨Card ScriptableObject£©
+    // å½“å¡ç‰Œè¢«â€œç¡®è®¤â€æ—¶å¹¿æ’­è¯¥å¡ç‰Œçš„æ•°æ®ï¼ˆCard ScriptableObjectï¼‰
     public static event Action<Card> OnCardConfirmed;
-    // µ±ÎäÆ÷±»¡°È·ÈÏ¡±Ê±¹ã²¥¸ÃÎäÆ÷µÄÊı¾İ£¨Weapon ScriptableObject£©
+    // å½“æ­¦å™¨è¢«â€œç¡®è®¤â€æ—¶å¹¿æ’­è¯¥æ­¦å™¨çš„æ•°æ®ï¼ˆWeapon ScriptableObjectï¼‰
     public static event Action<Weapon> OnWeaponConfirmed;
 
-    [Header("¿¨ÅÆÕı·´Ãæ (Canvas UI ÏÂµÄ GameObject)")]
-    public GameObject frontFace; // ÕıÃæ£¨°üº¬ CardControl / WeaponCardControl µÈ UI ÔªËØ£©
-    public GameObject backFace; // ±³Ãæ£¨Ä¬ÈÏÏÔÊ¾£©
+    [Header("å¡ç‰Œæ­£åé¢ (Canvas UI ä¸‹çš„ GameObject)")]
+    public GameObject frontFace; // æ­£é¢ï¼ˆåŒ…å« CardControl / WeaponCardControl ç­‰ UI å…ƒç´ ï¼‰
+    public GameObject backFace; // èƒŒé¢ï¼ˆé»˜è®¤æ˜¾ç¤ºï¼‰
 
-    [Header("½»»¥ÉèÖÃ")]
-    public float hoverScale = 1.08f; // Êó±êĞüÍ£·Å´ó±¶ÂÊ
-    public float scaleSpeed = 10f; // Ëõ·ÅËÙ¶È£¨Ô½´óÔ½¿ì£©
-    public float flipDuration = 0.4f; // ·­×ª×ÜÊ±³¤£¨Ãë£©
+    [Header("äº¤äº’è®¾ç½®")]
+    public float hoverScale = 1.08f; // é¼ æ ‡æ‚¬åœæ”¾å¤§å€ç‡
+    public float scaleSpeed = 10f; // ç¼©æ”¾é€Ÿåº¦ï¼ˆè¶Šå¤§è¶Šå¿«ï¼‰
+    public float flipDuration = 0.4f; // ç¿»è½¬æ€»æ—¶é•¿ï¼ˆç§’ï¼‰
 
-    [Header("È·ÈÏÉèÖÃ")]
-    [Tooltip("Èç¹ûÎª true£¬Ôòµ±¿¨ÅÆÕıÃæ³¯ÉÏÊ±ÔÙ´Îµã»÷ÊÓÎªÈ·ÈÏ£º²»»á°Ñ¿¨ÅÆ·­»ØÈ¥¡£")]
+    [Header("ç¡®è®¤è®¾ç½®")]
+    [Tooltip("å¦‚æœä¸º trueï¼Œåˆ™å½“å¡ç‰Œæ­£é¢æœä¸Šæ—¶å†æ¬¡ç‚¹å‡»è§†ä¸ºç¡®è®¤ï¼šä¸ä¼šæŠŠå¡ç‰Œç¿»å›å»ã€‚")]
     public bool secondClickIsConfirm = false;
-    [Tooltip("µ± secondClickIsConfirm Îª true ÇÒÓÃ»§ÔÚÕıÃæÔÙ´Îµã»÷Ê±´¥·¢µÄÊÂ¼ş£¨¿ÉÔÚ Inspector ÖĞ°ó¶¨£©¡£")]
+    [Tooltip("å½“ secondClickIsConfirm ä¸º true ä¸”ç”¨æˆ·åœ¨æ­£é¢å†æ¬¡ç‚¹å‡»æ—¶è§¦å‘çš„äº‹ä»¶ï¼ˆå¯åœ¨ Inspector ä¸­ç»‘å®šï¼‰ã€‚")]
     public UnityEvent onConfirm;
 
-    private bool isFaceDown = true; // Ä¬ÈÏ±³Ãæ³¯ÉÏ
+    private bool isFaceDown = true; // é»˜è®¤èƒŒé¢æœä¸Š
     private bool isAnimating = false;
     private Vector3 originalScale;
     private Coroutine scaleCoroutine;
 
-    // ±ê¼Ç£ºµ±¶ÔÏó±»½ûÓÃºóÔÙ´ÎÆôÓÃÊ±ÊÇ·ñÓ¦ÖØÖÃÎª±³Ãæ
+    // æ ‡è®°ï¼šå½“å¯¹è±¡è¢«ç¦ç”¨åå†æ¬¡å¯ç”¨æ—¶æ˜¯å¦åº”é‡ç½®ä¸ºèƒŒé¢
     private bool _resetToBackOnEnable = false;
 
     private void Awake()
     {
-        // ÌáÇ°±£´æ³õÊ¼Ëõ·Å£¬±ÜÃâ OnEnable ÔÚ Start Ö®Ç°·ÃÎÊµ½Î´³õÊ¼»¯µÄ originalScale
+        // æå‰ä¿å­˜åˆå§‹ç¼©æ”¾ï¼Œé¿å… OnEnable åœ¨ Start ä¹‹å‰è®¿é—®åˆ°æœªåˆå§‹åŒ–çš„ originalScale
         originalScale = transform.localScale;
     }
 
     private void OnEnable()
     {
-        // Èç¹ûÖ®Ç°±»½ûÓÃ¹ı£¨ÊÓÎª¡°¹Ø±Õ¡±£©£¬ÔòÔÚÖØĞÂÆôÓÃÊ±ÖØÖÃÎª±³Ãæ×´Ì¬
+        // å¦‚æœä¹‹å‰è¢«ç¦ç”¨è¿‡ï¼ˆè§†ä¸ºâ€œå…³é—­â€ï¼‰ï¼Œåˆ™åœ¨é‡æ–°å¯ç”¨æ—¶é‡ç½®ä¸ºèƒŒé¢çŠ¶æ€
         if (_resetToBackOnEnable)
         {
             ResetToBack();
@@ -58,42 +58,42 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     private void OnDisable()
     {
-        // ¼ÇÂ¼Îª¡°ÒÑ¹Ø±Õ¡±×´Ì¬£¬µÈ´ıÏÂ´ÎÆôÓÃÊ±ÖØÖÃÎª±³Ãæ
+        // è®°å½•ä¸ºâ€œå·²å…³é—­â€çŠ¶æ€ï¼Œç­‰å¾…ä¸‹æ¬¡å¯ç”¨æ—¶é‡ç½®ä¸ºèƒŒé¢
         _resetToBackOnEnable = true;
     }
 
     private void Start()
     {
-        // ³õÊ¼×´Ì¬£º±³Ãæ¿É¼û£¬ÕıÃæÒş²Ø
+        // åˆå§‹çŠ¶æ€ï¼šèƒŒé¢å¯è§ï¼Œæ­£é¢éšè—
         if (frontFace != null) frontFace.SetActive(!isFaceDown);
         if (backFace != null) backFace.SetActive(isFaceDown);
-        // ±£Ö¤³õÊ¼Ğı×ªÎª 0 »ò 180£¬±ÜÃâÀÛ»ıĞı×ªÎÊÌâ
+        // ä¿è¯åˆå§‹æ—‹è½¬ä¸º 0 æˆ– 180ï¼Œé¿å…ç´¯ç§¯æ—‹è½¬é—®é¢˜
         transform.localEulerAngles = new Vector3(0f, isFaceDown ? 0f : 180f, 0f);
     }
 
     /// <summary>
-    /// ½«¿¨ÅÆÇ¿ÖÆÖØÖÃÎª±³Ãæ×´Ì¬£¨Í£Ö¹¶¯»­¡¢¸´Î»Ğı×ª¡¢ÏÔÊ¾±³Ãæ¡¢»¹Ô­Ëõ·Å£©
+    /// å°†å¡ç‰Œå¼ºåˆ¶é‡ç½®ä¸ºèƒŒé¢çŠ¶æ€ï¼ˆåœæ­¢åŠ¨ç”»ã€å¤ä½æ—‹è½¬ã€æ˜¾ç¤ºèƒŒé¢ã€è¿˜åŸç¼©æ”¾ï¼‰
     /// </summary>
     private void ResetToBack()
     {
-        // Í£Ö¹Ëõ·ÅĞ­³Ì
+        // åœæ­¢ç¼©æ”¾åç¨‹
         if (scaleCoroutine != null)
         {
             StopCoroutine(scaleCoroutine);
             scaleCoroutine = null;
         }
 
-        // Í£Ö¹·­×ª¶¯»­×´Ì¬
+        // åœæ­¢ç¿»è½¬åŠ¨ç”»çŠ¶æ€
         isAnimating = false;
 
-        // Ç¿ÖÆ±³Ãæ³¯ÉÏ
+        // å¼ºåˆ¶èƒŒé¢æœä¸Š
         isFaceDown = true;
 
-        // ¸´Î»Ğı×ªÓëËõ·Å
+        // å¤ä½æ—‹è½¬ä¸ç¼©æ”¾
         transform.localEulerAngles = new Vector3(0f, 0f, 0f);
         transform.localScale = originalScale;
 
-        // ÏÔÊ¾/Òş²ØÕı·´Ãæ
+        // æ˜¾ç¤º/éšè—æ­£åé¢
         if (frontFace != null) frontFace.SetActive(false);
         if (backFace != null) backFace.SetActive(true);
     }
@@ -114,13 +114,13 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         if (isAnimating) return;
 
-        // Èç¹ûÆôÓÃÁË¡°ÔÙ´Îµã»÷ÎªÈ·ÈÏ¡±ÇÒµ±Ç°ÎªÕıÃæ³¯ÉÏ£¬Ôò°ÑÔÙ´Îµã»÷ÊÓÎªÈ·ÈÏ¶ø²»ÊÇ·­»ØÈ¥
+        // å¦‚æœå¯ç”¨äº†â€œå†æ¬¡ç‚¹å‡»ä¸ºç¡®è®¤â€ä¸”å½“å‰ä¸ºæ­£é¢æœä¸Šï¼Œåˆ™æŠŠå†æ¬¡ç‚¹å‡»è§†ä¸ºç¡®è®¤è€Œä¸æ˜¯ç¿»å›å»
         if (!isFaceDown && secondClickIsConfirm)
         {
-            // ÏÈ´¥·¢ inspector °ó¶¨µÄ UnityEvent
+            // å…ˆè§¦å‘ inspector ç»‘å®šçš„ UnityEvent
             onConfirm?.Invoke();
 
-            // ÏÈ²éÕÒ CardControl£¨Í¨³£ÔÚÕıÃæµÄ×Ó¶ÔÏóÉÏ£©£¬²¢¹ã²¥±»È·ÈÏµÄ Card£¨Èç¹û´æÔÚ£©
+            // å…ˆæŸ¥æ‰¾ CardControlï¼ˆé€šå¸¸åœ¨æ­£é¢çš„å­å¯¹è±¡ä¸Šï¼‰ï¼Œå¹¶å¹¿æ’­è¢«ç¡®è®¤çš„ Cardï¼ˆå¦‚æœå­˜åœ¨ï¼‰
             CardControl cc = GetComponentInChildren<CardControl>();
             if (cc != null && cc.card_data != null)
             {
@@ -128,7 +128,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 return;
             }
 
-            // ÔÙ²éÕÒ WeaponCardControl ²¢¹ã²¥ Weapon£¨Èô´æÔÚ£©
+            // å†æŸ¥æ‰¾ WeaponCardControl å¹¶å¹¿æ’­ Weaponï¼ˆè‹¥å­˜åœ¨ï¼‰
             WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
             if (wc != null && wc.weapon_data != null)
             {
@@ -161,14 +161,14 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         isAnimating = true;
 
-        // Í³Ò»ÆğÊ¼½Ç¶È£¨±ÜÃâÀÛ¼Æ£©
+        // ç»Ÿä¸€èµ·å§‹è§’åº¦ï¼ˆé¿å…ç´¯è®¡ï¼‰
         float startAngle = isFaceDown ? 0f : 180f;
         float endAngle = startAngle + 180f;
 
         float elapsed = 0f;
         bool swapped = false;
 
-        // ÔÚ·­×ª¹ı³ÌÖĞ½ûÓÃ½»»¥£¨¿É¸ù¾İĞèÒªÌí¼Ó CanvasGroup ½ûÓÃÉäÏß£©
+        // åœ¨ç¿»è½¬è¿‡ç¨‹ä¸­ç¦ç”¨äº¤äº’ï¼ˆå¯æ ¹æ®éœ€è¦æ·»åŠ  CanvasGroup ç¦ç”¨å°„çº¿ï¼‰
         while (elapsed < flipDuration)
         {
             elapsed += Time.unscaledDeltaTime;
@@ -176,7 +176,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             float angle = Mathf.Lerp(startAngle, endAngle, frac);
             transform.localEulerAngles = new Vector3(0f, angle, 0f);
 
-            // ·­×ªµ½ÖĞµã£¨90¶ÈÆ«ÒÆ£©Ê±½»»»Õı·´ÃæÏÔÊ¾
+            // ç¿»è½¬åˆ°ä¸­ç‚¹ï¼ˆ90åº¦åç§»ï¼‰æ—¶äº¤æ¢æ­£åé¢æ˜¾ç¤º
             if (!swapped && Mathf.Abs(Mathf.DeltaAngle(startAngle, angle)) >= 90f)
             {
                 SwapFaces();
@@ -186,11 +186,11 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             yield return null;
         }
 
-        // È·±£½áÊø½Ç¶È¹æ·¶µ½ 0..360
+        // ç¡®ä¿ç»“æŸè§’åº¦è§„èŒƒåˆ° 0..360
         float finalY = endAngle % 360f;
         transform.localEulerAngles = new Vector3(0f, finalY, 0f);
 
-        // ·­Ãæ×´Ì¬È¡·´
+        // ç¿»é¢çŠ¶æ€å–å
         isFaceDown = !isFaceDown;
         isAnimating = false;
     }

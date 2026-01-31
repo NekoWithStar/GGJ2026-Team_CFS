@@ -1,19 +1,19 @@
 using UnityEngine;
 
 /// <summary>
-/// ¼òµ¥ÉËº¦³ÐÔØÆ÷£º½«¸Ã×é¼þ·Åµ½ÎäÆ÷ÃüÖÐÅÐ¶¨Ìå»òÒ»´ÎÐÔÃüÖÐÌØÐ§ÉÏ£¬±ãÓÚÊÜ»÷¶ÔÏó¶ÁÈ¡ÉËº¦Öµ¡£
-/// Ê¹ÓÃ½¨Òé£º
-/// - ½üÕ½ÎäÆ÷£ºÔÚÎäÆ÷µÄ Hitbox£¨Trigger£©ÉÏ¹Ò¸Ã×é¼þ²¢ÉèÖÃ damage£»ÎäÆ÷ÔÚ´¥·¢Ê±ÆôÓÃ¸Ã Hitbox¡£
-/// - Ô¶³Ì×Óµ¯£º×Óµ¯Ô¤ÖÆÌåÐ¯´ø¸Ã×é¼þ²¢ÔÚÃüÖÐºóÏú»Ù£¨destroyOnHit = true£©¡£
+/// ç®€å•ä¼¤å®³æ‰¿è½½å™¨ï¼šå°†è¯¥ç»„ä»¶æ”¾åˆ°æ­¦å™¨å‘½ä¸­åˆ¤å®šä½“æˆ–ä¸€æ¬¡æ€§å‘½ä¸­ç‰¹æ•ˆä¸Šï¼Œä¾¿äºŽå—å‡»å¯¹è±¡è¯»å–ä¼¤å®³å€¼ã€‚
+/// ä½¿ç”¨å»ºè®®ï¼š
+/// - è¿‘æˆ˜æ­¦å™¨ï¼šåœ¨æ­¦å™¨çš„ Hitboxï¼ˆTriggerï¼‰ä¸ŠæŒ‚è¯¥ç»„ä»¶å¹¶è®¾ç½® damageï¼›æ­¦å™¨åœ¨è§¦å‘æ—¶å¯ç”¨è¯¥ Hitboxã€‚
+/// - è¿œç¨‹å­å¼¹ï¼šå­å¼¹é¢„åˆ¶ä½“æºå¸¦è¯¥ç»„ä»¶å¹¶åœ¨å‘½ä¸­åŽé”€æ¯ï¼ˆdestroyOnHit = trueï¼‰ã€‚
 /// </summary>
 public class DamageDealer : MonoBehaviour
 {
-    [Tooltip("ÉËº¦Öµ")]
+    [Tooltip("ä¼¤å®³å€¼")]
     public int damage = 10;
 
-    [Tooltip("ÃüÖÐºóÊÇ·ñÏú»Ù×Ô¼º£¨×Óµ¯/Ò»´ÎÐÔÅÐ¶¨³£ÓÃ£©")]
+    [Tooltip("å‘½ä¸­åŽæ˜¯å¦é”€æ¯è‡ªå·±ï¼ˆå­å¼¹/ä¸€æ¬¡æ€§åˆ¤å®šå¸¸ç”¨ï¼‰")]
     public bool destroyOnHit = true;
 
-    [Tooltip("ÉËº¦À´Ô´£¨¿ÉÓÃÓÚ±ÜÃâ×ÔÉË£©£¬¿ÉÔÚÉú³ÉÊ±ÉèÖÃÎª·¢ÆðÕß GameObject")]
+    [Tooltip("ä¼¤å®³æ¥æºï¼ˆå¯ç”¨äºŽé¿å…è‡ªä¼¤ï¼‰ï¼Œå¯åœ¨ç”Ÿæˆæ—¶è®¾ç½®ä¸ºå‘èµ·è€… GameObject")]
     public GameObject owner;
 }

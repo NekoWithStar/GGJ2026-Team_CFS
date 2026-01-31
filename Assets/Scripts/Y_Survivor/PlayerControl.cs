@@ -1,63 +1,63 @@
 using UnityEngine;
 
 /// <summary>
-/// 2DÀàĞÒ´æÕßÍæ¼ÒºËĞÄ¿ØÖÆ£ºWASDÒÆ¶¯+Êó±ê³¯Ïò+»ù´¡ÊôĞÔ/×´Ì¬
-/// ÍâÖÃÎäÆ÷Ö§³Ö£º¿ÉÔÚ¼ìÊÓÃæ°åÖ¸¶¨Ô¤ÖÆÌå»òÔËĞĞÊ±Í¨¹ı½Å±¾¸ü»»£¬ÎäÆ÷½Å±¾¿ÉÊµÏÖ IWeapon ½Ó¿ÚÒÔ½ÓÊÕÊ¹ÓÃµ÷ÓÃ
+/// 2Dç±»å¹¸å­˜è€…ç©å®¶æ ¸å¿ƒæ§åˆ¶ï¼šWASDç§»åŠ¨+é¼ æ ‡æœå‘+åŸºç¡€å±æ€§/çŠ¶æ€
+/// å¤–ç½®æ­¦å™¨æ”¯æŒï¼šå¯åœ¨æ£€è§†é¢æ¿æŒ‡å®šé¢„åˆ¶ä½“æˆ–è¿è¡Œæ—¶é€šè¿‡è„šæœ¬æ›´æ¢ï¼Œæ­¦å™¨è„šæœ¬å¯å®ç° IWeapon æ¥å£ä»¥æ¥æ”¶ä½¿ç”¨è°ƒç”¨
 /// </summary>
 public class PlayerControl : MonoBehaviour
 {
-    [Header("ÒÆ¶¯ÅäÖÃ")]
-    [Tooltip("Íæ¼ÒÒÆ¶¯ËÙ¶È£¬ÀàĞÒ´æÕß½¨Òé8-12")]
+    [Header("ç§»åŠ¨é…ç½®")]
+    [Tooltip("ç©å®¶ç§»åŠ¨é€Ÿåº¦ï¼Œç±»å¹¸å­˜è€…å»ºè®®8-12")]
     public float moveSpeed = 10f;
-    [Tooltip("ÊÇ·ñÏŞÖÆÒÆ¶¯£¨ÈçËÀÍö/Éı¼¶Ê±£©")]
+    [Tooltip("æ˜¯å¦é™åˆ¶ç§»åŠ¨ï¼ˆå¦‚æ­»äº¡/å‡çº§æ—¶ï¼‰")]
     public bool canMove = true;
 
-    [Header("Íæ¼Ò»ù´¡ÊôĞÔ")]
-    public int maxHp = 100;    // ×î´óÑªÁ¿
-    public int currentHp;     // µ±Ç°ÑªÁ¿
-    public int attack = 10;   // ¹¥»÷Á¦£¨ºóĞø¹¥»÷ÓÃ£©
-    public int coin = 0;      // ½ğ±Ò£¨ºóĞøÉı¼¶ÓÃ£©
+    [Header("ç©å®¶åŸºç¡€å±æ€§")]
+    public int maxHp = 100;    // æœ€å¤§è¡€é‡
+    public int currentHp;     // å½“å‰è¡€é‡
+    public int attack = 10;   // æ”»å‡»åŠ›ï¼ˆåç»­æ”»å‡»ç”¨ï¼‰
+    public int coin = 0;      // é‡‘å¸ï¼ˆåç»­å‡çº§ç”¨ï¼‰
 
-    [Header("ÍâÖÃÎäÆ÷£¨¿ÉÑ¡£©")]
-    [Tooltip("ÔÚInspectorÖ¸¶¨ÍâÖÃÎäÆ÷Ô¤ÖÆÌå£¬Æô¶¯Ê±»áÊµÀı»¯²¢¹ÒÔØµ½ weaponAttachPoint")]
+    [Header("å¤–ç½®æ­¦å™¨ï¼ˆå¯é€‰ï¼‰")]
+    [Tooltip("åœ¨InspectoræŒ‡å®šå¤–ç½®æ­¦å™¨é¢„åˆ¶ä½“ï¼Œå¯åŠ¨æ—¶ä¼šå®ä¾‹åŒ–å¹¶æŒ‚è½½åˆ° weaponAttachPoint")]
     public GameObject externalWeaponPrefab;
-    [Tooltip("ÎäÆ÷¹Òµã£¨Îª¿ÕÔòÊ¹ÓÃÍæ¼ÒÎïÌåTransform×÷Îª¹Òµã£©")]
+    [Tooltip("æ­¦å™¨æŒ‚ç‚¹ï¼ˆä¸ºç©ºåˆ™ä½¿ç”¨ç©å®¶ç‰©ä½“Transformä½œä¸ºæŒ‚ç‚¹ï¼‰")]
     public Transform weaponAttachPoint;
 
-    [Header("ÎäÆ÷ÊäÈë")]
-    [Tooltip("·¢Éä/Ê¹ÓÃÎäÆ÷°´¼ü£¬Ä¬ÈÏÊó±ê×ó¼ü")]
+    [Header("æ­¦å™¨è¾“å…¥")]
+    [Tooltip("å‘å°„/ä½¿ç”¨æ­¦å™¨æŒ‰é”®ï¼Œé»˜è®¤é¼ æ ‡å·¦é”®")]
     public KeyCode fireKey = KeyCode.Mouse0;
-    [Tooltip("ÊÇ·ñ°´×¡³ÖĞø¿ª»ğ£¨¶ÔÖ§³ÖÀäÈ´µÄÔ¶³ÌÎäÆ÷ÓĞĞ§£©")]
+    [Tooltip("æ˜¯å¦æŒ‰ä½æŒç»­å¼€ç«ï¼ˆå¯¹æ”¯æŒå†·å´çš„è¿œç¨‹æ­¦å™¨æœ‰æ•ˆï¼‰")]
     public bool holdToFire = false;
 
-    private Rigidbody2D rb;       // 2D¸ÕÌå£¨ºËĞÄÒÆ¶¯×é¼ş£©
-    private Vector2 moveDir;      // ÒÆ¶¯·½Ïò
-    private Camera mainCam;       // Ö÷Ïà»ú£¨ÓÃÓÚÊó±ê³¯Ïò¼ÆËã£©
+    private Rigidbody2D rb;       // 2Dåˆšä½“ï¼ˆæ ¸å¿ƒç§»åŠ¨ç»„ä»¶ï¼‰
+    private Vector2 moveDir;      // ç§»åŠ¨æ–¹å‘
+    private Camera mainCam;       // ä¸»ç›¸æœºï¼ˆç”¨äºé¼ æ ‡æœå‘è®¡ç®—ï¼‰
 
-    // ÍâÖÃÎäÆ÷ÊµÀıÓë½Ó¿ÚÒıÓÃ£¨¿ÉÔÚÔËĞĞÊ±Í¨¹ı API ¸ü»»£©
+    // å¤–ç½®æ­¦å™¨å®ä¾‹ä¸æ¥å£å¼•ç”¨ï¼ˆå¯åœ¨è¿è¡Œæ—¶é€šè¿‡ API æ›´æ¢ï¼‰
     private GameObject externalWeaponInstance;
     private IWeapon externalWeaponScript;
 
-    #region ³õÊ¼»¯
+    #region åˆå§‹åŒ–
     private void Awake()
     {
-        // »ñÈ¡ºËĞÄ×é¼ş£¬±ÜÃâÆµ·±Find£¨ĞÔÄÜÓÅ»¯+¼ò½à£©
+        // è·å–æ ¸å¿ƒç»„ä»¶ï¼Œé¿å…é¢‘ç¹Findï¼ˆæ€§èƒ½ä¼˜åŒ–+ç®€æ´ï¼‰
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
     }
 
     private void Start()
     {
-        // ³õÊ¼»¯ÑªÁ¿
+        // åˆå§‹åŒ–è¡€é‡
         currentHp = maxHp;
 
-        // Èç¹ûÔÚInspectorÖĞÖ¸¶¨ÁËÎäÆ÷Ô¤ÖÆÌå£¬×Ô¶¯×°±¸
+        // å¦‚æœåœ¨Inspectorä¸­æŒ‡å®šäº†æ­¦å™¨é¢„åˆ¶ä½“ï¼Œè‡ªåŠ¨è£…å¤‡
         if (externalWeaponPrefab != null)
         {
             EquipExternalWeapon(externalWeaponPrefab);
         }
 
-        // Èç¹ûÃ»ÓĞÖ¸¶¨¹Òµã£¬ÔòÄ¬ÈÏÊ¹ÓÃÍæ¼Ò×ÔÉíTransform
+        // å¦‚æœæ²¡æœ‰æŒ‡å®šæŒ‚ç‚¹ï¼Œåˆ™é»˜è®¤ä½¿ç”¨ç©å®¶è‡ªèº«Transform
         if (weaponAttachPoint == null)
         {
             weaponAttachPoint = transform;
@@ -65,86 +65,96 @@ public class PlayerControl : MonoBehaviour
     }
     #endregion
 
-    #region Ö¡¸üĞÂ£ºÒÆ¶¯+³¯Ïò£¨ºËĞÄÂß¼­£©
+    #region å¸§æ›´æ–°ï¼šç§»åŠ¨+æœå‘ï¼ˆæ ¸å¿ƒé€»è¾‘ï¼‰
     private void Update()
     {
-        if (!canMove) return; // ²»ÄÜÒÆ¶¯ÔòÖ±½Ó·µ»Ø
+        if (!canMove) return; // ä¸èƒ½ç§»åŠ¨åˆ™ç›´æ¥è¿”å›
 
-        // 1. »ñÈ¡WASDÊäÈë£¨¶şÎ¬ÏòÁ¿£¬×Ô¶¯¹éÒ»»¯±ÜÃâĞ±Ïò¼ÓËÙ£©
+        // 1. è·å–WASDè¾“å…¥ï¼ˆäºŒç»´å‘é‡ï¼Œè‡ªåŠ¨å½’ä¸€åŒ–é¿å…æ–œå‘åŠ é€Ÿï¼‰
         GetMoveInput();
-        // 2. ¼ÆËãÊó±ê³¯Ïò£¬ÈÃÍæ¼ÒÊ¼ÖÕÃæ³¯Êó±ê
+        // 2. è®¡ç®—é¼ æ ‡æœå‘ï¼Œè®©ç©å®¶å§‹ç»ˆé¢æœé¼ æ ‡
         LookAtMouse();
 
-        // 3. ¹¥»÷ÊäÈë£ºÖ±½ÓÔÚ PlayerControl ÖĞ´¦ÀíÒÑ×°±¸ÎäÆ÷µÄ´¥·¢
+        // 3. æ”»å‡»è¾“å…¥ï¼šç›´æ¥åœ¨ PlayerControl ä¸­å¤„ç†å·²è£…å¤‡æ­¦å™¨çš„è§¦å‘
         var equipped = GetEquippedWeapon();
         if (equipped != null)
         {
-            bool doFire = holdToFire ? Input.GetKey(fireKey) : Input.GetKeyDown(fireKey);
-            if (doFire)
+            var weaponData = GetEquippedWeaponData();
+            if (weaponData != null && weaponData.automatic)
             {
-                UseEquippedWeapon();
+                // è‡ªåŠ¨æ­¦å™¨ï¼šé€šè¿‡ IWeapon.Use æ–¹æ³•æ¿€æ´»è‡ªåŠ¨å¼€ç«ï¼ˆå®é™…å¼€ç«åœ¨ WeaponControl.Update ä¸­å¤„ç†ï¼‰
+                equipped.Use(gameObject);
+            }
+            else
+            {
+                // éè‡ªåŠ¨æ­¦å™¨ï¼šéœ€è¦ç©å®¶æŒ‰é”®è§¦å‘
+                bool doFire = holdToFire ? Input.GetKey(fireKey) : Input.GetKeyDown(fireKey);
+                if (doFire)
+                {
+                    UseEquippedWeapon();
+                }
             }
         }
     }
 
-    // ¹Ì¶¨Ö¡¸üĞÂ£ºÎïÀíÏà¹ØÂß¼­£¨UnityÍÆ¼ö£¬±ÜÃâÖ¡ÂÊ²¨¶¯µ¼ÖÂÒÆ¶¯¿¨¶Ù£©
+    // å›ºå®šå¸§æ›´æ–°ï¼šç‰©ç†ç›¸å…³é€»è¾‘ï¼ˆUnityæ¨èï¼Œé¿å…å¸§ç‡æ³¢åŠ¨å¯¼è‡´ç§»åŠ¨å¡é¡¿ï¼‰
     private void FixedUpdate()
     {
         if (!canMove)
         {
-            rb.velocity = Vector2.zero; // ²»ÄÜÒÆ¶¯Ê±Çå¿ÕËÙ¶È£¬·ÀÖ¹Æ®ÒÆ
+            rb.velocity = Vector2.zero; // ä¸èƒ½ç§»åŠ¨æ—¶æ¸…ç©ºé€Ÿåº¦ï¼Œé˜²æ­¢é£˜ç§»
             return;
         }
-        // 3. ¸ÕÌåÒÆ¶¯£¨2DÎïÀí±ê×¼Ğ´·¨£¬Ë³»¬ÎŞ´©Ä££©
+        // 3. åˆšä½“ç§»åŠ¨ï¼ˆ2Dç‰©ç†æ ‡å‡†å†™æ³•ï¼Œé¡ºæ»‘æ— ç©¿æ¨¡ï¼‰
         MovePlayer();
     }
     #endregion
 
-    #region ºËĞÄ²Ù×÷£ºÒÆ¶¯+³¯Ïò+ÎäÆ÷¹ÒÔØAPI
+    #region æ ¸å¿ƒæ“ä½œï¼šç§»åŠ¨+æœå‘+æ­¦å™¨æŒ‚è½½API
     /// <summary>
-    /// »ñÈ¡WASDÒÆ¶¯ÊäÈë
+    /// è·å–WASDç§»åŠ¨è¾“å…¥
     /// </summary>
     private void GetMoveInput()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        moveDir = new Vector2(horizontal, vertical).normalized; // Ğ±ÏòÒÆ¶¯²»¼ÓËÙ
+        moveDir = new Vector2(horizontal, vertical).normalized; // æ–œå‘ç§»åŠ¨ä¸åŠ é€Ÿ
     }
 
     /// <summary>
-    /// ¸ÕÌåÒÆ¶¯£¨FixedUpdateÖĞÖ´ĞĞ£¬2DÎïÀí±ê×¼Ğ´·¨£©
+    /// åˆšä½“ç§»åŠ¨ï¼ˆFixedUpdateä¸­æ‰§è¡Œï¼Œ2Dç‰©ç†æ ‡å‡†å†™æ³•ï¼‰
     /// </summary>
     private void MovePlayer()
     {
-        // ¸ø¸ÕÌå¸³ÖµËÙ¶È£¬½áºÏÒÆ¶¯·½ÏòºÍËÙ¶È£¬Time.fixedDeltaTimeÊÇ¹Ì¶¨Ö¡Ê±¼ä
+        // ç»™åˆšä½“èµ‹å€¼é€Ÿåº¦ï¼Œç»“åˆç§»åŠ¨æ–¹å‘å’Œé€Ÿåº¦ï¼ŒTime.fixedDeltaTimeæ˜¯å›ºå®šå¸§æ—¶é—´
         rb.velocity = moveDir * moveSpeed * Time.fixedDeltaTime;
     }
 
     /// <summary>
-    /// Íæ¼ÒÃæ³¯Êó±ê·½Ïò£¨2DºËĞÄĞ´·¨£¬»ùÓÚÊÀ½ç×ø±ê¼ÆËã£©
+    /// ç©å®¶é¢æœé¼ æ ‡æ–¹å‘ï¼ˆ2Dæ ¸å¿ƒå†™æ³•ï¼ŒåŸºäºä¸–ç•Œåæ ‡è®¡ç®—ï¼‰
     /// </summary>
     private void LookAtMouse()
     {
-        // 1. ½«Êó±êÆÁÄ»×ø±ê×ªÎªÊÀ½ç×ø±ê£¨2DĞèÖ¸¶¨ZÖá£¬ÓëÍæ¼ÒÍ¬²ã£©
+        // 1. å°†é¼ æ ‡å±å¹•åæ ‡è½¬ä¸ºä¸–ç•Œåæ ‡ï¼ˆ2Déœ€æŒ‡å®šZè½´ï¼Œä¸ç©å®¶åŒå±‚ï¼‰
         Vector2 mouseWorldPos = mainCam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCam.orthographicSize));
-        // 2. ¼ÆËãÍæ¼Òµ½Êó±êµÄ·½ÏòÏòÁ¿
+        // 2. è®¡ç®—ç©å®¶åˆ°é¼ æ ‡çš„æ–¹å‘å‘é‡
         Vector2 lookDir = mouseWorldPos - rb.position;
-        // 3. ¼ÆËã·½ÏòÏòÁ¿µÄ½Ç¶È£¨»¡¶È×ª½Ç¶È£¬2DÈÆZÖáĞı×ª£©
+        // 3. è®¡ç®—æ–¹å‘å‘é‡çš„è§’åº¦ï¼ˆå¼§åº¦è½¬è§’åº¦ï¼Œ2Dç»•Zè½´æ—‹è½¬ï¼‰
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-        // 4. ¸øÍæ¼ÒÉèÖÃĞı×ª½Ç¶È£¨Ãæ³¯Êó±ê£©
+        // 4. ç»™ç©å®¶è®¾ç½®æ—‹è½¬è§’åº¦ï¼ˆé¢æœé¼ æ ‡ï¼‰
         rb.rotation = angle;
     }
 
     /// <summary>
-    /// ½«ÎäÆ÷Ô¤ÖÆÌåÊµÀı»¯²¢¹ÒÔØµ½ weaponAttachPoint£¨ÈôÒÑÓĞÔòÌæ»»£©
-    /// Èç¹ûÊµÀıÉÏ´æÔÚÊµÏÖ IWeapon µÄ×é¼ş£¬»á»º´æÒıÓÃ±ãÓÚµ÷ÓÃ
+    /// å°†æ­¦å™¨é¢„åˆ¶ä½“å®ä¾‹åŒ–å¹¶æŒ‚è½½åˆ° weaponAttachPointï¼ˆè‹¥å·²æœ‰åˆ™æ›¿æ¢ï¼‰
+    /// å¦‚æœå®ä¾‹ä¸Šå­˜åœ¨å®ç° IWeapon çš„ç»„ä»¶ï¼Œä¼šç¼“å­˜å¼•ç”¨ä¾¿äºè°ƒç”¨
     /// </summary>
-    /// <param name="weaponPrefab">ÎäÆ÷Ô¤ÖÆÌå</param>
+    /// <param name="weaponPrefab">æ­¦å™¨é¢„åˆ¶ä½“</param>
     public void EquipExternalWeapon(GameObject weaponPrefab)
     {
         if (weaponPrefab == null) return;
 
-        // Ğ¶ÔØ¾ÉÎäÆ÷
+        // å¸è½½æ—§æ­¦å™¨
         if (externalWeaponInstance != null)
         {
             Destroy(externalWeaponInstance);
@@ -152,22 +162,32 @@ public class PlayerControl : MonoBehaviour
             externalWeaponScript = null;
         }
 
-        // ÊµÀı»¯²¢¹Òµ½¹Òµã
+        // å®ä¾‹åŒ–å¹¶æŒ‚åˆ°æŒ‚ç‚¹
         externalWeaponInstance = Instantiate(weaponPrefab, weaponAttachPoint.position, weaponAttachPoint.rotation, weaponAttachPoint);
         externalWeaponInstance.transform.localPosition = Vector3.zero;
         externalWeaponInstance.transform.localRotation = Quaternion.identity;
 
-        // ²éÕÒÊµÏÖ IWeapon µÄ½Å±¾£¨ÈôÓĞ£©
+        // æŸ¥æ‰¾å®ç° IWeapon çš„è„šæœ¬ï¼ˆè‹¥æœ‰ï¼‰
         externalWeaponScript = externalWeaponInstance.GetComponentInChildren<IWeapon>();
     }
 
     /// <summary>
-    /// Ğ¶ÏÂµ±Ç°ÍâÖÃÎäÆ÷£¨Ïú»ÙÊµÀı£©
+    /// å¸ä¸‹å½“å‰å¤–ç½®æ­¦å™¨ï¼ˆé”€æ¯å®ä¾‹ï¼‰
     /// </summary>
     public void UnequipExternalWeapon()
     {
         if (externalWeaponInstance != null)
         {
+            // åœæ­¢è‡ªåŠ¨æ­¦å™¨çš„å¼€ç«
+            if (externalWeaponScript != null)
+            {
+                var stopable = externalWeaponScript as WeaponControl;
+                if (stopable != null)
+                {
+                    stopable.StopAutomatic();
+                }
+            }
+
             Destroy(externalWeaponInstance);
             externalWeaponInstance = null;
             externalWeaponScript = null;
@@ -175,8 +195,18 @@ public class PlayerControl : MonoBehaviour
     }
 
     /// <summary>
-    /// Ê¹ÓÃÒÑ×°±¸ÎäÆ÷£¨ÓÉÍâ²¿µ÷ÓÃ»ò¶¯»­ÊÂ¼ş´¥·¢£©¡£
-    /// ÎäÆ÷½Å±¾ĞèÊµÏÖ IWeapon ½Ó¿ÚÒÔÏìÓ¦ Use µ÷ÓÃ£»·ñÔò²»»á²úÉúĞ§¹û¡£
+    /// è·å–å½“å‰è£…å¤‡æ­¦å™¨çš„ Weapon æ•°æ®èµ„æº
+    /// </summary>
+    private Weapon GetEquippedWeaponData()
+    {
+        if (externalWeaponInstance == null) return null;
+        var weaponCtrl = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
+        return weaponCtrl != null ? weaponCtrl.weaponData : null;
+    }
+
+    /// <summary>
+    /// ä½¿ç”¨å·²è£…å¤‡æ­¦å™¨ï¼ˆç”±å¤–éƒ¨è°ƒç”¨æˆ–åŠ¨ç”»äº‹ä»¶è§¦å‘ï¼‰ã€‚
+    /// æ­¦å™¨è„šæœ¬éœ€å®ç° IWeapon æ¥å£ä»¥å“åº” Use è°ƒç”¨ï¼›å¦åˆ™ä¸ä¼šäº§ç”Ÿæ•ˆæœã€‚
     /// </summary>
     public void UseEquippedWeapon()
     {
@@ -187,7 +217,7 @@ public class PlayerControl : MonoBehaviour
     }
 
     /// <summary>
-    /// ·µ»Øµ±Ç°×°±¸µÄ IWeapon£¨·½±ãÍâ²¿½Å±¾¿ØÖÆ£©
+    /// è¿”å›å½“å‰è£…å¤‡çš„ IWeaponï¼ˆæ–¹ä¾¿å¤–éƒ¨è„šæœ¬æ§åˆ¶ï¼‰
     /// </summary>
     public IWeapon GetEquippedWeapon()
     {
@@ -195,63 +225,63 @@ public class PlayerControl : MonoBehaviour
     }
     #endregion
 
-    #region »ù´¡×´Ì¬·½·¨£¨ºóĞøÀ©Õ¹Ö±½Ó²¹Âß¼­£¬ÎŞĞè¸ÄºËĞÄ£©
+    #region åŸºç¡€çŠ¶æ€æ–¹æ³•ï¼ˆåç»­æ‰©å±•ç›´æ¥è¡¥é€»è¾‘ï¼Œæ— éœ€æ”¹æ ¸å¿ƒï¼‰
     /// <summary>
-    /// ÊÜ»÷·½·¨£¨µĞÈË¹¥»÷Ê±µ÷ÓÃ£©
+    /// å—å‡»æ–¹æ³•ï¼ˆæ•Œäººæ”»å‡»æ—¶è°ƒç”¨ï¼‰
     /// </summary>
-    /// <param name="damage">ÊÜµ½µÄÉËº¦Öµ</param>
+    /// <param name="damage">å—åˆ°çš„ä¼¤å®³å€¼</param>
     public void TakeDamage(int damage)
     {
-        currentHp = Mathf.Max(currentHp - damage, 0); // ÑªÁ¿²»Ğ¡ÓÚ0
+        currentHp = Mathf.Max(currentHp - damage, 0); // è¡€é‡ä¸å°äº0
         if (currentHp <= 0)
         {
-            Die(); // ÑªÁ¿Îª0ÔòËÀÍö
+            Die(); // è¡€é‡ä¸º0åˆ™æ­»äº¡
         }
-        // ºóĞø¿É¼Ó£ºÊÜ»÷ÌØĞ§¡¢ÎŞµĞÖ¡¡¢ÆÁÄ»¶¶¶¯µÈ
+        // åç»­å¯åŠ ï¼šå—å‡»ç‰¹æ•ˆã€æ— æ•Œå¸§ã€å±å¹•æŠ–åŠ¨ç­‰
     }
 
     /// <summary>
-    /// ËÀÍö·½·¨
+    /// æ­»äº¡æ–¹æ³•
     /// </summary>
     private void Die()
     {
-        canMove = false; // ËÀÍöºó½ûÖ¹ÒÆ¶¯
-        // ºóĞø¿É¼Ó£ºËÀÍöÌØĞ§¡¢ÓÎÏ·½áÊøUI¡¢Ïú»ÙÍæ¼ÒµÈ
-        Debug.Log("Íæ¼ÒËÀÍö£¡");
+        canMove = false; // æ­»äº¡åç¦æ­¢ç§»åŠ¨
+        // åç»­å¯åŠ ï¼šæ­»äº¡ç‰¹æ•ˆã€æ¸¸æˆç»“æŸUIã€é”€æ¯ç©å®¶ç­‰
+        Debug.Log("ç©å®¶æ­»äº¡ï¼");
     }
 
     /// <summary>
-    /// Ê°È¡µÀ¾ß·½·¨£¨½ğ±Ò/Ñª°ü£¬Ê°È¡½Å±¾µ÷ÓÃ£©
+    /// æ‹¾å–é“å…·æ–¹æ³•ï¼ˆé‡‘å¸/è¡€åŒ…ï¼Œæ‹¾å–è„šæœ¬è°ƒç”¨ï¼‰
     /// </summary>
-    /// <param name="type">µÀ¾ßÀàĞÍ£ºCoin/Hp</param>
-    /// <param name="value">µÀ¾ßÊıÖµ</param>
+    /// <param name="type">é“å…·ç±»å‹ï¼šCoin/Hp</param>
+    /// <param name="value">é“å…·æ•°å€¼</param>
     public void PickupItem(string type, int value)
     {
         switch (type)
         {
             case "Coin":
                 coin += value;
-                Debug.Log("Ê°È¡½ğ±Ò£º" + value + "£¬µ±Ç°½ğ±Ò£º" + coin);
+                Debug.Log("æ‹¾å–é‡‘å¸ï¼š" + value + "ï¼Œå½“å‰é‡‘å¸ï¼š" + coin);
                 break;
             case "Hp":
-                currentHp = Mathf.Min(currentHp + value, maxHp); // ÑªÁ¿²»³¬¹ı×î´óÖµ
-                Debug.Log("Ê°È¡Ñª°ü£º" + value + "£¬µ±Ç°ÑªÁ¿£º" + currentHp);
+                currentHp = Mathf.Min(currentHp + value, maxHp); // è¡€é‡ä¸è¶…è¿‡æœ€å¤§å€¼
+                Debug.Log("æ‹¾å–è¡€åŒ…ï¼š" + value + "ï¼Œå½“å‰è¡€é‡ï¼š" + currentHp);
                 break;
         }
-        // ºóĞø¿É¼Ó£ºÊ°È¡ÌØĞ§¡¢Ê°È¡ÒôĞ§µÈ
+        // åç»­å¯åŠ ï¼šæ‹¾å–ç‰¹æ•ˆã€æ‹¾å–éŸ³æ•ˆç­‰
     }
     #endregion
 }
 
 /// <summary>
-/// ÎäÆ÷ĞĞÎª½Ó¿Ú£¨¿ÉÓÉÍâÖÃÎäÆ÷½Å±¾ÊµÏÖ£©£¬Use ·½·¨½ÓÊÕÊ¹ÓÃÕß£¨Íæ¼Ò£©¶ÔÏó
-/// ÕâÑù¿ÉÒÔ½«¾ßÌå¹¥»÷/·¢Éä/ÀäÈ´µÈÂß¼­·ÅÔÚÎäÆ÷½Å±¾ÖĞ£¬PlayerControl Ö»¸ºÔğ¹ÒÔØÓëµ÷ÓÃ
+/// æ­¦å™¨è¡Œä¸ºæ¥å£ï¼ˆå¯ç”±å¤–ç½®æ­¦å™¨è„šæœ¬å®ç°ï¼‰ï¼ŒUse æ–¹æ³•æ¥æ”¶ä½¿ç”¨è€…ï¼ˆç©å®¶ï¼‰å¯¹è±¡
+/// è¿™æ ·å¯ä»¥å°†å…·ä½“æ”»å‡»/å‘å°„/å†·å´ç­‰é€»è¾‘æ”¾åœ¨æ­¦å™¨è„šæœ¬ä¸­ï¼ŒPlayerControl åªè´Ÿè´£æŒ‚è½½ä¸è°ƒç”¨
 /// </summary>
 public interface IWeapon
 {
     /// <summary>
-    /// Ê¹ÓÃÎäÆ÷£¨ÀıÈç½üÕ½»Ó¿³¡¢·¢Éä×Óµ¯µÈ£©
+    /// ä½¿ç”¨æ­¦å™¨ï¼ˆä¾‹å¦‚è¿‘æˆ˜æŒ¥ç ã€å‘å°„å­å¼¹ç­‰ï¼‰
     /// </summary>
-    /// <param name="user">·¢ÆğÊ¹ÓÃµÄÎïÌå£¨Í¨³£ÎªÍæ¼Ò£©</param>
+    /// <param name="user">å‘èµ·ä½¿ç”¨çš„ç‰©ä½“ï¼ˆé€šå¸¸ä¸ºç©å®¶ï¼‰</param>
     void Use(GameObject user);
 }

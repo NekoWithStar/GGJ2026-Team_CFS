@@ -4,42 +4,42 @@ using UnityEngine.UI;
 
 public class SimpleScrollbar : MonoBehaviour
 {
-    // ¹ã²¥£ºµ±Ä³Ò»ÀàÇãÏòµÄ rank ¸Ä±äÊ±Í¨Öª¶©ÔÄÕß (type, newRank)
+    // å¹¿æ’­ï¼šå½“æŸä¸€ç±»å€¾å‘çš„ rank æ”¹å˜æ—¶é€šçŸ¥è®¢é˜…è€… (type, newRank)
     public static event Action<Card.CARD_TYPE, int> OnRankChanged;
 
-    [Header("×ÔÎÒÇãÏò£¨ÀíĞÔ£©")]
-    public Scrollbar scrollBar_Ego;    // ×ÔÎÒ¹ö¶¯Ìõ
-    public Text text_EgoValue;         // ×ÔÎÒÊıÖµÎÄ±¾
-    private int _egoValue;             // ×ÔÎÒÇãÏòÖµ
+    [Header("è‡ªæˆ‘å€¾å‘ï¼ˆç†æ€§ï¼‰")]
+    public Scrollbar scrollBar_Ego;    // è‡ªæˆ‘æ»šåŠ¨æ¡
+    public Text text_EgoValue;         // è‡ªæˆ‘æ•°å€¼æ–‡æœ¬
+    private int _egoValue;             // è‡ªæˆ‘å€¾å‘å€¼
 
-    [Header("±¾ÎÒÇãÏò£¨¸ĞÊÜ£©")]
-    public Scrollbar scrollBar_Id;     // ±¾ÎÒ¹ö¶¯Ìõ
-    public Text text_IdValue;          // ±¾ÎÒÊıÖµÎÄ±¾
-    private int _idValue;              // ±¾ÎÒÇãÏòÖµ
+    [Header("æœ¬æˆ‘å€¾å‘ï¼ˆæ„Ÿå—ï¼‰")]
+    public Scrollbar scrollBar_Id;     // æœ¬æˆ‘æ»šåŠ¨æ¡
+    public Text text_IdValue;          // æœ¬æˆ‘æ•°å€¼æ–‡æœ¬
+    private int _idValue;              // æœ¬æˆ‘å€¾å‘å€¼
 
-    [Header("³¬ÎÒÇãÏò£¨ÀíÏë£©")]
-    public Scrollbar scrollBar_Superego; // ³¬ÎÒ¹ö¶¯Ìõ
-    public Text text_SuperegoValue;     // ³¬ÎÒÊıÖµÎÄ±¾
-    private int _superegoValue;         // ³¬ÎÒÇãÏòÖµ
+    [Header("è¶…æˆ‘å€¾å‘ï¼ˆç†æƒ³ï¼‰")]
+    public Scrollbar scrollBar_Superego; // è¶…æˆ‘æ»šåŠ¨æ¡
+    public Text text_SuperegoValue;     // è¶…æˆ‘æ•°å€¼æ–‡æœ¬
+    private int _superegoValue;         // è¶…æˆ‘å€¾å‘å€¼
 
-    [Header("ÅäÖÃ")]
-    public int maxTendencyValue = 30;  // ÇãÏòÖµ×î´óÖµ£¨Í³Ò»¹éÒ»µ½0~30£©
+    [Header("é…ç½®")]
+    public int maxTendencyValue = 30;  // å€¾å‘å€¼æœ€å¤§å€¼ï¼ˆç»Ÿä¸€å½’ä¸€åˆ°0~30ï¼‰
 
-    [Header("¶¯»­")]
-    [Tooltip("È·ÈÏ¿¨ÅÆÊ±¹ö¶¯ÌõÔö¼ÓµÄÆ½»¬¶¯»­Ê±³¤£¨Ãë£©")]
+    [Header("åŠ¨ç”»")]
+    [Tooltip("ç¡®è®¤å¡ç‰Œæ—¶æ»šåŠ¨æ¡å¢åŠ çš„å¹³æ»‘åŠ¨ç”»æ—¶é•¿ï¼ˆç§’ï¼‰")]
     public float confirmTweenDuration = 0.5f;
 
-    // ÒÖÖÆ OnValueChanged ÖĞµÄ¡°Ğ´»Ø¿¨ÅÆ¡±Âß¼­£¨ÓÃÓÚ³ÌĞò»¯¸üĞÂ¹ö¶¯Ìõ£¬²»Ó¦¸²¸Ç¿¨ÅÆÔ­ÓĞ rank£©
+    // æŠ‘åˆ¶ OnValueChanged ä¸­çš„â€œå†™å›å¡ç‰Œâ€é€»è¾‘ï¼ˆç”¨äºç¨‹åºåŒ–æ›´æ–°æ»šåŠ¨æ¡ï¼Œä¸åº”è¦†ç›–å¡ç‰ŒåŸæœ‰ rankï¼‰
     private bool suppressOnValueChanged = false;
 
-    // ¿ØÖÆ¸÷À¸Ä¿µÄ²¢·¢Ğ­³ÌÒıÓÃ£¬±ãÓÚÍ£Ö¹
+    // æ§åˆ¶å„æ ç›®çš„å¹¶å‘åç¨‹å¼•ç”¨ï¼Œä¾¿äºåœæ­¢
     private Coroutine egoCoroutine;
     private Coroutine idCoroutine;
     private Coroutine superegoCoroutine;
 
     void OnEnable()
     {
-        // ¶©ÔÄ¿¨ÅÆÈ·ÈÏ¹ã²¥£¨Flip_Card ĞèÔÚÈ·ÈÏÊ±´¥·¢¾²Ì¬ÊÂ¼ş£©
+        // è®¢é˜…å¡ç‰Œç¡®è®¤å¹¿æ’­ï¼ˆFlip_Card éœ€åœ¨ç¡®è®¤æ—¶è§¦å‘é™æ€äº‹ä»¶ï¼‰
         Flip_Card.OnCardConfirmed += HandleCardConfirmed;
     }
 
@@ -50,14 +50,14 @@ public class SimpleScrollbar : MonoBehaviour
 
     void Start()
     {
-        // ³õÊ¼»¯Ä¬ÈÏ rank Îª 0£¨²»´Ó³¡¾°¾ÛºÏ£©
+        // åˆå§‹åŒ–é»˜è®¤ rank ä¸º 0ï¼ˆä¸ä»åœºæ™¯èšåˆï¼‰
         _egoValue = 0;
         _idValue = 0;
         _superegoValue = 0;
 
         if (maxTendencyValue <= 0) maxTendencyValue = 30;
 
-        // ³õÊ¼»¯ UI£¨ÔÚÌí¼Ó¼àÌıÆ÷Ç°ÉèÖÃÖµ£¬±ÜÃâ´¥·¢Ğ´»Ø£©
+        // åˆå§‹åŒ– UIï¼ˆåœ¨æ·»åŠ ç›‘å¬å™¨å‰è®¾ç½®å€¼ï¼Œé¿å…è§¦å‘å†™å›ï¼‰
         if (scrollBar_Ego != null) scrollBar_Ego.value = 0f;
         if (scrollBar_Id != null) scrollBar_Id.value = 0f;
         if (scrollBar_Superego != null) scrollBar_Superego.value = 0f;
@@ -66,21 +66,21 @@ public class SimpleScrollbar : MonoBehaviour
         UpdateIdText(_idValue);
         UpdateSuperegoText(_superegoValue);
 
-        // °ó¶¨ÓÃ»§½»»¥¼àÌıÆ÷£¨´ËºóÓÃ»§ÍÏ¶¯»á´¥·¢Ğ´»Ø¿¨ÅÆµÄÂß¼­£©
+        // ç»‘å®šç”¨æˆ·äº¤äº’ç›‘å¬å™¨ï¼ˆæ­¤åç”¨æˆ·æ‹–åŠ¨ä¼šè§¦å‘å†™å›å¡ç‰Œçš„é€»è¾‘ï¼‰
         InitScrollbars();
     }
 
-    #region ³õÊ¼»¯¹ö¶¯Ìõ£¨¶ÀÁ¢°ó¶¨£©
+    #region åˆå§‹åŒ–æ»šåŠ¨æ¡ï¼ˆç‹¬ç«‹ç»‘å®šï¼‰
     void InitScrollbars()
     {
-        // Ã¿¸ö¹ö¶¯ÌõÖ»°ó¶¨×Ô¼ºµÄ¸üĞÂ·½·¨£¬±Ë´ËÎŞ¹ØÁª
+        // æ¯ä¸ªæ»šåŠ¨æ¡åªç»‘å®šè‡ªå·±çš„æ›´æ–°æ–¹æ³•ï¼Œå½¼æ­¤æ— å…³è”
         if (scrollBar_Ego != null) scrollBar_Ego.onValueChanged.AddListener(OnEgoScrollChanged);
         if (scrollBar_Id != null) scrollBar_Id.onValueChanged.AddListener(OnIdScrollChanged);
         if (scrollBar_Superego != null) scrollBar_Superego.onValueChanged.AddListener(OnSuperegoScrollChanged);
     }
     #endregion
 
-    #region ´¦Àí¿¨ÅÆÈ·ÈÏ£¨Flip_Card ¹ã²¥£© - Ê¹ÓÃĞ­³ÌÆ½»¬Ôö¼Ó
+    #region å¤„ç†å¡ç‰Œç¡®è®¤ï¼ˆFlip_Card å¹¿æ’­ï¼‰ - ä½¿ç”¨åç¨‹å¹³æ»‘å¢åŠ 
     void HandleCardConfirmed(Card card)
     {
         if (card == null) return;
@@ -107,7 +107,7 @@ public class SimpleScrollbar : MonoBehaviour
     {
         int maxValue = Mathf.Max(1, maxTendencyValue);
 
-        // ¼ÆËãĞÂµÄÄ¿±êÖµ²¢ clamp
+        // è®¡ç®—æ–°çš„ç›®æ ‡å€¼å¹¶ clamp
         int startValue;
         int targetValue;
         switch (type)
@@ -135,7 +135,7 @@ public class SimpleScrollbar : MonoBehaviour
 
     System.Collections.IEnumerator AnimateScrollbar(Card.CARD_TYPE type, Scrollbar targetScrollbar, int startValue, int targetValue, int maxValue)
     {
-        // Èç¹ûÃ»ÓĞ UI£¬Ö±½ÓĞ´Èë²¢·µ»Ø
+        // å¦‚æœæ²¡æœ‰ UIï¼Œç›´æ¥å†™å…¥å¹¶è¿”å›
         if (targetScrollbar == null)
         {
             ApplyFinalValue(type, targetValue);
@@ -146,7 +146,7 @@ public class SimpleScrollbar : MonoBehaviour
         float startNormalized = (float)startValue / maxValue;
         float endNormalized = (float)targetValue / maxValue;
 
-        // Éè¶¨ÒÖÖÆ£¬±ÜÃâ³ÌĞòÉèÖÃ value Ê±´¥·¢Ğ´»Ø
+        // è®¾å®šæŠ‘åˆ¶ï¼Œé¿å…ç¨‹åºè®¾ç½® value æ—¶è§¦å‘å†™å›
         suppressOnValueChanged = true;
 
         float elapsed = 0f;
@@ -156,7 +156,7 @@ public class SimpleScrollbar : MonoBehaviour
         {
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
-            // Ê¹ÓÃ SmoothStep ¿É»ñµÃ¸ü×ÔÈ»µÄ¶¯»­
+            // ä½¿ç”¨ SmoothStep å¯è·å¾—æ›´è‡ªç„¶çš„åŠ¨ç”»
             float v = Mathf.Lerp(startNormalized, endNormalized, Mathf.SmoothStep(0f, 1f, t));
             if (targetScrollbar != null) targetScrollbar.value = v;
             int displayRank = Mathf.RoundToInt(v * maxValue);
@@ -164,12 +164,12 @@ public class SimpleScrollbar : MonoBehaviour
             yield return null;
         }
 
-        // ½áÊøÊ±ÉèÖÃ×îÖÕÖµ
+        // ç»“æŸæ—¶è®¾ç½®æœ€ç»ˆå€¼
         if (targetScrollbar != null) targetScrollbar.value = endNormalized;
         ApplyFinalValue(type, targetValue);
         UpdateTextByType(type, targetValue);
 
-        // ½â³ıÒÖÖÆ
+        // è§£é™¤æŠ‘åˆ¶
         suppressOnValueChanged = false;
     }
 
@@ -206,31 +206,31 @@ public class SimpleScrollbar : MonoBehaviour
     }
     #endregion
 
-    #region Èı¸ö¹ö¶¯ÌõµÄ¶ÀÁ¢Âß¼­£¨ºËĞÄ¹éÒ»Ó³Éä£©
+    #region ä¸‰ä¸ªæ»šåŠ¨æ¡çš„ç‹¬ç«‹é€»è¾‘ï¼ˆæ ¸å¿ƒå½’ä¸€æ˜ å°„ï¼‰
     /// <summary>
-    /// ×ÔÎÒ¹ö¶¯ÌõÖµ±ä»¯£¨ÓÃ»§½»»¥Ê±£©
+    /// è‡ªæˆ‘æ»šåŠ¨æ¡å€¼å˜åŒ–ï¼ˆç”¨æˆ·äº¤äº’æ—¶ï¼‰
     /// </summary>
     public void OnEgoScrollChanged(float scrollValue)
     {
-        // ¹éÒ»Ó³Éä£º0~1 ¡ú 0~maxTendencyValue
+        // å½’ä¸€æ˜ å°„ï¼š0~1 â†’ 0~maxTendencyValue
         _egoValue = Mathf.RoundToInt(scrollValue * maxTendencyValue);
         _egoValue = Mathf.Clamp(_egoValue, 0, maxTendencyValue);
-        // Ö»¸üĞÂ×Ô¼ºµÄÎÄ±¾
+        // åªæ›´æ–°è‡ªå·±çš„æ–‡æœ¬
         UpdateEgoText(_egoValue);
 
-        // Èç¹ûÊÇ³ÌĞò»¯´¥·¢£¨ÀıÈçÈ·ÈÏ¿¨ÅÆÊ±ÉèÖÃ value£©£¬Ôò²»°ÑÖµĞ´»Ø¿¨ÅÆ
+        // å¦‚æœæ˜¯ç¨‹åºåŒ–è§¦å‘ï¼ˆä¾‹å¦‚ç¡®è®¤å¡ç‰Œæ—¶è®¾ç½® valueï¼‰ï¼Œåˆ™ä¸æŠŠå€¼å†™å›å¡ç‰Œ
         if (suppressOnValueChanged) return;
 
-        // ¹ã²¥±ä»¯¸ø¶©ÔÄÕß£¨CardControl ½«»á°Ñ card_data.cardRank ¸üĞÂÎª¸ÃÖµ£©
+        // å¹¿æ’­å˜åŒ–ç»™è®¢é˜…è€…ï¼ˆCardControl å°†ä¼šæŠŠ card_data.cardRank æ›´æ–°ä¸ºè¯¥å€¼ï¼‰
         OnRankChanged?.Invoke(Card.CARD_TYPE.Reason, _egoValue);
 
-        // ¿ÉÑ¡£º½âËøÌáÊ¾£¨±£ÁôºËĞÄ¹æÔò£¬ÎŞ¶àÓàÂß¼­£©
-        if (_egoValue >= 10) Debug.Log("×ÔÎÒÇãÏò¡İ10£¬½âËøÀíĞÔ¿¨Rank2");
-        if (_egoValue >= 24) Debug.Log("×ÔÎÒÇãÏò¡İ24£¬½âËøÀíĞÔ¿¨Rank3");
+        // å¯é€‰ï¼šè§£é”æç¤ºï¼ˆä¿ç•™æ ¸å¿ƒè§„åˆ™ï¼Œæ— å¤šä½™é€»è¾‘ï¼‰
+        if (_egoValue >= 10) Debug.Log("è‡ªæˆ‘å€¾å‘â‰¥10ï¼Œè§£é”ç†æ€§å¡Rank2");
+        if (_egoValue >= 24) Debug.Log("è‡ªæˆ‘å€¾å‘â‰¥24ï¼Œè§£é”ç†æ€§å¡Rank3");
     }
 
     /// <summary>
-    /// ±¾ÎÒ¹ö¶¯ÌõÖµ±ä»¯£¨ÓÃ»§½»»¥Ê±£©
+    /// æœ¬æˆ‘æ»šåŠ¨æ¡å€¼å˜åŒ–ï¼ˆç”¨æˆ·äº¤äº’æ—¶ï¼‰
     /// </summary>
     public void OnIdScrollChanged(float scrollValue)
     {
@@ -241,12 +241,12 @@ public class SimpleScrollbar : MonoBehaviour
         if (suppressOnValueChanged) return;
 
         OnRankChanged?.Invoke(Card.CARD_TYPE.Feel, _idValue);
-        if (_idValue >= 10) Debug.Log("±¾ÎÒÇãÏò¡İ10£¬½âËø¸ĞÊÜ¿¨Rank2");
-        if (_idValue >= 24) Debug.Log("±¾ÎÒÇãÏò¡İ24£¬½âËø¸ĞÊÜ¿¨Rank3");
+        if (_idValue >= 10) Debug.Log("æœ¬æˆ‘å€¾å‘â‰¥10ï¼Œè§£é”æ„Ÿå—å¡Rank2");
+        if (_idValue >= 24) Debug.Log("æœ¬æˆ‘å€¾å‘â‰¥24ï¼Œè§£é”æ„Ÿå—å¡Rank3");
     }
 
     /// <summary>
-    /// ³¬ÎÒ¹ö¶¯ÌõÖµ±ä»¯£¨ÓÃ»§½»»¥Ê±£©
+    /// è¶…æˆ‘æ»šåŠ¨æ¡å€¼å˜åŒ–ï¼ˆç”¨æˆ·äº¤äº’æ—¶ï¼‰
     /// </summary>
     public void OnSuperegoScrollChanged(float scrollValue)
     {
@@ -257,25 +257,25 @@ public class SimpleScrollbar : MonoBehaviour
         if (suppressOnValueChanged) return;
 
         OnRankChanged?.Invoke(Card.CARD_TYPE.Dream, _superegoValue);
-        if (_superegoValue >= 10) Debug.Log("³¬ÎÒÇãÏò¡İ10£¬½âËøÀíÏë¿¨Rank2");
-        if (_superegoValue >= 24) Debug.Log("³¬ÎÒÇãÏò¡İ24£¬½âËøÀíÏë¿¨Rank3");
+        if (_superegoValue >= 10) Debug.Log("è¶…æˆ‘å€¾å‘â‰¥10ï¼Œè§£é”ç†æƒ³å¡Rank2");
+        if (_superegoValue >= 24) Debug.Log("è¶…æˆ‘å€¾å‘â‰¥24ï¼Œè§£é”ç†æƒ³å¡Rank3");
     }
     #endregion
 
-    #region ¶ÀÁ¢¸üĞÂÎÄ±¾£¨¼«¼ò£©
+    #region ç‹¬ç«‹æ›´æ–°æ–‡æœ¬ï¼ˆæç®€ï¼‰
     void UpdateEgoText(int value)
     {
-        if (text_EgoValue != null) text_EgoValue.text = $"Reason£º{value}";
+        if (text_EgoValue != null) text_EgoValue.text = $"Reasonï¼š{value}";
     }
 
     void UpdateIdText(int value)
     {
-        if (text_IdValue != null) text_IdValue.text = $"Feel£º{value}";
+        if (text_IdValue != null) text_IdValue.text = $"Feelï¼š{value}";
     }
 
     void UpdateSuperegoText(int value)
     {
-        if (text_SuperegoValue != null) text_SuperegoValue.text = $"Dream£º{value}";
+        if (text_SuperegoValue != null) text_SuperegoValue.text = $"Dreamï¼š{value}";
     }
     #endregion
 }

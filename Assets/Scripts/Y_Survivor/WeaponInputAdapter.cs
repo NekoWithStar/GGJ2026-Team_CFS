@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 简单输入适配器：按键触发玩家已装备武器的 Use 调用
+/// 绠�鍗曡緭鍏ラ�傞厤鍣細鎸夐敭瑙﹀彂鐜╁宸茶澶囨鍣ㄧ殑 Use 璋冪敤
 /// </summary>
 [RequireComponent(typeof(PlayerControl))]
 public class WeaponInputAdapter : MonoBehaviour

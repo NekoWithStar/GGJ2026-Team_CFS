@@ -1,9 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// ÔËĞĞÊ±¼òµ¥×Óµ¯ÊµÏÖ£¨¼æÈİÏÖÓĞ DamageDealer + EnemyControl£©
-/// - ³õÊ¼»¯Ê±Ìí¼Ó/ÉèÖÃ DamageDealer¡¢Rigidbody2D¡¢Collider2D£¨Circle, trigger£©
-/// - ÉèÖÃËÙ¶ÈÓëÉú´æÊ±¼ä£»ÃüÖĞ´¦ÀíÓÉ EnemyControl µÄ ApplyDamageFromCollider ¶ÁÈ¡ DamageDealer Ö´ĞĞ
+/// è¿è¡Œæ—¶ç®€å•å­å¼¹å®ç°ï¼ˆå…¼å®¹ç°æœ‰ DamageDealer + EnemyControlï¼‰
+/// - åˆå§‹åŒ–æ—¶æ·»åŠ /è®¾ç½® DamageDealerã€Rigidbody2Dã€Collider2Dï¼ˆCircle, triggerï¼‰
+/// - è®¾ç½®é€Ÿåº¦ä¸ç”Ÿå­˜æ—¶é—´ï¼›å‘½ä¸­å¤„ç†ç”± EnemyControl çš„ ApplyDamageFromCollider è¯»å– DamageDealer æ‰§è¡Œ
 /// </summary>
 [DisallowMultipleComponent]
 public class SimpleProjectile : MonoBehaviour
@@ -15,14 +15,14 @@ public class SimpleProjectile : MonoBehaviour
     Rigidbody2D rb;
 
     /// <summary>
-    /// ³õÊ¼»¯×Óµ¯£¨»á×Ô¶¯Ìí¼ÓËùĞè×é¼ş²¢ÉèÖÃ£©
+    /// åˆå§‹åŒ–å­å¼¹ï¼ˆä¼šè‡ªåŠ¨æ·»åŠ æ‰€éœ€ç»„ä»¶å¹¶è®¾ç½®ï¼‰
     /// </summary>
-    /// <param name="direction">µ¥Î»·½Ïò</param>
-    /// <param name="speed">ËÙ¶È</param>
-    /// <param name="damage">ÉËº¦</param>
-    /// <param name="owner">·¢ÉäÕß</param>
-    /// <param name="life">´æ»îÊ±¼ä</param>
-    /// <param name="destroyOnHit">ÃüÖĞºóÊÇ·ñÏú»Ù×Ô¼º£¨½»¸ø DamageDealer£©</param>
+    /// <param name="direction">å•ä½æ–¹å‘</param>
+    /// <param name="speed">é€Ÿåº¦</param>
+    /// <param name="damage">ä¼¤å®³</param>
+    /// <param name="owner">å‘å°„è€…</param>
+    /// <param name="life">å­˜æ´»æ—¶é—´</param>
+    /// <param name="destroyOnHit">å‘½ä¸­åæ˜¯å¦é”€æ¯è‡ªå·±ï¼ˆäº¤ç»™ DamageDealerï¼‰</param>
     public void Initialize(Vector2 direction, float speed, int damage, GameObject owner, float life = 4f, bool destroyOnHit = true)
     {
         dd = gameObject.GetComponent<DamageDealer>() ?? gameObject.AddComponent<DamageDealer>();
@@ -34,7 +34,7 @@ public class SimpleProjectile : MonoBehaviour
         rb.gravityScale = 0f;
         rb.velocity = direction.normalized * speed;
 
-        // È·±£´æÔÚ Collider2D£¨ÓÃÓÚ´¥·¢¼ì²â£©£¬Ä¬ÈÏÌí¼Ó CircleCollider2D ²¢ÉèÎª trigger
+        // ç¡®ä¿å­˜åœ¨ Collider2Dï¼ˆç”¨äºè§¦å‘æ£€æµ‹ï¼‰ï¼Œé»˜è®¤æ·»åŠ  CircleCollider2D å¹¶è®¾ä¸º trigger
         Collider2D col = gameObject.GetComponent<Collider2D>();
         if (col == null)
         {

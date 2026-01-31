@@ -5,15 +5,15 @@ using UnityEngine.UI;
 
 public class CardControl : MonoBehaviour
 {
-    public Card card_data; // ¿¨ÅÆÊı¾İ
+    public Card card_data; // å¡ç‰Œæ•°æ®
 
-    // ¿¨ÅÆÔªËØ¿ØÖÆ
-    public Image picture; // ¿¨ÅÆÍ¼Æ¬
-    public Text card_name; // ¿¨ÅÆÃû³ÆÎÄ±¾
-    public Text describe; // ÃèÊöÎÄ±¾
-    public Text cost; // ·ÑÓÃÎÄ±¾
-    public Text rank; // ÇãÏòµÈ¼¶ÎÄ±¾
-    public GameObject back; // ¿¨ÅÆ±³ÃæÍ¼Æ¬
+    // å¡ç‰Œå…ƒç´ æ§åˆ¶
+    public Image picture; // å¡ç‰Œå›¾ç‰‡
+    public Text card_name; // å¡ç‰Œåç§°æ–‡æœ¬
+    public Text describe; // æè¿°æ–‡æœ¬
+    public Text cost; // è´¹ç”¨æ–‡æœ¬
+    public Text rank; // å€¾å‘ç­‰çº§æ–‡æœ¬
+    public GameObject back; // å¡ç‰ŒèƒŒé¢å›¾ç‰‡
 
     private void Awake()
     {
@@ -35,13 +35,13 @@ public class CardControl : MonoBehaviour
         SimpleScrollbar.OnRankChanged -= HandleRankChanged;
     }
 
-    // µ±¹ö¶¯Ìõ¹ã²¥¸ÃÀàĞÍ rank ¸Ä±äÊ±£¬¸üĞÂ ScriptableObject Óë UI£¨×îĞ¡ÈëÇÖ£©
+    // å½“æ»šåŠ¨æ¡å¹¿æ’­è¯¥ç±»å‹ rank æ”¹å˜æ—¶ï¼Œæ›´æ–° ScriptableObject ä¸ UIï¼ˆæœ€å°å…¥ä¾µï¼‰
     private void HandleRankChanged(Card.CARD_TYPE type, int newRank)
     {
         if (card_data == null) return;
         if (card_data.cardType != type) return;
 
-        // ¸üĞÂÊı¾İ ²¢Í¬²½ UI ÎÄ±¾
+        // æ›´æ–°æ•°æ® å¹¶åŒæ­¥ UI æ–‡æœ¬
         card_data.cardRank = newRank;
         if (rank != null) rank.text = newRank.ToString();
     }

@@ -7,18 +7,18 @@ using UnityEngine.EventSystems;
 public class DragUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     /// <summary>
-    /// UIºÍÖ¸ÕëµÄÎ»ÖÃÆ«ÒÆÁ¿
+    /// UIå’ŒæŒ‡é’ˆçš„ä½ç½®åç§»é‡
     /// </summary>
     Vector3 offset;
 
     RectTransform rt;
     Vector3 pos;
-    float minWidth;             //Ë®Æ½×îĞ¡ÍÏ×§·¶Î§
-    float maxWidth;            //Ë®Æ½×î´óÍÏ×§·¶Î§
-    float minHeight;            //´¹Ö±×îĞ¡ÍÏ×§·¶Î§  
-    float maxHeight;            //´¹Ö±×î´óÍÏ×§·¶Î§
-    float rangeX;               //ÍÏ×§·¶Î§
-    float rangeY;               //ÍÏ×§·¶Î§
+    float minWidth;             //æ°´å¹³æœ€å°æ‹–æ‹½èŒƒå›´
+    float maxWidth;            //æ°´å¹³æœ€å¤§æ‹–æ‹½èŒƒå›´
+    float minHeight;            //å‚ç›´æœ€å°æ‹–æ‹½èŒƒå›´  
+    float maxHeight;            //å‚ç›´æœ€å¤§æ‹–æ‹½èŒƒå›´
+    float rangeX;               //æ‹–æ‹½èŒƒå›´
+    float rangeY;               //æ‹–æ‹½èŒƒå›´
 
 
     void Update()
@@ -38,34 +38,34 @@ public class DragUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     }
 
     /// <summary>
-    /// ÍÏ×§·¶Î§ÏŞÖÆ
+    /// æ‹–æ‹½èŒƒå›´é™åˆ¶
     /// </summary>
     void DragRangeLimit()
     {
-        //ÏŞÖÆË®Æ½/´¹Ö±ÍÏ×§·¶Î§ÔÚ×îĞ¡/×î´óÖµÄÚ
+        //é™åˆ¶æ°´å¹³/å‚ç›´æ‹–æ‹½èŒƒå›´åœ¨æœ€å°/æœ€å¤§å€¼å†…
         rangeX = Mathf.Clamp(rt.position.x, minWidth, maxWidth);
         rangeY = Mathf.Clamp(rt.position.y, minHeight, maxHeight);
-        //¸üĞÂÎ»ÖÃ
+        //æ›´æ–°ä½ç½®
         rt.position = new Vector3(rangeX, rangeY, 0);
     }
 
     /// <summary>
-    /// ¿ªÊ¼ÍÏ×§
+    /// å¼€å§‹æ‹–æ‹½
     /// </summary>
     public void OnBeginDrag(PointerEventData eventData)
     {
         Vector3 globalMousePos;
 
-        //½«ÆÁÄ»×ø±ê×ª»»³ÉÊÀ½ç×ø±ê
+        //å°†å±å¹•åæ ‡è½¬æ¢æˆä¸–ç•Œåæ ‡
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, null, out globalMousePos))
         {
-            //¼ÆËãUIºÍÖ¸ÕëÖ®¼äµÄÎ»ÖÃÆ«ÒÆÁ¿
+            //è®¡ç®—UIå’ŒæŒ‡é’ˆä¹‹é—´çš„ä½ç½®åç§»é‡
             offset = rt.position - globalMousePos;
         }
     }
 
     /// <summary>
-    /// ÍÏ×§ÖĞ
+    /// æ‹–æ‹½ä¸­
     /// </summary>
     public void OnDrag(PointerEventData eventData)
     {
@@ -73,7 +73,7 @@ public class DragUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     }
 
     /// <summary>
-    /// ½áÊøÍÏ×§
+    /// ç»“æŸæ‹–æ‹½
     /// </summary>
     public void OnEndDrag(PointerEventData eventData)
     {
@@ -81,7 +81,7 @@ public class DragUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     }
 
     /// <summary>
-    /// ¸üĞÂUIµÄÎ»ÖÃ
+    /// æ›´æ–°UIçš„ä½ç½®
     /// </summary>
     private void SetDraggedPosition(PointerEventData eventData)
     {

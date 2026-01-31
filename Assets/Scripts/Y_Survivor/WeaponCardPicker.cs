@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// ¼àÌı Flip_Card.OnWeaponConfirmed ²¢µ÷ÓÃ PlayerControl.EquipExternalWeapon
-/// ½«´Ë½Å±¾¹Òµ½³¡¾°µÄ UI ¹ÜÀíÆ÷ÉÏ£¬²¢ÔÚ Inspector Ö¸¶¨ player
+/// ç›‘å¬ Flip_Card.OnWeaponConfirmed å¹¶è°ƒç”¨ PlayerControl.EquipExternalWeapon
+/// å°†æ­¤è„šæœ¬æŒ‚åˆ°åœºæ™¯çš„ UI ç®¡ç†å™¨ä¸Šï¼Œå¹¶åœ¨ Inspector æŒ‡å®š player
 /// </summary>
 public class WeaponCardPicker : MonoBehaviour
 {
@@ -29,7 +29,7 @@ public class WeaponCardPicker : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WeaponCardPicker: Ñ¡ÖĞµÄ Weapon Ã»ÓĞ weaponPrefab ×Ö¶Î¡£");
+            Debug.LogWarning("WeaponCardPicker: é€‰ä¸­çš„ Weapon æ²¡æœ‰ weaponPrefab å­—æ®µã€‚");
         }
     }
 }

@@ -2,31 +2,33 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ÎäÆ÷¿ØÖÆ£º¹ÒÔÚÎäÆ÷Ô¤ÖÆÌåÉÏ£¬¼æÈİ PlayerControl µÄ IWeapon µ÷ÓÃ
-/// - ¿ÉÍ¨¹ı weaponData ´Ó ScriptableObject Ìî³ä UI ÓëÔËĞĞÊ±²ÎÊı
-/// - ÊµÏÖ IWeapon ½Ó¿ÚÒÔ±» PlayerControl.UseEquippedWeapon() µ÷ÓÃ
-/// - ½üÕ½Ê¹ÓÃ OverlapCircleAll ÅĞ¶¨£»Ô¶³ÌÊµÀı»¯ projectilePrefab£¬Èç¹û prefab Ã»ÓĞ DamageDealer Ôò¶¯Ì¬²¹³ä
+/// æ­¦å™¨æ§åˆ¶ï¼šæŒ‚åœ¨æ­¦å™¨é¢„åˆ¶ä½“ä¸Šï¼Œå…¼å®¹ PlayerControl çš„ IWeapon è°ƒç”¨
+/// - å¯é€šè¿‡ weaponData ä» ScriptableObject å¡«å…… UI ä¸è¿è¡Œæ—¶å‚æ•°
+/// - å®ç° IWeapon æ¥å£ä»¥è¢« PlayerControl.UseEquippedWeapon() è°ƒç”¨
+/// - è¿‘æˆ˜ä½¿ç”¨ OverlapCircleAll åˆ¤å®šï¼›è¿œç¨‹å®ä¾‹åŒ– projectilePrefabï¼Œå¦‚æœ prefab æ²¡æœ‰ DamageDealer åˆ™åŠ¨æ€è¡¥å……
+/// - æ”¯æŒè‡ªåŠ¨å¼€ç«ï¼ˆautomatic = trueï¼‰ï¼šè£…å¤‡æ—¶è‡ªåŠ¨æŒ‰ attackRate æˆ– cooldown å¼€ç«
 /// </summary>
 public class WeaponControl : MonoBehaviour, IWeapon
 {
-    [Header("Êı¾İÔ´£¨ScriptableObject£©")]
+    [Header("æ•°æ®æºï¼ˆScriptableObjectï¼‰")]
     public Weapon weaponData;
 
-    [Header("UI£¨¿ÉÑ¡£©")]
+    [Header("UIï¼ˆå¯é€‰ï¼‰")]
     public Image icon;
     public Text weaponNameText;
     public Text damageText;
     public Text cooldownText;
     public Text rangeText;
 
-    [Header("ÔËĞĞÊ±¹Òµã")]
-    [Tooltip("·¢Éä¿Ú»ò½üÕ½ÅĞ¶¨ÖĞĞÄ£¨Îª¿ÕÔòÊ¹ÓÃÎäÆ÷×ÔÉíÎ»ÖÃ£©")]
+    [Header("è¿è¡Œæ—¶æŒ‚ç‚¹")]
+    [Tooltip("å‘å°„å£æˆ–è¿‘æˆ˜åˆ¤å®šä¸­å¿ƒï¼ˆä¸ºç©ºåˆ™ä½¿ç”¨æ­¦å™¨è‡ªèº«ä½ç½®ï¼‰")]
     public Transform muzzlePoint;
 
-    // ÔËĞĞÊ±²ÎÊı»º´æ
+    // è¿è¡Œæ—¶å‚æ•°ç¼“å­˜
     private float lastUseTime = -999f;
+    private GameObject weaponUser = null; // ç¼“å­˜æ­¦å™¨ä½¿ç”¨è€…ï¼ˆç©å®¶ï¼‰
 
-    #region ÉúÃüÖÜÆÚÓë UI Í¬²½
+    #region ç”Ÿå‘½å‘¨æœŸä¸ UI åŒæ­¥
     private void Awake()
     {
         if (muzzlePoint == null) muzzlePoint = transform;
@@ -35,12 +37,45 @@ public class WeaponControl : MonoBehaviour, IWeapon
 
     private void OnValidate()
     {
-        // ±à¼­Æ÷ÏÂÊµÊ±Í¬²½ÏÔÊ¾£¬·½±ãµ÷ÊÔ
+        // ç¼–è¾‘å™¨ä¸‹å®æ—¶åŒæ­¥æ˜¾ç¤ºï¼Œæ–¹ä¾¿è°ƒè¯•
         SyncUI();
     }
 
+    private void Update()
+    {
+        // å¦‚æœæ­¦å™¨ä¸ºè‡ªåŠ¨æ¨¡å¼ï¼Œè‡ªåŠ¨è§¦å‘æ”»å‡»ï¼ˆä¸éœ€è¦ç©å®¶æŒ‰é”®ï¼‰
+        if (weaponData != null && weaponData.automatic && weaponUser != null)
+        {
+            PerformAutomaticFire();
+        }
+    }
+
     /// <summary>
-    /// ½« ScriptableObject µÄÊı¾İÍ¬²½µ½ Inspector Ö¸¶¨µÄ UI ÔªËØ£¨×îĞ¡ÇÖÈë£©
+    /// è‡ªåŠ¨å¼€ç«é€»è¾‘ï¼šæŒ‰ç…§ cooldown æˆ– attackRate æŒç»­å°„å‡»
+    /// </summary>
+    private void PerformAutomaticFire()
+    {
+        float interval = weaponData.useCooldown 
+            ? weaponData.cooldown 
+            : (1f / Mathf.Max(weaponData.attackRate, 0.1f));
+
+        if (Time.time - lastUseTime >= interval)
+        {
+            lastUseTime = Time.time;
+
+            if (weaponData.weaponType == Weapon.WEAPON_TYPE.Ranged)
+            {
+                FireProjectile(weaponUser);
+            }
+            else // Melee
+            {
+                PerformMelee(weaponUser);
+            }
+        }
+    }
+
+    /// <summary>
+    /// å°† ScriptableObject çš„æ•°æ®åŒæ­¥åˆ° Inspector æŒ‡å®šçš„ UI å…ƒç´ ï¼ˆæœ€å°ä¾µå…¥ï¼‰
     /// </summary>
     private void SyncUI()
     {
@@ -48,8 +83,8 @@ public class WeaponControl : MonoBehaviour, IWeapon
 
         if (icon != null)
         {
-            // Weapon.weaponIcon ÔÚÏîÄ¿ÖĞÒÔ Image ´æ´¢£¨Óë Card ·ç¸ñÒ»ÖÂ£©¡£
-            // ÔÚ UI ÉÏÏÔÊ¾Ê±Ö»¶ÁÈ¡Æä sprite£¨±ÜÃâÖ±½ÓÒıÓÃ UI ×é¼ş£©
+            // Weapon.weaponIcon åœ¨é¡¹ç›®ä¸­ä»¥ Image å­˜å‚¨ï¼ˆä¸ Card é£æ ¼ä¸€è‡´ï¼‰ã€‚
+            // åœ¨ UI ä¸Šæ˜¾ç¤ºæ—¶åªè¯»å–å…¶ spriteï¼ˆé¿å…ç›´æ¥å¼•ç”¨ UI ç»„ä»¶ï¼‰
             icon.sprite = weaponData.weaponIcon != null ? weaponData.weaponIcon.sprite : null;
             icon.enabled = icon.sprite != null;
         }
@@ -61,7 +96,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
     }
 
     /// <summary>
-    /// ÔÚÔËĞĞÊ±ÉèÖÃ/Ìæ»» weaponData ²¢Ë¢ĞÂ UI
+    /// åœ¨è¿è¡Œæ—¶è®¾ç½®/æ›¿æ¢ weaponData å¹¶åˆ·æ–° UI
     /// </summary>
     public void SetWeaponData(Weapon newData)
     {
@@ -70,16 +105,34 @@ public class WeaponControl : MonoBehaviour, IWeapon
     }
     #endregion
 
-    #region IWeapon ÊµÏÖ
+    #region IWeapon å®ç°
     /// <summary>
-    /// IWeapon ½Ó¿ÚÊµÏÖ ¡ª ÓÉ PlayerControl µ÷ÓÃ
+    /// IWeapon æ¥å£å®ç° â€” ç”± PlayerControl è°ƒç”¨
+    /// å¯¹äºè‡ªåŠ¨æ­¦å™¨ï¼Œä»…åœ¨è£…å¤‡æ—¶ç¼“å­˜ä½¿ç”¨è€…ï¼›å®é™…å¼€ç«ç”± Update çš„è‡ªåŠ¨é€»è¾‘å¤„ç†
+    /// å¯¹äºéè‡ªåŠ¨æ­¦å™¨ï¼Œç«‹å³æ‰§è¡Œä¸€æ¬¡å¼€ç«åŠ¨ä½œ
     /// </summary>
-    /// <param name="user">·¢ÆğÊ¹ÓÃµÄÎïÌå£¨Í¨³£ÎªÍæ¼Ò£©</param>
+    /// <param name="user">å‘èµ·ä½¿ç”¨çš„ç‰©ä½“ï¼ˆé€šå¸¸ä¸ºç©å®¶ï¼‰</param>
     public void Use(GameObject user)
     {
         if (weaponData == null) return;
 
-        if (Time.time - lastUseTime < weaponData.cooldown) return;
+        weaponUser = user;
+
+        // è‡ªåŠ¨æ­¦å™¨åªéœ€ç¼“å­˜ä½¿ç”¨è€…ï¼Œç”± Update è‡ªåŠ¨è§¦å‘
+        if (weaponData.automatic)
+        {
+            // é‡ç½®è®¡æ—¶å™¨ä»¥ç¡®ä¿ç«‹å³é¦–æ¬¡å¼€ç«
+            lastUseTime = Time.time - weaponData.cooldown;
+            return;
+        }
+
+        // éè‡ªåŠ¨æ­¦å™¨éœ€è¦åˆ¤æ–­å†·å´æ—¶é—´
+        float interval = weaponData.useCooldown 
+            ? weaponData.cooldown 
+            : (1f / Mathf.Max(weaponData.attackRate, 0.1f));
+
+        if (Time.time - lastUseTime < interval) return;
+        
         lastUseTime = Time.time;
 
         if (weaponData.weaponType == Weapon.WEAPON_TYPE.Ranged)
@@ -91,9 +144,17 @@ public class WeaponControl : MonoBehaviour, IWeapon
             PerformMelee(user);
         }
     }
-    #endregion
 
-    #region Ô¶³Ì/½üÕ½ÊµÏÖ
+    /// <summary>
+    /// åœæ­¢è‡ªåŠ¨æ­¦å™¨å¼€ç«ï¼ˆå¸é™¤æ­¦å™¨æ—¶è°ƒç”¨ï¼‰
+    /// </summary>
+    public void StopAutomatic()
+    {
+        weaponUser = null;
+    }
+    #endregion
+    
+    #region è¿œç¨‹/è¿‘æˆ˜å®ç°
     private void FireProjectile(GameObject user)
     {
         GameObject prefab = weaponData.projectilePrefab != null ? weaponData.projectilePrefab : weaponData.weaponPrefab;
@@ -106,12 +167,12 @@ public class WeaponControl : MonoBehaviour, IWeapon
         Vector3 spawnPos = muzzlePoint != null ? muzzlePoint.position : transform.position;
         Vector2 dir = (muzzlePoint != null) ? (muzzlePoint.right) : (user.transform.right);
 
-        // ÊµÀı»¯²¢³¯Ïò·¢Éä·½Ïò£¨±ãÓÚÊÓ¾õÓëĞı×ª£©
+        // å®ä¾‹åŒ–å¹¶æœå‘å‘å°„æ–¹å‘ï¼ˆä¾¿äºè§†è§‰ä¸æ—‹è½¬ï¼‰
         GameObject proj = Instantiate(prefab, spawnPos, Quaternion.identity);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         proj.transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // ÓÅÏÈÈ¡ DamageDealer£¨×é¼ş»ò×Ó¶ÔÏó£©
+        // ä¼˜å…ˆå– DamageDealerï¼ˆç»„ä»¶æˆ–å­å¯¹è±¡ï¼‰
         var dd = proj.GetComponent<DamageDealer>() ?? proj.GetComponentInChildren<DamageDealer>();
         if (dd != null)
         {
@@ -120,7 +181,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
             dd.destroyOnHit = true;
         }
 
-        // ÈôÔ¤ÖÆÌåÓĞ Rigidbody2D£¬Ö±½ÓÉèÖÃËÙ¶È£»ÈôÃ»ÓĞÔò¾¡Á¿²¹Æë×é¼ş»òÊ¹ÓÃ SimpleProjectile£¨Èç´æÔÚ£©
+        // è‹¥é¢„åˆ¶ä½“æœ‰ Rigidbody2Dï¼Œç›´æ¥è®¾ç½®é€Ÿåº¦ï¼›è‹¥æ²¡æœ‰åˆ™å°½é‡è¡¥é½ç»„ä»¶æˆ–ä½¿ç”¨ SimpleProjectileï¼ˆå¦‚å­˜åœ¨ï¼‰
         var rb = proj.GetComponent<Rigidbody2D>() ?? proj.GetComponentInChildren<Rigidbody2D>();
         if (rb != null)
         {
@@ -129,7 +190,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
         }
         else
         {
-            // Èô´æÔÚ SimpleProjectile ½Å±¾£¬ÓÅÏÈÊ¹ÓÃÆä Initialize
+            // è‹¥å­˜åœ¨ SimpleProjectile è„šæœ¬ï¼Œä¼˜å…ˆä½¿ç”¨å…¶ Initialize
             var sp = proj.GetComponent<SimpleProjectile>() ?? proj.GetComponentInChildren<SimpleProjectile>();
             if (sp != null)
             {
@@ -137,8 +198,8 @@ public class WeaponControl : MonoBehaviour, IWeapon
                 return;
             }
 
-            // Èô¼ÈÎŞ Rigidbody2D Ò²ÎŞ SimpleProjectile£¬ÔòÔÚÊµÀıÉÏ¶¯Ì¬Ìí¼Ó±ØÒª×é¼ş²¢Çı¶¯
-            // Ìí¼Ó DamageDealer£¨Èç¹û²»´æÔÚ£©
+            // è‹¥æ—¢æ—  Rigidbody2D ä¹Ÿæ—  SimpleProjectileï¼Œåˆ™åœ¨å®ä¾‹ä¸ŠåŠ¨æ€æ·»åŠ å¿…è¦ç»„ä»¶å¹¶é©±åŠ¨
+            // æ·»åŠ  DamageDealerï¼ˆå¦‚æœä¸å­˜åœ¨ï¼‰
             if (dd == null)
             {
                 dd = proj.AddComponent<DamageDealer>();
@@ -147,12 +208,12 @@ public class WeaponControl : MonoBehaviour, IWeapon
                 dd.destroyOnHit = true;
             }
 
-            // Ìí¼Ó Rigidbody2D ²¢¸³ËÙ¶È
+            // æ·»åŠ  Rigidbody2D å¹¶èµ‹é€Ÿåº¦
             var newRb = proj.AddComponent<Rigidbody2D>();
             newRb.gravityScale = 0f;
             newRb.velocity = dir.normalized * weaponData.projectileSpeed;
 
-            // Ìí¼ÓÄ¬ÈÏÅö×²Ìå£¨CircleCollider2D£©²¢ÉèÎª trigger£¬·½±ã EnemyControl ¶ÁÈ¡ DamageDealer
+            // æ·»åŠ é»˜è®¤ç¢°æ’ä½“ï¼ˆCircleCollider2Dï¼‰å¹¶è®¾ä¸º triggerï¼Œæ–¹ä¾¿ EnemyControl è¯»å– DamageDealer
             var col = proj.GetComponent<Collider2D>();
             if (col == null)
             {
@@ -165,7 +226,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
             }
         }
 
-        // È·±£Åö×²ÌåÎª trigger£¬±ãÓÚ EnemyControl.ApplyDamageFromCollider ÒÔ´¥·¢·½Ê½¶ÁÈ¡ DamageDealer
+        // ç¡®ä¿ç¢°æ’ä½“ä¸º triggerï¼Œä¾¿äº EnemyControl.ApplyDamageFromCollider ä»¥è§¦å‘æ–¹å¼è¯»å– DamageDealer
         var collider = proj.GetComponent<Collider2D>() ?? proj.GetComponentInChildren<Collider2D>();
         if (collider != null) collider.isTrigger = true;
     }
@@ -187,7 +248,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
                 continue;
             }
 
-            // ÈôÊÇÃüÖĞ´ø DamageDealer µÄÁÙÊ±ÅĞ¶¨Ìå£¨ÀıÈç¼¼ÄÜÌØĞ§£©£¬ÔòÉèÖÃÆä owner Óë damage
+            // è‹¥æ˜¯å‘½ä¸­å¸¦ DamageDealer çš„ä¸´æ—¶åˆ¤å®šä½“ï¼ˆä¾‹å¦‚æŠ€èƒ½ç‰¹æ•ˆï¼‰ï¼Œåˆ™è®¾ç½®å…¶ owner ä¸ damage
             var dd = col.GetComponent<DamageDealer>() ?? col.GetComponentInParent<DamageDealer>();
             if (dd != null)
             {

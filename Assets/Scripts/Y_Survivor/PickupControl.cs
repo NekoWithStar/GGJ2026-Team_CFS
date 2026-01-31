@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// 2DÊ°È¡½Å±¾£º½ğ±Ò/Ñª°ü£¬Íæ¼Ò´¥Åö¼´Ê°È¡
+/// 2Dæ‹¾å–è„šæœ¬ï¼šé‡‘å¸/è¡€åŒ…ï¼Œç©å®¶è§¦ç¢°å³æ‹¾å–
 /// </summary>
 public class PickupControl : MonoBehaviour
 {
-    [Header("Ê°È¡ÅäÖÃ")]
-    public string pickupType = "Coin"; // Ê°È¡ÀàĞÍ£ºCoin/Hp
-    public int pickupValue = 5;        // Ê°È¡ÊıÖµ
+    [Header("æ‹¾å–é…ç½®")]
+    public string pickupType = "Coin"; // æ‹¾å–ç±»å‹ï¼šCoin/Hp
+    public int pickupValue = 5;        // æ‹¾å–æ•°å€¼
     private SpriteRenderer sr;
     private Collider2D col;
 
@@ -17,17 +17,17 @@ public class PickupControl : MonoBehaviour
         col = GetComponent<Collider2D>();
     }
 
-    // 2D´¥·¢Æ÷¼ì²â£ºÍæ¼Ò´¥Åö¼´Ê°È¡
+    // 2Dè§¦å‘å™¨æ£€æµ‹ï¼šç©å®¶è§¦ç¢°å³æ‹¾å–
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            // µ÷ÓÃÍæ¼ÒÊ°È¡·½·¨
+            // è°ƒç”¨ç©å®¶æ‹¾å–æ–¹æ³•
             other.GetComponent<PlayerControl>().PickupItem(pickupType, pickupValue);
-            // Òş²Ø²¢½ûÓÃÅö×²£¨±ÜÃâÖØ¸´Ê°È¡£©
+            // éšè—å¹¶ç¦ç”¨ç¢°æ’ï¼ˆé¿å…é‡å¤æ‹¾å–ï¼‰
             sr.enabled = false;
             col.enabled = false;
-            // ÑÓ³ÙÏú»Ù
+            // å»¶è¿Ÿé”€æ¯
             Destroy(gameObject, 0.1f);
         }
     }
