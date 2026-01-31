@@ -16,9 +16,21 @@ MonoBehaviour:
   weaponName: Gun
   weaponIcon: {fileID: 0}
   damage: 15
-  cooldown: 1
-  range: 8
+  continuousAutoFire: 1
+  continuousFireDuration: 3
+  firePattern: {fileID: 11400000, guid: ebc962bebd067cb44801017741e11de0, type: 2}
+  requiresCharging: 0
+  chargingTime: 0.2
+  cooldown: 0
+  attackRate: 295
+  critChanceBase: 0
+  critDamageBase: 1.5
+  meleeRange: 2
+  fireSound: {fileID: 0}
+  chargingSound: {fileID: 0}
+  continuousFireEndSound: {fileID: 0}
+  cooldownEndSound: {fileID: 0}
   description: "Biu,BiuBiu ! \u2014\u2014Shotgun sounds"
   projectilePrefab: {fileID: 5430024515765536962, guid: 6b69ce863332591488efb8059eb10559, type: 3}
-  projectileSpeed: 12
+  projectileSpeed: 5
   weaponPrefab: {fileID: 2688711753480837464, guid: eb9402c91a1936d46a8602de7941ce3f, type: 3}

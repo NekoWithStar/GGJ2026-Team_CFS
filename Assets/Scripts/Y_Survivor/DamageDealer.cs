@@ -8,7 +8,8 @@ using UnityEngine;
 /// </summary>
 public class DamageDealer : MonoBehaviour
 {
-    [Tooltip("伤害值")]
+    [Header("基础伤害")]
+    [Tooltip("基础伤害值")]
     public int damage = 10;
 
     [Tooltip("命中后是否销毁自己（子弹/一次性判定常用）")]
@@ -16,4 +17,61 @@ public class DamageDealer : MonoBehaviour
 
     [Tooltip("伤害来源（可用于避免自伤），可在生成时设置为发起者 GameObject")]
     public GameObject owner;
+    
+    [Header("暴击系统")]
+    [Tooltip("暴击率（0~1，0=0%，1=100%）")]
+    [Range(0f, 1f)]
+    public float critChance = 0f;
+    
+    [Tooltip("暴击伤害倍率（1.5 = 150%伤害）")]
+    public float critDamageMultiplier = 1.5f;
+    
+    [Tooltip("本次攻击是否暴击（运行时计算）")]
+    [HideInInspector]
+    public bool isCritical = false;
+    
+    /// <summary>
+    /// 初始化时计算是否暴击
+    /// </summary>
+    private void Awake()
+    {
+        RollCritical();
+    }
+    
+    /// <summary>
+    /// 根据暴击率计算本次攻击是否暴击
+    /// </summary>
+    public void RollCritical()
+    {
+        isCritical = Random.value < critChance;
+    }
+    
+    /// <summary>
+    /// 获取最终伤害值（考虑暴击）
+    /// </summary>
+    /// <returns>最终伤害值</returns>
+    public int GetFinalDamage()
+    {
+        if (isCritical)
+        {
+            return Mathf.RoundToInt(damage * critDamageMultiplier);
+        }
+        return damage;
+    }
+    
+    /// <summary>
+    /// 设置完整的伤害参数
+    /// </summary>
+    /// <param name="baseDamage">基础伤害</param>
+    /// <param name="critRate">暴击率</param>
+    /// <param name="critMultiplier">暴击伤害倍率</param>
+    /// <param name="damageOwner">伤害来源</param>
+    public void Setup(int baseDamage, float critRate, float critMultiplier, GameObject damageOwner)
+    {
+        damage = baseDamage;
+        critChance = critRate;
+        critDamageMultiplier = critMultiplier;
+        owner = damageOwner;
+        RollCritical();
+    }
 }

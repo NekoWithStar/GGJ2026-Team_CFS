@@ -6,8 +6,8 @@ public class Weapon : ScriptableObject
 {
     public enum WEAPON_TYPE
     {
-        Melee,
-        Ranged
+        Melee, // 近战
+        Ranged // 远程
     }
 
     [Header("基础信息")]
@@ -18,19 +18,53 @@ public class Weapon : ScriptableObject
     [Header("数值")]
     public int damage = 10;
 
-    [Tooltip("是否启用 cooldown 节流（优先级高）。若关闭则改用攻击速率 attackRate 计算间隔。")]
-    public bool useCooldown = true;
-    [Tooltip("当 useCooldown 为 true 时生效：每次攻击的冷却秒数（可在 Inspector 调整）。")]
+    [Header("开火模式")]
+    [Tooltip("是否为持续自动开火武器（装备后自动连续开火，无法瞄准，按预设脚本发射）")]
+    public bool continuousAutoFire = false;
+    
+    [Tooltip("持续自动开火持续时间（秒）- 持续自动开火武器能够开火的时间")]
+    public float continuousFireDuration = 5f;
+    
+    [Tooltip("持续自动开火发射模式脚本（控制发射数量和方式，仅对持续自动开火武器生效）")]
+    public FirePattern firePattern;
+    
+    [Tooltip("是否需要蓄力（所有武器类型都可以蓄力）")]
+    public bool requiresCharging = false;
+    
+    [Tooltip("蓄力时间（秒）- 按住开火键后需要多少时间才能进入开火状态")]
+    public float chargingTime = 0.2f;
+
+    [Header("时间设置")]
+    [Tooltip("冷却时间（秒）- 持续开火时间结束后，需要等待多久才能再次进行持续开火。若无需冷却可设为 0")]
     public float cooldown = 0.5f;
 
-    [Tooltip("每秒攻击次数（attack per second）。当 useCooldown 为 false 时使用此值计算间隔（interval = 1 / attackRate）。")]
+    [Tooltip("攻击速率（每秒攻击次数）- 在持续开火时间内或连续开火时的攻击速度")]
     public float attackRate = 1f;
 
-    [Tooltip("是否为自动/连续开火武器（装备时自动按 attackRate 或 cooldown 开火）。")]
-    public bool automatic = false;
+    [Header("暴击")]
+    [Tooltip("暴击率基础值（0~1，0=0%，1=100%）")]
+    [Range(0f, 1f)]
+    public float critChanceBase = 0f;
+    
+    [Tooltip("暴击伤害倍率基础值（1.5 = 150%伤害）")]
+    public float critDamageBase = 1.5f;
 
-    public float range = 2f; // 近战判定半径或远程可视范围
-    public float attackSpeed = 1f; // 攻击动画速度或远程射速
+    [Header("近战专用")]
+    [Tooltip("近战攻击判定半径")]
+    public float meleeRange = 2f;
+
+    [Header("音效")]
+    [Tooltip("开火时播放的音效")]
+    public AudioClip fireSound;
+    
+    [Tooltip("蓄力时播放的音效")]
+    public AudioClip chargingSound;
+    
+    [Tooltip("持续开火结束时播放的音效（如过热音效）")]
+    public AudioClip continuousFireEndSound;
+    
+    [Tooltip("冷却结束时播放的音效")]
+    public AudioClip cooldownEndSound;
 
     [Header("描述")]
     public string description;

@@ -50,4 +50,16 @@ public class SimpleProjectile : MonoBehaviour
         destroyOnAnyCollision = destroyOnHit;
         Destroy(gameObject, lifeTime);
     }
+
+
+    public void Update()
+    {
+        // 减少存活时间
+        lifeTime -= Time.deltaTime;
+        if (lifeTime <= 0f)
+        {
+            Destroy(gameObject);
+        }
+        
+    }
 }

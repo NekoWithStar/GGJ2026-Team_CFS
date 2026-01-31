@@ -23,13 +23,23 @@ public class WeaponCardPicker : MonoBehaviour
         if (player == null) player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerControl>();
         if (player == null || weapon == null) return;
 
-        if (weapon.weaponPrefab != null)
+        // 检查玩家是否已有武器
+        if (player.ExternalWeaponInstance != null)
         {
-            player.EquipExternalWeapon(weapon.weaponPrefab);
+            // 已有武器：只切换数据，保持对象和属性加成
+            player.SwitchWeaponData(weapon);
         }
         else
         {
-            Debug.LogWarning("WeaponCardPicker: 选中的 Weapon 没有 weaponPrefab 字段。");
+            // 首次装备：创建武器对象
+            if (weapon.weaponPrefab != null)
+            {
+                player.EquipExternalWeapon(weapon.weaponPrefab, weapon);
+            }
+            else
+            {
+                Debug.LogWarning("WeaponCardPicker: 选中的 Weapon 没有 weaponPrefab 字段。");
+            }
         }
     }
 }

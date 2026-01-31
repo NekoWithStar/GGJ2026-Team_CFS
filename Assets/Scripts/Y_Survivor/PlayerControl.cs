@@ -27,8 +27,6 @@ public class PlayerControl : MonoBehaviour
     [Header("武器输入")]
     [Tooltip("发射/使用武器按键，默认鼠标左键")]
     public KeyCode fireKey = KeyCode.Mouse0;
-    [Tooltip("是否按住持续开火（对支持冷却的远程武器有效）")]
-    public bool holdToFire = false;
 
     private Rigidbody2D rb;       // 2D刚体（核心移动组件）
     private Vector2 moveDir;      // 移动方向
@@ -37,6 +35,11 @@ public class PlayerControl : MonoBehaviour
     // 外置武器实例与接口引用（可在运行时通过 API 更换）
     private GameObject externalWeaponInstance;
     private IWeapon externalWeaponScript;
+    
+    /// <summary>
+    /// 获取当前装备的外置武器实例（只读）
+    /// </summary>
+    public GameObject ExternalWeaponInstance => externalWeaponInstance;
 
     #region 初始化
     private void Awake()
@@ -75,23 +78,27 @@ public class PlayerControl : MonoBehaviour
         // 2. 计算鼠标朝向，让玩家始终面朝鼠标
         LookAtMouse();
 
-        // 3. 攻击输入：直接在 PlayerControl 中处理已装备武器的触发
+        // 3. 攻击输入：所有手动武器都是连续开火（按住持续射击）
         var equipped = GetEquippedWeapon();
         if (equipped != null)
         {
             var weaponData = GetEquippedWeaponData();
-            if (weaponData != null && weaponData.automatic)
+            // 持续自动开火武器由WeaponControl自动处理，不响应玩家输入
+            if (weaponData != null && !weaponData.continuousAutoFire)
             {
-                // 自动武器：通过 IWeapon.Use 方法激活自动开火（实际开火在 WeaponControl.Update 中处理）
-                equipped.Use(gameObject);
-            }
-            else
-            {
-                // 非自动武器：需要玩家按键触发
-                bool doFire = holdToFire ? Input.GetKey(fireKey) : Input.GetKeyDown(fireKey);
-                if (doFire)
+                var wc = externalWeaponScript as WeaponControl;
+                if (wc != null)
                 {
-                    UseEquippedWeapon();
+                    // 按下开火键：开始连续开火
+                    if (Input.GetKeyDown(fireKey))
+                    {
+                        equipped.Use(gameObject);
+                    }
+                    // 松开开火键：停止连续开火
+                    else if (Input.GetKeyUp(fireKey))
+                    {
+                        wc.StopFiring();
+                    }
                 }
             }
         }
@@ -169,6 +176,78 @@ public class PlayerControl : MonoBehaviour
 
         // 查找实现 IWeapon 的脚本（若有）
         externalWeaponScript = externalWeaponInstance.GetComponentInChildren<IWeapon>();
+    }
+
+    /// <summary>
+    /// 装备外置武器并将对应的 ScriptableObject 数据传入（供通过卡牌选择时使用）
+    /// </summary>
+    /// <param name="weaponPrefab">武器预制体</param>
+    /// <param name="weaponData">Weapon ScriptableObject 数据</param>
+    public void EquipExternalWeapon(GameObject weaponPrefab, Weapon weaponData)
+    {
+        EquipExternalWeapon(weaponPrefab);
+
+        if (externalWeaponInstance != null && weaponData != null)
+        {
+            var wc = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
+            if (wc != null)
+            {
+                wc.SetWeaponData(weaponData);
+                
+                // 若为持续自动开火武器，启动自动开火（Use 会缓存使用者并使 WeaponControl 立刻开始按设定间隔开火）
+                if (weaponData.continuousAutoFire)
+                {
+                    wc.Use(gameObject);
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 更换当前武器的数据（不销毁重建武器对象，保持属性卡加成）
+    /// 推荐用于卡牌选择武器切换，避免丢失属性加成
+    /// </summary>
+    /// <param name="newWeaponData">新的武器数据</param>
+    /// <returns>是否成功更换</returns>
+    public bool SwitchWeaponData(Weapon newWeaponData)
+    {
+        if (newWeaponData == null)
+        {
+            Debug.LogWarning("[PlayerControl] Cannot switch to null weapon data!");
+            return false;
+        }
+        
+        // 检查是否有武器实例
+        if (externalWeaponInstance == null)
+        {
+            Debug.LogWarning("[PlayerControl] No weapon equipped! Use EquipExternalWeapon() first.");
+            return false;
+        }
+        
+        // 获取 WeaponControl
+        var wc = externalWeaponInstance.GetComponentInChildren<WeaponControl>();
+        if (wc == null)
+        {
+            Debug.LogError("[PlayerControl] Weapon instance has no WeaponControl component!");
+            return false;
+        }
+        
+        // 停止当前武器的所有动作
+        wc.StopAutomatic();
+        
+        // 更换武器数据（会自动刷新 PropertyManager 的基础值）
+        wc.SetWeaponData(newWeaponData);
+        
+        // 若为持续自动开火武器，启动自动开火
+        if (newWeaponData.continuousAutoFire)
+        {
+            wc.Use(gameObject);
+        }
+        
+        Debug.Log($"[PlayerControl] Switched weapon to: {newWeaponData.weaponName} " +
+                  $"({newWeaponData.weaponType}). Property card bonuses preserved.");
+        
+        return true;
     }
 
     /// <summary>

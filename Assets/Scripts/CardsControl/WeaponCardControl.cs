@@ -33,7 +33,7 @@ public class WeaponCardControl : MonoBehaviour
         if (weapon_name != null) weapon_name.text = weapon_data.weaponName;
         if (damage != null) damage.text = weapon_data.damage.ToString();
         if (cooldown != null) cooldown.text = weapon_data.cooldown.ToString("F2");
-        if (range != null) range.text = weapon_data.range.ToString("F1");
+        if (range != null) range.text = weapon_data.meleeRange.ToString("F1");
         if (describe != null) describe.text = weapon_data.description;
         if (back == null && weapon_data.weaponPrefab != null)
         {
@@ -48,7 +48,7 @@ public class WeaponCardControl : MonoBehaviour
         if (weapon_name != null) weapon_name.text = weapon_data.weaponName;
         if (damage != null) damage.text = weapon_data.damage.ToString();
         if (cooldown != null) cooldown.text = weapon_data.cooldown.ToString("F2");
-        if (range != null) range.text = weapon_data.range.ToString("F1");
+        if (range != null) range.text = weapon_data.meleeRange.ToString("F1");
         if (describe != null) describe.text = weapon_data.description;
         if (icon != null && weapon_data.weaponIcon != null)
         {
