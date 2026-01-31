@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     {
         SceneManager sceneManager = SceneManager.Instance;//创建场景管理
         EnemyManager enemyManager = EnemyManager.Instance;//创建敌怪管理
+        PlayerManager playerManager = PlayerManager.Instance;//创建玩家管理
     }
 
     public enum GameState
