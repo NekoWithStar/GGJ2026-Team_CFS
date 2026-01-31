@@ -498,6 +498,66 @@ public class PlayerControl : MonoBehaviour
         Debug.Log("玩家死亡！");
     }
 
+    // PickupItem is implemented above; duplicate removed to avoid CS0111
+
+    /// <summary>
+    /// 触发卡牌选择
+    /// </summary>
+    private void TriggerCardSelection()
+    {
+        // 暂停游戏逻辑
+        PauseGameForCardSelection();
+
+        // 显示卡牌选择UI（需要CardSelectionManager）
+        var cardSelection = FindAnyObjectByType<CardSelectionManager>();
+        if (cardSelection != null)
+        {
+            cardSelection.ShowCardSelection(3); // 显示3张卡牌选择
+        }
+    }
+
+    /// <summary>
+    /// 暂停游戏用于卡牌选择
+    /// </summary>
+    private void PauseGameForCardSelection()
+    {
+        canMove = false;
+        // 暂停武器
+        var weapon = GetEquippedWeapon() as WeaponControl;
+        if (weapon != null)
+        {
+            weapon.PauseWeapon();
+        }
+        // 暂停敌人AI
+        var enemies = FindObjectsByType<EnemyControl>(FindObjectsSortMode.None);
+        foreach (var enemy in enemies)
+        {
+            enemy.PauseAI();
+        }
+        // 暂停时间缩放，但保持音乐
+        Time.timeScale = 0f;
+    }
+
+    /// <summary>
+    /// 恢复游戏
+    /// </summary>
+    public void ResumeGame()
+    {
+        canMove = true;
+        // 恢复武器
+        var weapon = GetEquippedWeapon() as WeaponControl;
+        if (weapon != null)
+        {
+            weapon.ResumeWeapon();
+        }
+        Time.timeScale = 1f;
+        var enemies = FindObjectsByType<EnemyControl>(FindObjectsSortMode.None);
+        foreach (var enemy in enemies)
+        {
+            enemy.ResumeAI();
+        }
+    }
+
     /// <summary>
     /// 拾取道具方法（金币/血包，拾取脚本调用）
     /// </summary>
@@ -509,7 +569,13 @@ public class PlayerControl : MonoBehaviour
         {
             case "Coin":
                 coin += value;
-                Debug.Log("拾取金币：" + value + "，当前金币：" + coin);
+                Debug.Log($"拾取金币 +{value}，当前金币: {coin}");
+
+                // 检查是否触发卡牌选择
+                if (coin >= 100)
+                {
+                    TriggerCardSelection();
+                }
                 break;
             case "Hp":
                 currentHp = Mathf.Min(currentHp + value, maxHp); // 血量不超过最大值
@@ -525,7 +591,7 @@ public class PlayerControl : MonoBehaviour
         }
         // 后续可加：拾取特效、拾取音效等
     }
-    
+
     /// <summary>
     /// 诊断方法：检查武器装备状态（按 D 键调用）
     /// </summary>

@@ -32,6 +32,7 @@ public class EnemyControl : MonoBehaviour
     private Transform player;      // 玩家Transform（追击目标）
     private float lastAttackTime;  // 上一次攻击时间（计算冷却）
     private bool isDead = false;   // 死亡标记
+    private bool aiPaused = false; // AI暂停标记
     private Collider2D col2d;
     private SpriteRenderer sr;
 
@@ -55,9 +56,9 @@ public class EnemyControl : MonoBehaviour
     #region 帧更新：追击+攻击（核心逻辑）
     private void FixedUpdate()
     {
-        if (isDead || player == null)
+        if (isDead || player == null || aiPaused)
         {
-            rb.velocity = Vector2.zero; // 死亡/无玩家时停止移动
+            rb.velocity = Vector2.zero; // 死亡/无玩家/AI暂停时停止移动
             return;
         }
 
@@ -254,6 +255,25 @@ public class EnemyControl : MonoBehaviour
                 }
             }
         }
+    }
+    #endregion
+
+    #region AI控制
+    /// <summary>
+    /// 暂停AI
+    /// </summary>
+    public void PauseAI()
+    {
+        aiPaused = true;
+        rb.velocity = Vector2.zero;
+    }
+
+    /// <summary>
+    /// 恢复AI
+    /// </summary>
+    public void ResumeAI()
+    {
+        aiPaused = false;
     }
     #endregion
 }

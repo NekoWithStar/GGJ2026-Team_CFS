@@ -99,7 +99,7 @@ public class WeaponDebugger : MonoBehaviour
     {
         if (playerControl == null)
         {
-            playerControl = FindObjectOfType<PlayerControl>();
+            playerControl = FindAnyObjectByType<PlayerControl>();
         }
     }
 

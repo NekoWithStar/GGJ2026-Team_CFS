@@ -23,7 +23,22 @@ public class WeaponCardControl : MonoBehaviour
     private void Awake()
     {
         if (weapon_data == null) return;
+        RefreshUI();
+    }
 
+    private void OnValidate()
+    {
+        // 编辑器下实时同步显示，方便调试
+        if (weapon_data == null) return;
+        RefreshUI();
+    }
+
+    /// <summary>
+    /// 刷新UI显示（可由SetupCard/OnValidate/Awake调用）
+    /// </summary>
+    private void RefreshUI()
+    {
+        if (weapon_data == null) return;
         if (icon != null && weapon_data.weaponIcon != null)
         {
             icon.sprite = weapon_data.weaponIcon.sprite;
@@ -35,24 +50,14 @@ public class WeaponCardControl : MonoBehaviour
         if (cooldown != null) cooldown.text = weapon_data.cooldown.ToString("F2");
         if (range != null) range.text = weapon_data.meleeRange.ToString("F1");
         if (describe != null) describe.text = weapon_data.description;
-        if (back == null && weapon_data.weaponPrefab != null)
-        {
-            // 可选：不强制赋值，仅保留字段方便 Inspector 绑定
-        }
     }
 
-    private void OnValidate()
+    /// <summary>
+    /// 运行时绑定Weapon数据并刷新UI（供 CardSelectionManager 使用）
+    /// </summary>
+    public void SetupCard(Weapon weapon)
     {
-        // 编辑器下实时同步显示，方便调试
-        if (weapon_data == null) return;
-        if (weapon_name != null) weapon_name.text = weapon_data.weaponName;
-        if (damage != null) damage.text = weapon_data.damage.ToString();
-        if (cooldown != null) cooldown.text = weapon_data.cooldown.ToString("F2");
-        if (range != null) range.text = weapon_data.meleeRange.ToString("F1");
-        if (describe != null) describe.text = weapon_data.description;
-        if (icon != null && weapon_data.weaponIcon != null)
-        {
-            icon.sprite = weapon_data.weaponIcon.sprite;
-        }
+        weapon_data = weapon;
+        RefreshUI();
     }
 }

@@ -54,6 +54,15 @@ public class PropertyCardControl : MonoBehaviour
     }
 
     /// <summary>
+    /// 在运行时由外部调用以绑定卡牌数据并刷新UI
+    /// </summary>
+    public void SetupCard(PropertyCard card)
+    {
+        propertyCard = card;
+        UpdateUI();
+    }
+
+    /// <summary>
     /// 生成修饰符显示文本
     /// </summary>
     private string GetModifiersDisplayText()

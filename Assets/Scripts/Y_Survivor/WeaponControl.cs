@@ -47,6 +47,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
 
     // 运行时参数缓存
     private GameObject weaponUser = null; // 缓存武器使用者（玩家）
+    private bool isPaused = false; // 暂停标记
     
     // 新的状态管理
     private WeaponState currentState = WeaponState.Idle;
@@ -91,7 +92,7 @@ public class WeaponControl : MonoBehaviour, IWeapon
 
     private void Update()
     {
-        if (weaponData == null || weaponUser == null) return;
+        if (weaponData == null || weaponUser == null || isPaused) return;
 
         UpdateWeaponState();
         
@@ -828,4 +829,20 @@ public class WeaponControl : MonoBehaviour, IWeapon
         UnityEditor.Handles.DrawSolidDisc(p.position, Vector3.forward, meleeRange);
     }
 #endif
+
+    /// <summary>
+    /// 暂停武器
+    /// </summary>
+    public void PauseWeapon()
+    {
+        isPaused = true;
+    }
+
+    /// <summary>
+    /// 恢复武器
+    /// </summary>
+    public void ResumeWeapon()
+    {
+        isPaused = false;
+    }
 }
