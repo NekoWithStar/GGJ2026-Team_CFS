@@ -19,7 +19,7 @@ public class EnemyManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    public void SpawnEnemy(EnemyControl type, Vector3 position)
+    public void SpawnEnemy(EnemyControl _enemy, Vector3 _position)
     {
         // 对象池生成敌怪
     }
