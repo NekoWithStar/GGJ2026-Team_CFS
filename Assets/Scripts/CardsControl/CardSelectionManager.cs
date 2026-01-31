@@ -12,7 +12,6 @@ public class CardSelectionManager : MonoBehaviour
     public GameObject cardSelectionPanel; // 选择面板
     public Transform cardContainer; // 卡牌容器
     public GameObject cardPrefab; // 卡牌UI预制体（Flip_Card或简化版）
-    public Button confirmButton; // 确认按钮（可选）
 
     [Header("选择配置")]
     public int cardsToShow = 3; // 显示卡牌数量
@@ -32,10 +31,10 @@ public class CardSelectionManager : MonoBehaviour
             cardSelectionPanel.SetActive(false);
         }
 
-        if (confirmButton != null)
-        {
-            confirmButton.onClick.AddListener(OnConfirmSelection);
-        }
+        // 监听卡牌确认事件
+        Flip_Card.OnCardConfirmed += OnCardSelected;
+        Flip_Card.OnWeaponConfirmed += OnWeaponSelected;
+        Flip_Card.OnPropertyCardConfirmed += OnPropertyCardSelected;
     }
 
     /// <summary>
@@ -58,6 +57,14 @@ public class CardSelectionManager : MonoBehaviour
         foreach (var card in cards)
         {
             GameObject cardUI = Instantiate(cardPrefab, cardContainer);
+            
+            // 设置Flip_Card为选择模式
+            var flipCard = cardUI.GetComponent<Flip_Card>();
+            if (flipCard != null)
+            {
+                flipCard.secondClickIsConfirm = true;
+            }
+            
             // 配置卡牌UI（假设cardPrefab有相应脚本）
             var cardControl = cardUI.GetComponent<PropertyCardControl>();
             if (cardControl != null && card is PropertyCard propertyCard)
@@ -90,9 +97,33 @@ public class CardSelectionManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 确认选择（消费coin并恢复游戏）
+    /// 当普通卡牌被选择时
     /// </summary>
-    private void OnConfirmSelection()
+    private void OnCardSelected(Card card)
+    {
+        ApplyCardSelection();
+    }
+
+    /// <summary>
+    /// 当武器卡牌被选择时
+    /// </summary>
+    private void OnWeaponSelected(Weapon weapon)
+    {
+        ApplyCardSelection();
+    }
+
+    /// <summary>
+    /// 当属性卡牌被选择时
+    /// </summary>
+    private void OnPropertyCardSelected(Y_Survivor.PropertyCard propertyCard)
+    {
+        ApplyCardSelection();
+    }
+
+    /// <summary>
+    /// 应用卡牌选择（消费coin并恢复游戏）
+    /// </summary>
+    private void ApplyCardSelection()
     {
         // 消费coin
         if (player != null)
@@ -109,6 +140,14 @@ public class CardSelectionManager : MonoBehaviour
         }
 
         HideCardSelection();
+    }
+
+    private void OnDestroy()
+    {
+        // 取消事件监听
+        Flip_Card.OnCardConfirmed -= OnCardSelected;
+        Flip_Card.OnWeaponConfirmed -= OnWeaponSelected;
+        Flip_Card.OnPropertyCardConfirmed -= OnPropertyCardSelected;
     }
 
     /// <summary>

@@ -12,11 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
   m_Name: NewPropertyCard
   m_EditorClassIdentifier: 
-  cardName: "\u65B0\u5C5E\u6027\u5361"
+  cardName: 
   description: 
   cardIcon: {fileID: 0}
   rarity: 0
-  modifiers: []
+  modifiers:
+  - targetProperty: 0
+    modifierType: 0
+    value: 0
+    priority: 0
   hasCustomEffect: 0
   customEffectType: 0
   customEffectValue: 0

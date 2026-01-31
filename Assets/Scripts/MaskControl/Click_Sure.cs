@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Y_Survivor;
 
 public class Click_Sure : MonoBehaviour
 {
