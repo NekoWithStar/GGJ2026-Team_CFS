@@ -20,6 +20,12 @@ public class CoinSystemConfig : MonoBehaviour
     [Header("卡牌消耗设置")]
     [Tooltip("应用（选择）一张卡牌需要消耗的金币数")]
     [SerializeField] private int coinCostPerCard = 30;
+    [Tooltip("记录升级次数")]
+    [SerializeField] private int countUpgrade = 0;
+    [Tooltip("升级难度增加的间隔（每N次升级增加卡牌消耗）")]
+    [SerializeField] private int upgradeIntervalForCost = 5;
+    [Tooltip("每次升级难度增加的金币消耗数")]
+    [SerializeField] private int coinCostIncreasePerUpgrade = 10;
     
     [Header("敌人掉落设置")]
     [Tooltip("敌人死亡时掉落的金币数")]
@@ -72,6 +78,37 @@ public class CoinSystemConfig : MonoBehaviour
     public int GetCoinDropPerEnemy()
     {
         return coinDropPerEnemy;
+    }
+
+    /// <summary>
+    /// 获取当前升级次数
+    /// </summary>
+    public int GetUpgradeCount()
+    {
+        return countUpgrade;
+    }
+
+    /// <summary>
+    /// 增加升级次数，每升级5次自动增加卡牌消耗
+    /// </summary>
+    public void IncreaseUpgradeCount()
+    {
+        countUpgrade++;
+        
+        if (countUpgrade % upgradeIntervalForCost == 0)
+        {
+            coinCostPerCard += coinCostIncreasePerUpgrade;
+            
+            if (debugMode)
+            {
+                Debug.Log($"[CoinSystemConfig] 🎯 升级难度提升！升级次数: {countUpgrade}，卡牌消耗已增加到: {coinCostPerCard}");
+            }
+        }
+        
+        if (debugMode)
+        {
+            Debug.Log($"[CoinSystemConfig] ⬆️ 升级次数: {countUpgrade}");
+        }
     }
 
     /// <summary>
@@ -156,6 +193,8 @@ public class CoinSystemConfig : MonoBehaviour
 ║ 📌 卡牌选择触发阈值: {coinThresholdForCardSelection}
 ║ 💳 单张卡牌消耗金币: {coinCostPerCard}
 ║ 👾 敌人掉落金币数: {coinDropPerEnemy}
+║ ⬆️ 升级次数: {countUpgrade}
+║ 🎯 升级难度间隔: 每 {upgradeIntervalForCost} 次升级，卡牌消耗 +{coinCostIncreasePerUpgrade}
 ║ 🔧 调试模式: {(debugMode ? "启用" : "禁用")}
 ║ ⏭️ 跳过金币检查: {(skipCoinCheck ? "是" : "否")}
 ╚════════════════════════════════════════════════════════════════════╝
@@ -196,7 +235,8 @@ public class CoinSystemConfig : MonoBehaviour
   2️⃣  玩家拾取金币 → 检查是否达到 {coinThresholdForCardSelection} 金币阈值
   3️⃣  金币 >= {coinThresholdForCardSelection} → 触发卡牌选择UI
   4️⃣  玩家选择卡牌 → 检查金币是否 >= {coinCostPerCard}
-  5️⃣  金币足够 → 消耗 {coinCostPerCard} 金币，应用卡牌效果
+  5️⃣  金币足够 → 消耗 {coinCostPerCard} 金币，应用卡牌效果，升级次数 +1
+  6️⃣  升级次数达到 {upgradeIntervalForCost} 的倍数 → 卡牌消耗自动 +{coinCostIncreasePerUpgrade}（难度提升）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ";
     }

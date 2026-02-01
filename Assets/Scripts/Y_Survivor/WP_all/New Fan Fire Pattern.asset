@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: New Fan Fire Pattern
   m_EditorClassIdentifier: 
   shotsPerCycle: 30
-  bulletsPerShot: 4
+  bulletsPerShot: 6
   bulletSpreadAngle: 10
   multiShotPattern: 0
   spreadAngle: 60

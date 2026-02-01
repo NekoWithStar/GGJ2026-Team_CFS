@@ -197,6 +197,14 @@ public class CardPoolManager : MonoBehaviour
             int costAmount = CoinSystemConfig.Instance != null ? CoinSystemConfig.Instance.GetCoinCostPerCard() : coinCostPerCard;
             bool consumed = ConsumeCoin(costAmount);
             Debug.Log($"[CardPoolManager] 🔁 applySuccess={applySuccess} consumed={consumed}");
+            
+            // 消耗金币成功后，增加升级计数
+            if (consumed && CoinSystemConfig.Instance != null)
+            {
+                CoinSystemConfig.Instance.IncreaseUpgradeCount();
+                Debug.Log($"[CardPoolManager] ⬆️ 升级计数已增加");
+            }
+            
             ResumeGameplay();
             // HUD 更新由 PlayerControl 负责
             if (cachedPlayer != null)

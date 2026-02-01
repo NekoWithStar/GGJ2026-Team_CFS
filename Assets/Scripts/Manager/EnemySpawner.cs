@@ -73,12 +73,12 @@ public class EnemySpawner : MonoBehaviour
         // 动态调整最大敌人数量和生成速度
         if (Time.time - lastMaxIncreaseTime >= 10f)
         {
-            maxEnemyCount *= 4;
+            maxEnemyCount *= 2;
             lastMaxIncreaseTime = Time.time;
             Debug.Log($"[EnemySpawner] 📈 最大敌人数量翻倍至: {maxEnemyCount}");
         }
 
-        if (Time.time - lastSpeedIncreaseTime >= 5f)
+        if (Time.time - lastSpeedIncreaseTime >= 10f)
         {
             spawnInterval /= 1.5f;
             // 防止间隔过小

@@ -17,7 +17,7 @@ MonoBehaviour:
   cardPicture_Wp: {fileID: 0}
   damage: 20
   continuousAutoFire: 1
-  continuousFireDuration: 3
+  continuousFireDuration: 10
   firePattern: {fileID: 11400000, guid: 92e9ec088a12ca34aaf5122ce25abaa4, type: 2}
   requiresCharging: 0
   chargingTime: 0.2

@@ -315,7 +315,7 @@ public class PlayerControl : MonoBehaviour
         // 诊断检查4：检查按键输入
         if (Input.GetKeyDown(fireKey))
         {
-            equipped.Use(gameObject);
+            // equipped.Use(gameObject);
         }
         else if (Input.GetKeyUp(fireKey))
         {
