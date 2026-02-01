@@ -107,4 +107,9 @@ public class PropertyCardControl : MonoBehaviour
             _ => type.ToString()
         };
     }
+
+    public void OnPointerClick()
+    {
+        Debug.Log($"[PropertyCardControl] 🖱️ 点击了属性卡: {propertyCard?.cardName ?? "null"}");
+    }
 }

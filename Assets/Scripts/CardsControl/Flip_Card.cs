@@ -35,6 +35,8 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public UnityEvent onConfirm;
 
     private bool isFaceDown = true; // 默认背面朝上
+    // 公共访问器，供外部（如全局点击代理）查询卡牌是否为正面朝上
+    public bool IsFaceUp => !isFaceDown;
     private bool isAnimating = false;
     private Vector3 originalScale;
     private Coroutine scaleCoroutine;
@@ -149,13 +151,22 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
         if (isAnimating) return;
 
-        // 如果启用了"再次点击为确认"且当前为正面朝上，则把再次点击视为确认而不是翻回去
-        if (!isFaceDown && secondClickIsConfirm)
+        // 如果当前为正面朝上，且处于卡牌选择界面，则把点击视为确认（平替方案）
+        if (!isFaceDown)
         {
-            Debug.Log($"[Flip_Card] ✅ 触发确认事件");
-            // 先触发 inspector 绑定的 UnityEvent
-            Confirm();
-            return;
+            bool selectionPanelOpen = false;
+            var csm = FindAnyObjectByType<CardSelectionManager>();
+            if (csm != null && csm.cardSelectionPanel != null)
+            {
+                selectionPanelOpen = csm.cardSelectionPanel.activeInHierarchy;
+            }
+
+            if (secondClickIsConfirm || selectionPanelOpen)
+            {
+                Debug.Log($"[Flip_Card] ✅ 触发确认事件 (secondClickIsConfirm={secondClickIsConfirm}, selectionPanelOpen={selectionPanelOpen})");
+                Confirm();
+                return;
+            }
         }
 
         // 如果是背面朝上，开始翻转到正面
@@ -197,11 +208,14 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         WeaponCardControl wc = null;
         PropertyCardControl pcc = null;
 
+        Debug.Log($"[Flip_Card] 🔍 开始搜索控件...\n  frontFace: {(frontFace != null ? frontFace.name : "NULL")}\n  backFace: {(backFace != null ? backFace.name : "NULL")}");
+
         if (frontFace != null)
         {
             cc = frontFace.GetComponentInChildren<CardControl>();
             wc = frontFace.GetComponentInChildren<WeaponCardControl>();
             pcc = frontFace.GetComponentInChildren<PropertyCardControl>();
+            Debug.Log($"[Flip_Card] 📦 frontFace 搜索结果：CC={cc != null}, WC={wc != null}, PCC={pcc != null}");
         }
 
         if ((cc == null && wc == null && pcc == null) && backFace != null)
@@ -209,6 +223,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             cc = backFace.GetComponentInChildren<CardControl>();
             wc = backFace.GetComponentInChildren<WeaponCardControl>();
             pcc = backFace.GetComponentInChildren<PropertyCardControl>();
+            Debug.Log($"[Flip_Card] 📦 backFace 搜索结果：CC={cc != null}, WC={wc != null}, PCC={pcc != null}");
         }
 
         if (cc == null && wc == null && pcc == null)
@@ -216,6 +231,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             cc = GetComponentInChildren<CardControl>();
             wc = GetComponentInChildren<WeaponCardControl>();
             pcc = GetComponentInChildren<PropertyCardControl>();
+            Debug.Log($"[Flip_Card] 📦 全局搜索结果：CC={cc != null}, WC={wc != null}, PCC={pcc != null}");
         }
 
         if (cc != null && cc.card_data != null)
@@ -242,7 +258,15 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             return;
         }
 
-        Debug.LogWarning("[Flip_Card] ⚠️ Confirm() 被调用，但未找到 CardControl、WeaponCardControl 或 PropertyCardControl");
+        // 详细诊断：列出找到的控件但数据为 null
+        if (cc != null)
+            Debug.LogWarning("[Flip_Card] ⚠️ 找到 CardControl 但 card_data 为 NULL");
+        if (wc != null)
+            Debug.LogWarning("[Flip_Card] ⚠️ 找到 WeaponCardControl 但 weapon_data 为 NULL");
+        if (pcc != null)
+            Debug.LogWarning("[Flip_Card] ⚠️ 找到 PropertyCardControl 但 propertyCard 为 NULL");
+
+        Debug.LogWarning("[Flip_Card] ⚠️ Confirm() 被调用，但未找到有效的 CardControl、WeaponCardControl 或 PropertyCardControl");
     }
 
     private IEnumerator ScaleTo(Vector3 target)

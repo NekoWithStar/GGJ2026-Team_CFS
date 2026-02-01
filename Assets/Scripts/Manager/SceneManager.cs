@@ -7,6 +7,51 @@ public class SceneManager : MonoBehaviour
 {
     public static SceneManager Instance { get; private set; }
 
+    [Header("Debug Shortcuts")]
+    [Tooltip("按 R 键时等待多少秒再重载当前场景（0 = 立即重载）")]
+    public float reloadDelay = 0f;
+
+    [Tooltip("当延迟重载时，是否在等待期间暂停游戏（通过 Time.timeScale=0）。等待使用实时秒数，不受 timeScale 影响。）")]
+    public bool pauseDuringReload = true;
+
+    private bool isReloading = false;
+
+    private void Update()
+    {
+        // 按 R 键重载当前场景（方便开发调试）
+        if (Input.GetKeyDown(KeyCode.R) && !isReloading)
+        {
+            if (reloadDelay > 0f)
+            {
+                StartCoroutine(ReloadAfterDelay(reloadDelay));
+            }
+            else
+            {
+                ReloadCurrentScene();
+            }
+        }
+    }
+
+    private IEnumerator ReloadAfterDelay(float delaySeconds)
+    {
+        isReloading = true;
+
+        if (pauseDuringReload)
+        {
+            Time.timeScale = 0f;
+        }
+
+        yield return new WaitForSecondsRealtime(delaySeconds);
+
+        if (pauseDuringReload)
+        {
+            Time.timeScale = 1f;
+        }
+
+        ReloadCurrentScene();
+        isReloading = false;
+    }
+
     /// <summary>
     /// 切换到指定场景
     /// </summary>

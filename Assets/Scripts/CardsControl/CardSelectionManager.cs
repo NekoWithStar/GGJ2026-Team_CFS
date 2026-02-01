@@ -162,6 +162,7 @@ public class CardSelectionManager : MonoBehaviour
     /// </summary>
     public void OnCardSelected(Card card)
     {
+        Debug.Log($"[CardSelectionManager] 📢 OnCardSelected 事件被触发: {card.cardName}");
         ApplyCardEffect(card);
     }
 
@@ -170,6 +171,7 @@ public class CardSelectionManager : MonoBehaviour
     /// </summary>
     private void OnWeaponSelected(Weapon weapon)
     {
+        Debug.Log($"[CardSelectionManager] 📢 OnWeaponSelected 事件被触发: {weapon.weaponName}");
         ApplyCardEffect(weapon);
     }
 
@@ -178,6 +180,7 @@ public class CardSelectionManager : MonoBehaviour
     /// </summary>
     private void OnPropertyCardSelected(Y_Survivor.PropertyCard propertyCard)
     {
+        Debug.Log($"[CardSelectionManager] 📢 OnPropertyCardSelected 事件被触发: {propertyCard.cardName}");
         ApplyCardEffect(propertyCard);
     }
 
