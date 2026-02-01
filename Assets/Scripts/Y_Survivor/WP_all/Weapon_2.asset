@@ -31,6 +31,6 @@ MonoBehaviour:
   continuousFireEndSound: {fileID: 0}
   cooldownEndSound: {fileID: 0}
   description: "Biu,BiuBiu ! \u2014\u2014Shotgun sounds"
-  projectilePrefab: {fileID: 5210218031670100140, guid: ae5a97e4bef5c5c43b8b51348b0aeec5, type: 3}
+  projectilePrefab: {fileID: 3535618518963994088, guid: 0fc43adf6310ef448b437feac3e5f834, type: 3}
   projectileSpeed: 5
   weaponPrefab: {fileID: 2688711753480837464, guid: eb9402c91a1936d46a8602de7941ce3f, type: 3}

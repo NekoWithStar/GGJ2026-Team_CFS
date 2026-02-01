@@ -112,6 +112,30 @@ public class SceneTransition : MonoBehaviour
         isTransitioning = false;
     }
 
+    /// <summary>
+    /// 取消当前过渡并销毁该单例（用于在强制重载场景时清理可能阻塞的异步加载）
+    /// </summary>
+    public void CancelAndDestroy()
+    {
+        if (isTransitioning)
+        {
+            StopAllCoroutines();
+        }
+        isTransitioning = false;
+
+        // 尝试销毁过渡画布
+        if (transitionCanvas != null)
+        {
+            Destroy(transitionCanvas.gameObject);
+            transitionCanvas = null;
+        }
+
+        // 最后销毁自身对象
+        Destroy(gameObject);
+        Instance = null;
+        Debug.Log("[SceneTransition] CancelAndDestroy called - transition aborted and instance destroyed");
+    }
+
     private IEnumerator Fade(float from, float to, float duration)
     {
         if (canvasGroup == null) yield break;

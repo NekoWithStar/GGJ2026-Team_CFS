@@ -35,7 +35,7 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public UnityEvent onConfirm;
 
     private bool isFaceDown = true; // 默认背面朝上
-    // 公共访问器，供外部（如全局点击代理）查询卡牌是否为正面朝上
+    // 供外部查询当前卡牌是否为正面朝上（用于全局点击代理等）
     public bool IsFaceUp => !isFaceDown;
     private bool isAnimating = false;
     private Vector3 originalScale;

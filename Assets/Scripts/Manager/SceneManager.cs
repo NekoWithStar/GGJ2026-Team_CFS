@@ -83,10 +83,16 @@ public class SceneManager : MonoBehaviour
     public void ReloadCurrentScene()
     {
         string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        // 在重载之前，取消任何可能正在进行的 SceneTransition（避免异步加载卡住）
+        if (SceneTransition.Instance != null)
+        {
+            SceneTransition.Instance.CancelAndDestroy();
+        }
+
         // 直接同步加载当前场景，避免使用异步过渡时发生卡住（某些情况下 LoadSceneAsync 的 allowSceneActivation=false
         // 会导致 progress 无法推进到 0.9，从而卡住重载流程）。
         UnityEngine.SceneManagement.SceneManager.LoadScene(currentSceneName);
-        Debug.Log($"[SceneManager] 重载当前场景（绕过过渡）: {currentSceneName}");
+        Debug.Log($"[SceneManager] 重载当前场景（绕过过渡，已取消过渡）: {currentSceneName}");
     }
 
     /// <summary>

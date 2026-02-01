@@ -23,6 +23,9 @@ public class EnemyControl : MonoBehaviour
     public float currentHp;    // 当前血量
     [Tooltip("死亡掉落金币数量（如果为0，会使用 CoinSystemConfig 中的配置）")]
     public int dropCoin = 0;
+    [Header("音效")]
+    [Tooltip("死亡时播放的音频（可为空，若为空则不播放）")]
+    public AudioClip deathClip;
 
     [Header("掉落配置")]
     public GameObject coinPrefab; // 金币预制体（后续创建，挂拾取脚本）
@@ -155,6 +158,12 @@ public class EnemyControl : MonoBehaviour
 
         // 禁用碰撞与渲染（可选）
         if (col2d != null) col2d.enabled = false;
+
+        // 播放死亡音效（如果有）
+        if (deathClip != null)
+        {
+            AudioSource.PlayClipAtPoint(deathClip, transform.position);
+        }
 
         DropCoin(); // 掉落金币
         // 延迟销毁（给掉落特效留时间，可选）

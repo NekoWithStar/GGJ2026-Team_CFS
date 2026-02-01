@@ -50,6 +50,8 @@ public class PlayerControl : MonoBehaviour
     public float deathPauseDelay = 2f;
     [Tooltip("得分榜显示 Text（显示最终得分：血量+金币）")]
     public Text scoreBoardText;
+    [Tooltip("玩家死亡时播放的音频（可为空）")]
+    public AudioClip deathClip;
 
     // 外置武器实例与接口引用（可在运行时通过 API 更换）
     private GameObject externalWeaponInstance;
@@ -580,6 +582,21 @@ public class PlayerControl : MonoBehaviour
         
         // 显示得分榜
         ShowScoreBoard();
+
+        // 播放死亡音效（如果配置了）
+        if (deathClip != null)
+        {
+            // 使用本地 AudioSource 优先播放，否则使用 PlayClipAtPoint
+            var src = GetComponent<AudioSource>();
+            if (src != null)
+            {
+                src.PlayOneShot(deathClip);
+            }
+            else
+            {
+                AudioSource.PlayClipAtPoint(deathClip, transform.position);
+            }
+        }
         
         // 延迟暂停游戏（但不停止音乐）
         StartCoroutine(DelayedGamePause());

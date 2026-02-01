@@ -640,8 +640,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 235b3464907ff5947b0c9d70f53d7a96, type: 3}
-  m_Resource: {fileID: 8300000, guid: 235b3464907ff5947b0c9d70f53d7a96, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 081745503837df642a0d334150af7878, type: 3}
+  m_Resource: {fileID: 8300000, guid: 081745503837df642a0d334150af7878, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -835,7 +835,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Survivor_Test
+          m_StringArgument: TalkingHere
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &817757005
@@ -888,6 +888,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71ba14c472bb3ef4f9de2270645b72f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  reloadDelay: 0
+  pauseDuringReload: 1
 --- !u!1 &1068401062
 GameObject:
   m_ObjectHideFlags: 0
@@ -1597,6 +1599,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71ba14c472bb3ef4f9de2270645b72f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  reloadDelay: 0
+  pauseDuringReload: 1
 --- !u!1 &2127341746
 GameObject:
   m_ObjectHideFlags: 0
