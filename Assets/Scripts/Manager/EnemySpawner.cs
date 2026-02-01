@@ -42,6 +42,10 @@ public class EnemySpawner : MonoBehaviour
     private int currentEnemyCount = 0;
     private Transform enemyContainer; // 统一的容器
 
+    // 新增：动态调整计时器
+    private float lastMaxIncreaseTime = 0f;
+    private float lastSpeedIncreaseTime = 0f;
+
     private void Awake()
     {
         if (targetCamera == null) targetCamera = Camera.main;
@@ -58,10 +62,31 @@ public class EnemySpawner : MonoBehaviour
         {
             SpawnEnemy();
         }
+
+        // 初始化动态调整计时器
+        lastMaxIncreaseTime = Time.time;
+        lastSpeedIncreaseTime = Time.time;
     }
 
     private void Update()
     {
+        // 动态调整最大敌人数量和生成速度
+        if (Time.time - lastMaxIncreaseTime >= 10f)
+        {
+            maxEnemyCount *= 2;
+            lastMaxIncreaseTime = Time.time;
+            Debug.Log($"[EnemySpawner] 📈 最大敌人数量翻倍至: {maxEnemyCount}");
+        }
+
+        if (Time.time - lastSpeedIncreaseTime >= 20f)
+        {
+            spawnInterval /= 1.5f;
+            // 防止间隔过小
+            spawnInterval = Mathf.Max(spawnInterval, 0.1f);
+            lastSpeedIncreaseTime = Time.time;
+            Debug.Log($"[EnemySpawner] ⚡ 生成速度增加，间隔降至: {spawnInterval}秒");
+        }
+
         if (!enableAutoSpawn) return;
 
         // 自动刷新逻辑
