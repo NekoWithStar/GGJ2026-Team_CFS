@@ -622,7 +622,7 @@ public class PlayerControl : MonoBehaviour
 
         if (scoreBoardText != null)
         {
-            scoreBoardText.text = $"欢迎下次光临！\n本次共消费: {displayedCoins}\n(血量: {Mathf.RoundToInt(currentHealth)} + 消耗金币: {displayedCoins})";
+            scoreBoardText.text = $"欢迎下次光临！\n本次共消费: {displayedCoins}\n(HP: {Mathf.RoundToInt(currentHealth)} + 消耗金币: {displayedCoins})";
             scoreBoardText.gameObject.SetActive(true);
             Debug.Log($"[PlayerControl] 显示得分榜：血量 {Mathf.RoundToInt(currentHealth)} + 消耗金币 {displayedCoins} = 最终得分 {finalScore}");
         }
