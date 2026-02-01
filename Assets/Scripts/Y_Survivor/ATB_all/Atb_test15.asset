@@ -10,41 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
-  m_Name: Atb_test1
+  m_Name: Atb_test15
   m_EditorClassIdentifier: 
-  cardName: "\u8D85\u7EA7\u529B\u91CF"
-  description: "+5  \u66B4\u51FB\u7387\n+5  \u653B\u51FB\n+2  \u8FDC\u7A0B\u51B7\u5374\n"
-  cardIcon: {fileID: 21300000, guid: bc3c201edfd089f48ac510ef447728c3, type: 3}
-  rarity: 4
+  cardName: "\u52A0\u50B7\u5BB3\u7684"
+  description: "\u50B7\u5BB3\u589E\u52A0150%"
+  cardIcon: {fileID: 21300000, guid: 02e2a32bf3243dc49972d4832fa2c72e, type: 3}
+  rarity: 3
   modifiers:
-  - targetProperty: 105
-    modifierType: 1
-    value: 5
-    priority: 0
   - targetProperty: 102
-    modifierType: 1
-    value: 5
-    priority: 0
-  - targetProperty: 100
-    modifierType: 1
-    value: 2
-    priority: 0
-  - targetProperty: 302
     modifierType: 3
-    value: 2
-    priority: 0
-  - targetProperty: 301
-    modifierType: 3
-    value: 2
-    priority: 0
+    value: 1.5
+    priority: 2
   - targetProperty: 300
     modifierType: 3
-    value: 2
-    priority: 0
+    value: 1.5
+    priority: 2
+  - targetProperty: 301
+    modifierType: 3
+    value: 1.5
+    priority: 2
+  - targetProperty: 302
+    modifierType: 3
+    value: 1.5
+    priority: 2
   hasCustomEffect: 0
-  customEffectType: 0
+  customEffectType: 5
   customEffectValue: 0
   customEffectValue2: 0
-  customEffectDuration: 3
+  customEffectDuration: 6
   replacementWeapon: {fileID: 0}
   randomAudioClips: []

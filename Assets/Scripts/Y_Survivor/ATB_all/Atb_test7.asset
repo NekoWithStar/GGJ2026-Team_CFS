@@ -23,7 +23,7 @@ MonoBehaviour:
     priority: 2
   - targetProperty: 301
     modifierType: 3
-    value: 1.1
+    value: 4
     priority: 2
   hasCustomEffect: 1
   customEffectType: 3

@@ -27,7 +27,7 @@ MonoBehaviour:
     priority: 0
   - targetProperty: 300
     modifierType: 3
-    value: 1.2
+    value: 50
     priority: 0
   hasCustomEffect: 0
   customEffectType: 0

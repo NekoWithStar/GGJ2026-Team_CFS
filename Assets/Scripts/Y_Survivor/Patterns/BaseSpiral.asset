@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37be253a0146f484bbc1b923760a3c99, type: 3}
   m_Name: BaseSpiral
   m_EditorClassIdentifier: 
-  shotsPerCycle: 1
-  bulletsPerShot: 4
-  bulletSpreadAngle: 1
+  shotsPerCycle: 4
+  bulletsPerShot: 10
+  bulletSpreadAngle: 4
   multiShotPattern: 1
   anglePerShot: 9.7
   radiusGrowth: 0.1

@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b01bbe3da337287419fa1ad7a1185839, type: 3}
-  m_Name: BaseWavePattern
+  m_Script: {fileID: 11500000, guid: d7d320fac77132d45959fe49ec4b5c05, type: 3}
+  m_Name: New Fan Fire Pattern
   m_EditorClassIdentifier: 
-  shotsPerCycle: 20
-  bulletsPerShot: 5
+  shotsPerCycle: 30
+  bulletsPerShot: 4
   bulletSpreadAngle: 10
   multiShotPattern: 0
-  waveAmplitude: 30
-  waveFrequency: 5
+  spreadAngle: 60
   useWeaponForward: 1
-  waveType: 0
+  oscillate: 0
+  oscillationPeriod: 2

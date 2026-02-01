@@ -15,15 +15,15 @@ MonoBehaviour:
   cardName: "\u5341\u5B57\u7130"
   description: "+20  HP\n\u8BF7\u51C6\u65F6\u9001\u8FBE"
   cardIcon: {fileID: 21300000, guid: 5861b4e29f472ab449a63c582fc71c87, type: 3}
-  rarity: 4
+  rarity: 2
   modifiers:
   - targetProperty: 200
     modifierType: 1
     value: 5
     priority: 2
   - targetProperty: 300
-    modifierType: 1
-    value: 5
+    modifierType: 3
+    value: 20
     priority: 1
   hasCustomEffect: 1
   customEffectType: 5

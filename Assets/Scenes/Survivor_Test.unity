@@ -836,6 +836,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ae9cb31770899654b88b7e36e56250bb, type: 2}
   - {fileID: 11400000, guid: df1c8cb98bf6e9a499a503d2f6b703ed, type: 2}
   - {fileID: 11400000, guid: 6880d4c374c4bee4f862255780072ded, type: 2}
+  - {fileID: 11400000, guid: 6880d4c374c4bee4f862255780072ded, type: 2}
+  - {fileID: 11400000, guid: a749d5589d64032469b92b35fef3f6b2, type: 2}
+  - {fileID: 11400000, guid: 0924a49ca3fefdf4c9052e84b4d28a9e, type: 2}
+  - {fileID: 11400000, guid: 20f7b9f969c3fd04692f0103d77cc445, type: 2}
+  - {fileID: 11400000, guid: 2a9f71332255f304c8c796938153858a, type: 2}
   cardsToShow: 4
   cardsToSelect: 1
   coinCostPerCard: 30
@@ -2531,8 +2536,8 @@ MonoBehaviour:
   m_ScreenX: 0.5
   m_ScreenY: 0.5
   m_CameraDistance: 10
-  m_DeadZoneWidth: 0.68
-  m_DeadZoneHeight: 0.69
+  m_DeadZoneWidth: 0.11
+  m_DeadZoneHeight: 0.1
   m_DeadZoneDepth: 0
   m_UnlimitedSoftZone: 0
   m_SoftZoneWidth: 0.75

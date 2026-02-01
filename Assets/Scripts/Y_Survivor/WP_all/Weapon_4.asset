@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8303b85d6cb52440b25c47d200c6308, type: 3}
-  m_Name: Weapon_2
+  m_Name: Weapon_4
   m_EditorClassIdentifier: 
   weaponType: 1
   weaponName: Gun
   cardPicture_Wp: {fileID: 0}
-  damage: 20
+  damage: 15
   continuousAutoFire: 1
   continuousFireDuration: 3
-  firePattern: {fileID: 11400000, guid: 92e9ec088a12ca34aaf5122ce25abaa4, type: 2}
+  firePattern: {fileID: 11400000, guid: 8fdfe644b84dce64fac30bf8a3f5b8a9, type: 2}
   requiresCharging: 0
   chargingTime: 0.2
-  cooldown: 0.1
+  cooldown: 0.2
   attackRate: 20
   critChanceBase: 0
   critDamageBase: 1.5
@@ -31,6 +31,6 @@ MonoBehaviour:
   continuousFireEndSound: {fileID: 0}
   cooldownEndSound: {fileID: 0}
   description: "Biu,BiuBiu ! \u2014\u2014Shotgun sounds"
-  projectilePrefab: {fileID: 3535618518963994088, guid: 0fc43adf6310ef448b437feac3e5f834, type: 3}
+  projectilePrefab: {fileID: 8423197780839628572, guid: a00caab8e5b772142939cae52fc5ee43, type: 3}
   projectileSpeed: 5
   weaponPrefab: {fileID: 2688711753480837464, guid: eb9402c91a1936d46a8602de7941ce3f, type: 3}
