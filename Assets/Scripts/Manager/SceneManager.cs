@@ -15,7 +15,15 @@ public class SceneManager : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(sceneName))
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            // 优先使用 SceneTransition 进行带淡入/淡出效果的切换
+            if (SceneTransition.Instance != null)
+            {
+                SceneTransition.Instance.TransitionToScene(sceneName);
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            }
             Debug.Log($"[SceneManager] 切换到场景: {sceneName}");
         }
         else
@@ -30,8 +38,10 @@ public class SceneManager : MonoBehaviour
     public void ReloadCurrentScene()
     {
         string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        // 直接同步加载当前场景，避免使用异步过渡时发生卡住（某些情况下 LoadSceneAsync 的 allowSceneActivation=false
+        // 会导致 progress 无法推进到 0.9，从而卡住重载流程）。
         UnityEngine.SceneManagement.SceneManager.LoadScene(currentSceneName);
-        Debug.Log($"[SceneManager] 重载当前场景: {currentSceneName}");
+        Debug.Log($"[SceneManager] 重载当前场景（绕过过渡）: {currentSceneName}");
     }
 
     /// <summary>

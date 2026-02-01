@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 572188421945884926}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8866678218543658721}
@@ -78,8 +78,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5DE6\u8FB9\u4F24\u5BB3\u9AD8\u7231\u4E0A\u53F3\u8FB9\u9AD8\u4F24\u5BB3\n+500 
-    Damage"
+  m_Text: "+5 \u66B4\u51FB\u7387\n+5  \u4F24\u5BB3"
 --- !u!1 &915932068086372472
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,6 +90,7 @@ GameObject:
   - component: {fileID: 8938276957421311645}
   - component: {fileID: 2015384814282661968}
   - component: {fileID: 2358351369309645415}
+  - component: {fileID: 3568522554453135502}
   m_Layer: 5
   m_Name: card_N1b
   m_TagString: Untagged
@@ -155,6 +155,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3568522554453135502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915932068086372472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2358351369309645415}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8193244973891980173}
+        m_TargetAssemblyTypeName: Flip_Card, Assembly-CSharp
+        m_MethodName: Confirm
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1421748536297895998
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,11 +220,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8866678218543658721}
-  - component: {fileID: 8830113134272363579}
-  - component: {fileID: 821801487821313130}
+  - component: {fileID: 3577349217149025731}
   - component: {fileID: 8193244973891980173}
   - component: {fileID: 6108878556657590040}
-  - component: {fileID: 753024376842743566}
+  - component: {fileID: 2257920181565804421}
+  - component: {fileID: 6067394688412952285}
   m_Layer: 5
   m_Name: card_N2
   m_TagString: Untagged
@@ -201,7 +257,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -114}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &8830113134272363579
+--- !u!222 &3577349217149025731
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,7 +265,48 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421748536297895998}
   m_CullTransparentMesh: 1
---- !u!114 &821801487821313130
+--- !u!114 &8193244973891980173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421748536297895998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ba1c1e03aca0f24099ef5a1bb986536, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frontFace: {fileID: 3748559312242060306}
+  backFace: {fileID: 915932068086372472}
+  swapFrontBackDefinition: 0
+  hoverScale: 1.08
+  scaleSpeed: 10
+  flipDuration: 0.4
+  secondClickIsConfirm: 0
+  onConfirm:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6108878556657590040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421748536297895998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7735d422700e5704ca6bf3bd827eaec7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  propertyCard: {fileID: 11400000, guid: 995a009cd8a352b4cbfa7a404b8ca0d8, type: 2}
+  cardIconImage: {fileID: 173230687775953983}
+  cardName: {fileID: 5859773400179279403}
+  rarity: {fileID: 0}
+  description: {fileID: 1527762265169390151}
+  modifiersInfo: {fileID: 0}
+  back: {fileID: 915932068086372472}
+--- !u!114 &2257920181565804421
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -239,47 +336,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8193244973891980173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1421748536297895998}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ba1c1e03aca0f24099ef5a1bb986536, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frontFace: {fileID: 915932068086372472}
-  backFace: {fileID: 0}
-  hoverScale: 1.08
-  scaleSpeed: 10
-  flipDuration: 0.4
-  secondClickIsConfirm: 0
-  onConfirm:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &6108878556657590040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1421748536297895998}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7735d422700e5704ca6bf3bd827eaec7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  propertyCard: {fileID: 11400000, guid: 995a009cd8a352b4cbfa7a404b8ca0d8, type: 2}
-  cardPicture_Po: {fileID: 173230687775953983}
-  cardName: {fileID: 5859773400179279403}
-  rarity: {fileID: 0}
-  description: {fileID: 1527762265169390151}
-  modifiersInfo: {fileID: 0}
-  back: {fileID: 915932068086372472}
---- !u!114 &753024376842743566
+--- !u!114 &6067394688412952285
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -319,7 +376,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 821801487821313130}
+  m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
@@ -346,6 +403,7 @@ GameObject:
   - component: {fileID: 7022760806917982977}
   - component: {fileID: 9082214734017428161}
   - component: {fileID: 2092752200963689066}
+  - component: {fileID: 6052665017378681382}
   m_Layer: 5
   m_Name: card_N1f
   m_TagString: Untagged
@@ -362,7 +420,7 @@ RectTransform:
   m_GameObject: {fileID: 3748559312242060306}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8866678218543658721}
@@ -410,6 +468,62 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6052665017378681382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3748559312242060306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2092752200963689066}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8193244973891980173}
+        m_TargetAssemblyTypeName: Flip_Card, Assembly-CSharp
+        m_MethodName: Confirm
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3891573264796634912
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,7 +551,7 @@ RectTransform:
   m_GameObject: {fileID: 3891573264796634912}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8866678218543658721}
@@ -512,15 +626,15 @@ RectTransform:
   m_GameObject: {fileID: 6875445348507594563}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8866678218543658721}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0001, y: -17}
-  m_SizeDelta: {x: 140, y: 140}
+  m_AnchoredPosition: {x: 0.0001, y: -33.77}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &693512701534207591
 CanvasRenderer:
@@ -550,7 +664,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5696100371054633094, guid: 9152d3552abf88a4ba0fdde9fe850d09, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc3c201edfd089f48ac510ef447728c3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -587,7 +701,7 @@ RectTransform:
   m_GameObject: {fileID: 9127830968370758035}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8866678218543658721}

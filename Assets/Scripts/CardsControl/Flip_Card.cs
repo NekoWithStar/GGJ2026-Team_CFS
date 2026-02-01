@@ -20,6 +20,8 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [Header("卡牌正反面 (Canvas UI 下的 GameObject)")]
     public GameObject frontFace; // 正面（包含 CardControl / WeaponCardControl 等 UI 元素）
     public GameObject backFace; // 背面（默认显示）
+    [Tooltip("如果启用，将把当前 Inspector 上的 front/back 引用互换（把原来的背面视为新的正面）")]
+    public bool swapFrontBackDefinition = true;
 
     [Header("交互设置")]
     public float hoverScale = 1.08f; // 鼠标悬停放大倍率
@@ -36,6 +38,8 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private bool isAnimating = false;
     private Vector3 originalScale;
     private Coroutine scaleCoroutine;
+    private Coroutine faceCameraCoroutine;
+    private bool isConfirmed = false;
 
     // 标记：当对象被禁用后再次启用时是否应重置为背面
     private bool _resetToBackOnEnable = true;
@@ -44,6 +48,13 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         // 提前保存初始缩放，避免 OnEnable 在 Start 之前访问到未初始化的 originalScale
         originalScale = transform.localScale;
+        // 如果需要，在启动时互换 front/back 的引用（不需要在 Inspector 中手动修改）
+        if (swapFrontBackDefinition)
+        {
+            var tmp = frontFace;
+            frontFace = backFace;
+            backFace = tmp;
+        }
     }
 
     private void OnEnable()
@@ -89,7 +100,9 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // 强制背面朝上
         isFaceDown = true;
 
-        // 复位旋转与缩放
+        // 复位旋转与缩放 — 面向摄像机（保持 Y 角度为 0）
+        transform.localScale = originalScale;
+        // 将卡牌旋转为正面/背面朝向屏幕（清除 X,Z 旋转），并将 Y 设为 0
         transform.localEulerAngles = new Vector3(0f, 0f, 0f);
         transform.localScale = originalScale;
 
@@ -100,14 +113,34 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (isConfirmed) return; // 已确认的卡牌不再响应悬停翻面/缩放
         if (scaleCoroutine != null) StopCoroutine(scaleCoroutine);
         scaleCoroutine = StartCoroutine(ScaleTo(originalScale * hoverScale));
+        // 开始面向摄像机（持续保持 X/Z 角度为 0，保留 Y 旋转以支持翻转动画）
+        if (faceCameraCoroutine != null) StopCoroutine(faceCameraCoroutine);
+        faceCameraCoroutine = StartCoroutine(FaceCameraCoroutine());
+        // 鼠标进入时若背面朝上则翻到正面
+        if (!isConfirmed && isFaceDown && !isAnimating)
+        {
+            StartCoroutine(FlipCoroutine());
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (isConfirmed) return; // 已确认的不翻回
         if (scaleCoroutine != null) StopCoroutine(scaleCoroutine);
         scaleCoroutine = StartCoroutine(ScaleTo(originalScale));
+        if (faceCameraCoroutine != null)
+        {
+            StopCoroutine(faceCameraCoroutine);
+            faceCameraCoroutine = null;
+        }
+        // 鼠标离开时如果正面朝上且未启用 secondClickIsConfirm，则翻回背面
+        if (!isConfirmed && !isFaceDown && !isAnimating && !secondClickIsConfirm)
+        {
+            StartCoroutine(FlipCoroutine());
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -144,31 +177,67 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void Confirm()
     {
         Debug.Log("[Flip_Card] 🎯 Confirm() 方法被调用");
+
+        // 停止交互相关协程（但延后设置 isConfirmed，直到找到并广播确认）
+        if (faceCameraCoroutine != null)
+        {
+            StopCoroutine(faceCameraCoroutine);
+            faceCameraCoroutine = null;
+        }
+        if (scaleCoroutine != null)
+        {
+            StopCoroutine(scaleCoroutine);
+            scaleCoroutine = null;
+        }
+
         onConfirm?.Invoke();
 
-        // 先查找 CardControl（通常在正面的子对象上），并广播被确认的 Card（如果存在）
-        CardControl cc = GetComponentInChildren<CardControl>();
+        // 为兼容可能被 swap 的 front/back 引用，优先在 frontFace 下查找控件，再在 backFace 下查找，最后回退到全局查找
+        CardControl cc = null;
+        WeaponCardControl wc = null;
+        PropertyCardControl pcc = null;
+
+        if (frontFace != null)
+        {
+            cc = frontFace.GetComponentInChildren<CardControl>();
+            wc = frontFace.GetComponentInChildren<WeaponCardControl>();
+            pcc = frontFace.GetComponentInChildren<PropertyCardControl>();
+        }
+
+        if ((cc == null && wc == null && pcc == null) && backFace != null)
+        {
+            cc = backFace.GetComponentInChildren<CardControl>();
+            wc = backFace.GetComponentInChildren<WeaponCardControl>();
+            pcc = backFace.GetComponentInChildren<PropertyCardControl>();
+        }
+
+        if (cc == null && wc == null && pcc == null)
+        {
+            cc = GetComponentInChildren<CardControl>();
+            wc = GetComponentInChildren<WeaponCardControl>();
+            pcc = GetComponentInChildren<PropertyCardControl>();
+        }
+
         if (cc != null && cc.card_data != null)
         {
             OnCardConfirmed?.Invoke(cc.card_data);
+            isConfirmed = true;
             Debug.Log($"[Flip_Card] ✅ 确认普通卡片: {cc.card_data.cardName}");
             return;
         }
 
-        // 再查找 WeaponCardControl 并广播 Weapon（若存在）
-        WeaponCardControl wc = GetComponentInChildren<WeaponCardControl>();
         if (wc != null && wc.weapon_data != null)
         {
             OnWeaponConfirmed?.Invoke(wc.weapon_data);
+            isConfirmed = true;
             Debug.Log($"[Flip_Card] ✅ 确认武器卡片: {wc.weapon_data.weaponName}");
             return;
         }
 
-        // 再查找 PropertyCardControl 并广播 PropertyCard（若存在）
-        PropertyCardControl pcc = GetComponentInChildren<PropertyCardControl>();
         if (pcc != null && pcc.propertyCard != null)
         {
             OnPropertyCardConfirmed?.Invoke(pcc.propertyCard);
+            isConfirmed = true;
             Debug.Log($"[Flip_Card] ✅ 确认属性卡片: {pcc.propertyCard.cardName}");
             return;
         }
@@ -189,6 +258,18 @@ public class Flip_Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
         transform.localScale = target;
         scaleCoroutine = null;
+    }
+
+    private IEnumerator FaceCameraCoroutine()
+    {
+        // 保持卡牌面向摄像机（只锁定 X/Z 旋转，保留 Y 以配合翻转）
+        while (true)
+        {
+            // 获取当前 Y 角度
+            float y = transform.localEulerAngles.y;
+            transform.localEulerAngles = new Vector3(0f, y, 0f);
+            yield return null;
+        }
     }
 
     private IEnumerator FlipCoroutine()

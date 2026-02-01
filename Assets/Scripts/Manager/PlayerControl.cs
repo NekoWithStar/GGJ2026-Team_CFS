@@ -616,17 +616,19 @@ public class PlayerControl : MonoBehaviour
     {
         // 计算最终得分：玩家血量 + 金币数量
         float currentHealth = playerPropertyManager != null ? playerPropertyManager.GetCurrentHealth() : 0f;
-        int finalScore = Mathf.RoundToInt(currentHealth) + coin;
-        
+        // 使用总消耗金币作为死亡时显示的金币数
+        int displayedCoins = totalCoinsSpent;
+        int finalScore = Mathf.RoundToInt(currentHealth) + displayedCoins;
+
         if (scoreBoardText != null)
         {
-            scoreBoardText.text = $"欢迎下次光临！\n本次共消费: {finalScore}\n(血量: {Mathf.RoundToInt(currentHealth)} + 金币: {coin})";
+            scoreBoardText.text = $"欢迎下次光临！\n本次共消费: {displayedCoins}\n(血量: {Mathf.RoundToInt(currentHealth)} + 消耗金币: {displayedCoins})";
             scoreBoardText.gameObject.SetActive(true);
-            Debug.Log($"[PlayerControl] 显示得分榜：血量 {Mathf.RoundToInt(currentHealth)} + 金币 {coin} = 最终得分 {finalScore}");
+            Debug.Log($"[PlayerControl] 显示得分榜：血量 {Mathf.RoundToInt(currentHealth)} + 消耗金币 {displayedCoins} = 最终得分 {finalScore}");
         }
         else
         {
-            Debug.Log($"[PlayerControl] 得分榜Text未设置，最终得分: {finalScore} (血量: {Mathf.RoundToInt(currentHealth)} + 金币: {coin})");
+            Debug.Log($"[PlayerControl] 得分榜Text未设置，最终得分: {finalScore} (血量: {Mathf.RoundToInt(currentHealth)} + 消耗金币: {displayedCoins})");
         }
     }
 

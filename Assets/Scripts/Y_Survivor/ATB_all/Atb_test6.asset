@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Atb_test6
   m_EditorClassIdentifier: 
   cardName: "\u89C6\u91CE\u53D7\u9650"
-  description: "-1 \u751F\u547D\n+2 \u66B4\u51FB\u7387\n3s \u6444\u50CF\u673A\u5F02\u5E38"
+  description: "-1  HP\n+2  \u66B4\u51FB\u7387\n3s   \u6444\u50CF\u673A\u5F02\u5E38"
   cardIcon: {fileID: 21300000, guid: 357333fe4acd9054292f05877a3aeb52, type: 3}
   rarity: 1
   modifiers:
@@ -29,6 +29,6 @@ MonoBehaviour:
   customEffectType: 1
   customEffectValue: 0
   customEffectValue2: 0
-  customEffectDuration: 3
+  customEffectDuration: 2
   replacementWeapon: {fileID: 0}
   randomAudioClips: []

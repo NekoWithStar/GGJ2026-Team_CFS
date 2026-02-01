@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8303b85d6cb52440b25c47d200c6308, type: 3}
-  m_Name: Weapon_2
+  m_Name: Weapon_3
   m_EditorClassIdentifier: 
   weaponType: 1
   weaponName: Gun
@@ -18,7 +18,7 @@ MonoBehaviour:
   damage: 10
   continuousAutoFire: 1
   continuousFireDuration: 3
-  firePattern: {fileID: 11400000, guid: 92e9ec088a12ca34aaf5122ce25abaa4, type: 2}
+  firePattern: {fileID: 11400000, guid: ebc962bebd067cb44801017741e11de0, type: 2}
   requiresCharging: 0
   chargingTime: 0.2
   cooldown: 0.2
@@ -31,6 +31,6 @@ MonoBehaviour:
   continuousFireEndSound: {fileID: 0}
   cooldownEndSound: {fileID: 0}
   description: "Biu,BiuBiu ! \u2014\u2014Shotgun sounds"
-  projectilePrefab: {fileID: 5210218031670100140, guid: ae5a97e4bef5c5c43b8b51348b0aeec5, type: 3}
+  projectilePrefab: {fileID: 5430024515765536962, guid: 6b69ce863332591488efb8059eb10559, type: 3}
   projectileSpeed: 5
   weaponPrefab: {fileID: 2688711753480837464, guid: eb9402c91a1936d46a8602de7941ce3f, type: 3}

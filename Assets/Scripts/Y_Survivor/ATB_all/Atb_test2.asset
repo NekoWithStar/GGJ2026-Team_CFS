@@ -13,17 +13,29 @@ MonoBehaviour:
   m_Name: Atb_test2
   m_EditorClassIdentifier: 
   cardName: "\u6211\u662F\u8DD1\u7537"
-  description: "+7 \u901F\u5EA6\n+5 \u751F\u547D"
+  description: "+7  \u79FB\u52A8\u901F\u5EA6\n+5  HP\n+?  \u8FD0\u52A8\u6709\u76CA\u5065\u5EB7"
   cardIcon: {fileID: 21300000, guid: 5861b4e29f472ab449a63c582fc71c87, type: 3}
   rarity: 3
   modifiers:
   - targetProperty: 200
     modifierType: 1
     value: 7
-    priority: 0
+    priority: 2
   - targetProperty: 201
     modifierType: 1
     value: 5
+    priority: 0
+  - targetProperty: 300
+    modifierType: 1
+    value: 2
+    priority: 0
+  - targetProperty: 301
+    modifierType: 1
+    value: 3
+    priority: 0
+  - targetProperty: 302
+    modifierType: 1
+    value: 1
     priority: 0
   hasCustomEffect: 0
   customEffectType: 0

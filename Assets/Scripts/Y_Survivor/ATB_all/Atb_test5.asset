@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Atb_test5
   m_EditorClassIdentifier: 
   cardName: "\u6210\u4ED9\u4E4B\u8DEF"
-  description: "+100 \u751F\u547D"
+  description: "+100  HP\n+3  \u8FDC\u7A0B\u51B7\u5374\n+?  \u8FFD\u968F\u8005"
   cardIcon: {fileID: 21300000, guid: 2f25ee8aa8b02324b911e26edd0baf78, type: 3}
   rarity: 4
   modifiers:
@@ -21,6 +21,14 @@ MonoBehaviour:
     modifierType: 1
     value: 100
     priority: 2
+  - targetProperty: 100
+    modifierType: 1
+    value: 3
+    priority: 0
+  - targetProperty: 300
+    modifierType: 3
+    value: 1.2
+    priority: 0
   hasCustomEffect: 0
   customEffectType: 0
   customEffectValue: 0

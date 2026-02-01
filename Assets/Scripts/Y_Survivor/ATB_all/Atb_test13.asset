@@ -10,21 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
-  m_Name: Atb_test10
+  m_Name: Atb_test13
   m_EditorClassIdentifier: 
-  cardName: "\u5C0F\u98DE\u68CD"
-  description: "+5  \u79FB\u901F\n\u7269\u7406\u5B66\u5723\u5251"
-  cardIcon: {fileID: 21300000, guid: 8ec025d33caabd94e9bb159fd6794478, type: 3}
-  rarity: 0
+  cardName: "\u5341\u5B57\u7130"
+  description: "+20  HP\n\u8BF7\u51C6\u65F6\u9001\u8FBE"
+  cardIcon: {fileID: 21300000, guid: 5861b4e29f472ab449a63c582fc71c87, type: 3}
+  rarity: 4
   modifiers:
   - targetProperty: 200
     modifierType: 1
     value: 5
     priority: 2
+  - targetProperty: 300
+    modifierType: 1
+    value: 5
+    priority: 1
   hasCustomEffect: 1
   customEffectType: 5
   customEffectValue: 0
   customEffectValue2: 0
   customEffectDuration: 6
-  replacementWeapon: {fileID: 11400000, guid: 6c21faf886dbe3c418ed31511f4b2e6d, type: 2}
+  replacementWeapon: {fileID: 11400000, guid: 7902be00dca9e2e42bb6f96e22b7f94c, type: 2}
   randomAudioClips: []

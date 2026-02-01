@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Atb_test3
   m_EditorClassIdentifier: 
   cardName: "\u62FF\u6765\u5427\u4F60"
-  description: "+50 \u751F\u547D\n-10 \u79FB\u901F"
+  description: "+50  HP\n-10  \u79FB\u901F"
   cardIcon: {fileID: 21300000, guid: 8ae62ece383d8764c993b878ca299eeb, type: 3}
   rarity: 3
   modifiers:
