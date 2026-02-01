@@ -89,6 +89,9 @@ public class SceneManager : MonoBehaviour
             SceneTransition.Instance.CancelAndDestroy();
         }
 
+        // 确保恢复游戏时间（防止暂停状态保留）
+        Time.timeScale = 1f;
+
         // 直接同步加载当前场景，避免使用异步过渡时发生卡住（某些情况下 LoadSceneAsync 的 allowSceneActivation=false
         // 会导致 progress 无法推进到 0.9，从而卡住重载流程）。
         UnityEngine.SceneManagement.SceneManager.LoadScene(currentSceneName);

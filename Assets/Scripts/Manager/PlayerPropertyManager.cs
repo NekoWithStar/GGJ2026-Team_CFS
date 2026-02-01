@@ -11,6 +11,7 @@ namespace Y_Survivor
     /// </summary>
     public class PlayerPropertyManager : MonoBehaviour
     {
+        public static PlayerPropertyManager Instance { get; private set; }
         [Header("基础值设置")]
         [Tooltip("基础移动速度")]
         public float baseMoveSpeed = 5f;
@@ -27,9 +28,25 @@ namespace Y_Survivor
             = new Dictionary<PropertyCard, List<(PropertyType, IModifier)>>();
         
         private CustomEffectHandler customEffectHandler;
+
+        private void NotifyHud()
+        {
+            if (global::PlayerControl.Instance != null)
+            {
+                global::PlayerControl.Instance.UpdateHUD();
+            }
+        }
         
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Debug.LogWarning("[PlayerPropertyManager] 检测到重复实例，已销毁多余的 PlayerPropertyManager");
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
             InitializeProperties();
             customEffectHandler = GetComponent<CustomEffectHandler>();
             if (customEffectHandler == null)
@@ -64,6 +81,20 @@ namespace Y_Survivor
                 var property = GetPropertyByType(element.targetProperty);
                 if (property != null)
                 {
+                    // 对“当前血量”做即时变更，避免形成最低血量“卡住”
+                    if (element.targetProperty == PropertyType.PlayerHealth)
+                    {
+                        if (element.modifierType == EasyPack.Modifiers.ModifierType.Add)
+                        {
+                            SetCurrentHealth(GetCurrentHealth() + element.value);
+                        }
+                        else if (element.modifierType == EasyPack.Modifiers.ModifierType.Mul)
+                        {
+                            SetCurrentHealth(GetCurrentHealth() * element.value);
+                        }
+                        continue;
+                    }
+
                     var modifier = element.CreateModifier();
                     property.AddModifier(modifier);
                     appliedModifiers.Add((element.targetProperty, modifier));
@@ -77,6 +108,9 @@ namespace Y_Survivor
             {
                 customEffectHandler.HandleCustomEffect(card);
             }
+
+            // 属性变化后，刷新HUD显示
+            NotifyHud();
             
             Debug.Log($"[PlayerPropertyManager] Applied card: {card.cardName} with {appliedModifiers.Count} modifiers");
         }
@@ -145,18 +179,30 @@ namespace Y_Survivor
         /// <summary>设置当前生命值（无上限限制）</summary>
         public void SetCurrentHealth(float value)
         {
+            if (IsDead && value > 0f)
+            {
+                Debug.LogWarning("[PlayerPropertyManager] ⚠️ 玩家已死亡，忽略生命值增加");
+                return;
+            }
             CurrentHealth.SetBaseValue(Mathf.Max(0f, value));
+            NotifyHud();
         }
         
         /// <summary>受到伤害</summary>
         public void TakeDamage(float damage)
         {
+            if (IsDead) return;
             SetCurrentHealth(GetCurrentHealth() - damage);
         }
         
         /// <summary>恢复生命</summary>
         public void Heal(float amount)
         {
+            if (IsDead)
+            {
+                Debug.LogWarning("[PlayerPropertyManager] ⚠️ 玩家已死亡，忽略治疗");
+                return;
+            }
             SetCurrentHealth(GetCurrentHealth() + amount);
         }
         

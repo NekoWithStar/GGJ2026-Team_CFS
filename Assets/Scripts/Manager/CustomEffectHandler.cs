@@ -141,8 +141,8 @@ public class CustomEffectHandler : MonoBehaviour
         mainCam.enabled = false;
         Debug.Log("[CustomEffectHandler] 摄像机已关闭");
 
-        // 等待持续时间
-        yield return new WaitForSeconds(duration);
+        // 等待持续时间（使用 WaitForSecondsRealtime 以处理 timeScale=0 的情况）
+        yield return new WaitForSecondsRealtime(duration);
 
         // 恢复摄像机
         if (mainCam != null)
@@ -177,8 +177,8 @@ public class CustomEffectHandler : MonoBehaviour
         audioListener.enabled = false;
         Debug.Log("[CustomEffectHandler] 耳机损耗激活 - AudioListener已关闭，所有音频静音");
 
-        // 等待持续时间
-        yield return new WaitForSeconds(duration);
+        // 等待持续时间（使用 WaitForSecondsRealtime 以处理 timeScale=0 的情况）
+        yield return new WaitForSecondsRealtime(duration);
 
         // 恢复AudioListener
         if (audioListener != null)
@@ -280,7 +280,7 @@ public class CustomEffectHandler : MonoBehaviour
         directionReversed = true;
         Debug.Log("[CustomEffectHandler] 失灵指南针激活 - 运动方向已颠倒");
 
-        yield return new WaitForSeconds(duration);
+        yield return new WaitForSecondsRealtime(duration);
 
         directionReversed = false;
         Debug.Log("[CustomEffectHandler] 失灵指南针效果结束");

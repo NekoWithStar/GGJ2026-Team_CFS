@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Ground
   - Weapon
+  - CardSlot
   layers:
   - Default
   - TransparentFX

@@ -21,12 +21,12 @@ public class EnemyManager : MonoBehaviour
     }
     public void SpawnEnemy(EnemyControl _enemy, Vector3 _position)
     {
-        // ¶ÔÏó³ØÉú³ÉµĞ¹Ö
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÉµĞ¹ï¿½
     }
 
     public void ClearAllEnemies()
     {
-        // ÇåÀíËùÓĞµĞ¹Ö
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ĞµĞ¹ï¿½
     }
     // Start is called before the first frame update
     void Start()

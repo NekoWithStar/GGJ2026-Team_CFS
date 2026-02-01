@@ -106,6 +106,9 @@ public class SceneTransition : MonoBehaviour
         // 给一帧时间让新场景初始化
         yield return null;
 
+        // 确保场景加载后恢复游戏时间（防止上一场景的暂停状态保留）
+        Time.timeScale = 1f;
+
         // Fade in
         yield return StartCoroutine(Fade(1f, 0f, fadeDuration));
 

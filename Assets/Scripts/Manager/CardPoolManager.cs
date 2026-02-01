@@ -38,6 +38,7 @@ public class CardPoolManager : MonoBehaviour
     // 单例
     public static CardPoolManager Instance { get; private set; }
     private PlayerControl cachedPlayer;
+    private CardSelectionManager cachedCardSelectionManager;
 
     private void Awake()
     {
@@ -48,6 +49,8 @@ public class CardPoolManager : MonoBehaviour
         }
         Instance = this;
         cachedPlayer = FindAnyObjectByType<PlayerControl>();
+        cachedCardSelectionManager = FindAnyObjectByType<CardSelectionManager>();
+        Debug.Log($"[CardPoolManager] ✅ Awake - PlayerControl={cachedPlayer != null}, CardSelectionManager={cachedCardSelectionManager != null}");
     }
 
     /// <summary>
@@ -255,6 +258,8 @@ public class CardPoolManager : MonoBehaviour
     /// <returns>是否成功触发升级</returns>
     public bool ProcessCoinUpgrade(int cardCount = -1, int customCoinCost = -1)
     {
+        Debug.Log($"[CardPoolManager] 💰 ProcessCoinUpgrade被调用 - cardCount={cardCount}, customCoinCost={customCoinCost}");
+        
         // 使用默认值或自定义值
         int actualCardCount = cardCount > 0 ? cardCount : cardsToShow;
         
@@ -281,6 +286,7 @@ public class CardPoolManager : MonoBehaviour
                 Debug.LogError("[CardPoolManager] ❌ ProcessCoinUpgrade失败：PlayerControl未找到");
                 return false;
             }
+            Debug.Log("[CardPoolManager] ✅ PlayerControl已重新缓存");
         }
 
         // 检查金币是否足够（使用统一的金币配置）
@@ -303,12 +309,16 @@ public class CardPoolManager : MonoBehaviour
             Debug.Log($"[CardPoolManager] 💰 开始金币升级流程 - 金币: {cachedPlayer.coin}/{actualCoinCost}, 卡牌数量: {actualCardCount}");
         }
 
-        // 查找CardSelectionManager
-        var cardSelectionManager = FindAnyObjectByType<CardSelectionManager>();
-        if (cardSelectionManager == null)
+        // 获取或重新查找CardSelectionManager
+        if (cachedCardSelectionManager == null)
         {
-            Debug.LogError("[CardPoolManager] ❌ ProcessCoinUpgrade失败：CardSelectionManager未找到");
-            return false;
+            cachedCardSelectionManager = FindAnyObjectByType<CardSelectionManager>();
+            if (cachedCardSelectionManager == null)
+            {
+                Debug.LogError("[CardPoolManager] ❌ ProcessCoinUpgrade失败：CardSelectionManager未找到");
+                return false;
+            }
+            Debug.Log("[CardPoolManager] ✅ CardSelectionManager已重新缓存");
         }
 
         // 触发卡牌选择
@@ -316,9 +326,18 @@ public class CardPoolManager : MonoBehaviour
         {
             // 暂停游戏（通过PlayerControl）
             cachedPlayer.PauseGameForCardSelection();
+            Debug.Log("[CardPoolManager] ✅ 游戏已暂停");
 
             // 显示卡牌选择UI
-            cardSelectionManager.ShowCardSelection(actualCardCount);
+            Debug.Log($"[CardPoolManager] 📢 调用ShowCardSelection({actualCardCount})");
+            bool uiShown = cachedCardSelectionManager.ShowCardSelection(actualCardCount);
+            if (!uiShown)
+            {
+                Debug.LogError("[CardPoolManager] ❌ 卡牌选择UI未能显示，恢复游戏");
+                ResumeGameplay();
+                return false;
+            }
+            Debug.Log("[CardPoolManager] ✅ 卡牌选择UI已显示");
 
             if (debugMode)
             {
@@ -328,7 +347,7 @@ public class CardPoolManager : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"[CardPoolManager] ❌ ProcessCoinUpgrade异常: {e.Message}");
+            Debug.LogError($"[CardPoolManager] ❌ ProcessCoinUpgrade异常: {e.Message}\n{e.StackTrace}");
             // 如果出现异常，尝试恢复游戏
             ResumeGameplay();
             return false;
@@ -362,7 +381,13 @@ public class CardPoolManager : MonoBehaviour
         try
         {
             cachedPlayer.PauseGameForCardSelection();
-            cardSelectionManager.ShowCardSelection(actualCardCount);
+            bool uiShown = cardSelectionManager.ShowCardSelection(actualCardCount);
+            if (!uiShown)
+            {
+                Debug.LogError("[CardPoolManager] ❌ 卡牌选择UI未能显示，恢复游戏");
+                ResumeGameplay();
+                return false;
+            }
             if (debugMode)
             {
                 Debug.Log($"[CardPoolManager] ✅ 强制金币升级启动成功");

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 /// </summary>
 public class PlayerControl : MonoBehaviour
 {
+    public static PlayerControl Instance { get; private set; }
     [Header("移动配置")]
     [Tooltip("是否限制移动（如死亡/升级时）")]
     public bool canMove = true;
@@ -65,6 +66,14 @@ public class PlayerControl : MonoBehaviour
     #region 初始化
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("[PlayerControl] 检测到重复实例，已销毁多余的 PlayerControl");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         // 获取核心组件，避免频繁Find（性能优化+简洁）
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
@@ -525,12 +534,17 @@ public class PlayerControl : MonoBehaviour
     #endregion
 
     #region 基础状态方法（后续扩展直接补逻辑，无需改核心）
+    private bool isDead = false;
+    [Header("Audio - Death")]
+    [Tooltip("死亡音效专用 AudioSource（可选，未设置则自动创建）")]
+    [SerializeField] private AudioSource deathAudioSource;
     /// <summary>
     /// 受击方法（敌人攻击时调用）
     /// </summary>
     /// <param name="damage">受到的伤害值</param>
     public void TakeDamage(float damage)
     {
+        if (isDead) return;
         // 直接使用PlayerPropertyManager处理伤害
         if (playerPropertyManager != null)
         {
@@ -564,7 +578,16 @@ public class PlayerControl : MonoBehaviour
     /// </summary>
     private void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
         canMove = false; // 死亡后禁止移动
+
+        // 确保生命值为0，避免后续被动加血
+        if (playerPropertyManager != null)
+        {
+            playerPropertyManager.SetCurrentHealth(0f);
+        }
         
         // 清理所有自定义效果
         var customEffectHandler = GetComponent<CustomEffectHandler>();
@@ -586,16 +609,42 @@ public class PlayerControl : MonoBehaviour
         // 播放死亡音效（如果配置了）
         if (deathClip != null)
         {
-            // 使用本地 AudioSource 优先播放，否则使用 PlayClipAtPoint
-            var src = GetComponent<AudioSource>();
-            if (src != null)
+            // 强制恢复 AudioListener，避免被音效损坏效果关闭
+            var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
+            foreach (var listener in listeners)
             {
-                src.PlayOneShot(deathClip);
+                listener.enabled = true;
             }
-            else
+
+            // 暂停其他音频源，避免冲突（保留死亡音效优先播放）
+            var allSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+            foreach (var source in allSources)
             {
-                AudioSource.PlayClipAtPoint(deathClip, transform.position);
+                if (source != null && source != deathAudioSource)
+                {
+                    source.Pause();
+                }
             }
+
+            // 使用专用死亡音源，避免与其他音频冲突
+            if (deathAudioSource == null)
+            {
+                deathAudioSource = GetComponent<AudioSource>();
+            }
+            if (deathAudioSource == null)
+            {
+                var audioGo = new GameObject("DeathAudioSource");
+                audioGo.transform.SetParent(transform, false);
+                deathAudioSource = audioGo.AddComponent<AudioSource>();
+                deathAudioSource.playOnAwake = false;
+                deathAudioSource.loop = false;
+                deathAudioSource.spatialBlend = 0f;
+                deathAudioSource.priority = 0;
+            }
+
+            deathAudioSource.Stop();
+            deathAudioSource.priority = 0; // 最高优先级
+            deathAudioSource.PlayOneShot(deathClip);
         }
         
         // 延迟暂停游戏（但不停止音乐）
@@ -689,6 +738,7 @@ public class PlayerControl : MonoBehaviour
 
     /// <summary>
     /// 暂停游戏用于卡牌选择
+    /// 注意：场景切换后会自动由 SceneTransition 恢复 Time.timeScale，无需担心时间冻结问题
     /// </summary>
     public void PauseGameForCardSelection()
     {
@@ -788,6 +838,11 @@ public class PlayerControl : MonoBehaviour
     /// <param name="value">道具数值</param>
     public void PickupItem(string type, int value)
     {
+        if (isDead)
+        {
+            Debug.LogWarning("[PlayerControl] ⚠️ 玩家已死亡，忽略拾取");
+            return;
+        }
         switch (type)
         {
             case "Coin":

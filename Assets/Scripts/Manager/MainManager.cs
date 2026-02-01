@@ -23,9 +23,9 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        SceneManager sceneManager = SceneManager.Instance;//´´½¨³¡¾°¹ÜÀí
-        EnemyManager enemyManager = EnemyManager.Instance;//´´½¨µÐ¹Ö¹ÜÀí
-        PlayerManager playerManager = PlayerManager.Instance;//´´½¨Íæ¼Ò¹ÜÀí
+        SceneManager sceneManager = SceneManager.Instance;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        EnemyManager enemyManager = EnemyManager.Instance;//ï¿½ï¿½ï¿½ï¿½ï¿½Ð¹Ö¹ï¿½ï¿½ï¿½
+        PlayerManager playerManager = PlayerManager.Instance;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò¹ï¿½ï¿½ï¿½
     }
 
     public enum GameState

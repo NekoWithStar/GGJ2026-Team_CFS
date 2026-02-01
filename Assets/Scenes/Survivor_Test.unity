@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8962264, g: 0.46079564, b: 0.46079564, a: 1}
+  m_Color: {r: 0.8820755, g: 0.31621575, b: 0.31621575, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -277,81 +277,6 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 53080805}
-  m_CullTransparentMesh: 1
---- !u!1 &71077814
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 71077815}
-  - component: {fileID: 71077817}
-  - component: {fileID: 71077816}
-  m_Layer: 5
-  m_Name: Swag_Dog (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &71077815
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 71077814}
-  m_LocalRotation: {x: -0, y: -0, z: -0.69900584, w: 0.715116}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1684142013}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -88.695}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.7, y: -37.4}
-  m_SizeDelta: {x: 400, y: 400}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &71077816
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 71077814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 55f590a1f232d81429a829e0344953e9, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &71077817
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 71077814}
   m_CullTransparentMesh: 1
 --- !u!1 &110840537
 GameObject:
@@ -687,6 +612,7 @@ MonoBehaviour:
   deathPauseDelay: 2
   scoreBoardText: {fileID: 1039126646}
   deathClip: {fileID: 8300000, guid: 9aae6dbfcf37eeb4aa980b0eb3b4d744, type: 3}
+  deathAudioSource: {fileID: 0}
 --- !u!114 &158854561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -878,6 +804,8 @@ MonoBehaviour:
   - {fileID: 1427631691}
   cardSpacing: 0
   cardWidth: 340
+  cardSlotTag: CardSlot
+  cardSlotNamePrefix: CardSlot_
   cardsToShow: 4
 --- !u!114 &249074555
 MonoBehaviour:
@@ -1055,8 +983,8 @@ GameObject:
   m_Component:
   - component: {fileID: 415567906}
   m_Layer: 5
-  m_Name: p2
-  m_TagString: Untagged
+  m_Name: CardSlot_1
+  m_TagString: CardSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2263,81 +2191,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1039126644}
   m_CullTransparentMesh: 1
---- !u!1 &1085069587
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1085069588}
-  - component: {fileID: 1085069590}
-  - component: {fileID: 1085069589}
-  m_Layer: 5
-  m_Name: Swag_Dog
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &1085069588
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1085069587}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1684142013}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 400, y: 400}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1085069589
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1085069587}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7d6d024f6df8c3643a78aa52061615d5, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1085069590
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1085069587}
-  m_CullTransparentMesh: 1
 --- !u!1 &1108770126
 GameObject:
   m_ObjectHideFlags: 0
@@ -2885,8 +2738,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1387850854}
   m_Layer: 5
-  m_Name: p3
-  m_TagString: Untagged
+  m_Name: CardSlot_2
+  m_TagString: CardSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2925,8 +2778,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1427631691}
   m_Layer: 5
-  m_Name: p4
-  m_TagString: Untagged
+  m_Name: CardSlot_3
+  m_TagString: CardSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3029,81 +2882,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1460712208}
   m_CullTransparentMesh: 1
---- !u!1 &1479499716
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1479499717}
-  - component: {fileID: 1479499719}
-  - component: {fileID: 1479499718}
-  m_Layer: 5
-  m_Name: Swag_Dog (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &1479499717
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1479499716}
-  m_LocalRotation: {x: -0, y: -0, z: 0.7095768, w: 0.7046281}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: -1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1684142013}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90.401}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 30.5, y: -2}
-  m_SizeDelta: {x: 400, y: 400}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1479499718
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1479499716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 55f590a1f232d81429a829e0344953e9, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1479499719
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1479499716}
-  m_CullTransparentMesh: 1
 --- !u!1 &1615903433
 GameObject:
   m_ObjectHideFlags: 0
@@ -3193,8 +2971,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1674819452}
   m_Layer: 5
-  m_Name: p1
-  m_TagString: Untagged
+  m_Name: CardSlot_0
+  m_TagString: CardSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3254,9 +3032,6 @@ RectTransform:
   - {fileID: 1799265973}
   - {fileID: 1890478051}
   - {fileID: 1189534843}
-  - {fileID: 1085069588}
-  - {fileID: 71077815}
-  - {fileID: 1479499717}
   m_Father: {fileID: 1030214898}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3822,6 +3597,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1966961592}
   - component: {fileID: 1966961591}
+  - component: {fileID: 1966961593}
   m_Layer: 0
   m_Name: AudioControler
   m_TagString: Untagged
@@ -3839,9 +3615,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: dff25dbec29dd144b89d680bfd669146, type: 3}
-  m_Resource: {fileID: 8300000, guid: dff25dbec29dd144b89d680bfd669146, type: 3}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 8300000, guid: 4fd18ac973717944da65ffada9cde5ed, type: 3}
+  m_Resource: {fileID: 8300000, guid: 4fd18ac973717944da65ffada9cde5ed, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 0.851
   m_Pitch: 1
   Loop: 1
@@ -3941,6 +3717,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1966961593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966961590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85676dee9232bac4b9e35aed9325799d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgmClips:
+  - {fileID: 8300000, guid: 4fd18ac973717944da65ffada9cde5ed, type: 3}
+  - {fileID: 8300000, guid: dff25dbec29dd144b89d680bfd669146, type: 3}
+  - {fileID: 8300000, guid: 18cea586da9006a4f8f270dbf5dda85c, type: 3}
+  - {fileID: 8300000, guid: 0961debe070fae944bcf1509341610ce, type: 3}
+  - {fileID: 8300000, guid: 235b3464907ff5947b0c9d70f53d7a96, type: 3}
 --- !u!224 &1709091899817853986 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6185058440886883472, guid: 9c9340b18d328154abfc067f70884cc0, type: 3}
