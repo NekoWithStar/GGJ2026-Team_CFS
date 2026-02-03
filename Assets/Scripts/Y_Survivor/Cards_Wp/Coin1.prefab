@@ -102,6 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupType: Coin
   pickupValue: 5
+  maxLifetime: 3
 --- !u!70 &-285180381586299929
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

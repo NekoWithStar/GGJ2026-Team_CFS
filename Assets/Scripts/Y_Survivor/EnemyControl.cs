@@ -169,7 +169,7 @@ public class EnemyControl : MonoBehaviour
         // 延迟销毁（给掉落特效留时间，可选）
         Destroy(gameObject, 0.2f);
         // 后续可加：死亡特效、死亡音效、通知波次管理器怪物死亡等
-        Debug.Log("敌人死亡，掉落" + dropCoin + "金币");
+        // Debug.Log("敌人死亡，掉落" + dropCoin + "金币"); // 关闭金币掉落debug通知
     }
 
     /// <summary>

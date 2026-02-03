@@ -29,9 +29,9 @@ MonoBehaviour:
     modifierType: 3
     value: 50
     priority: 0
-  hasCustomEffect: 0
-  customEffectType: 0
-  customEffectValue: 0
+  hasCustomEffect: 1
+  customEffectType: 6
+  customEffectValue: 2
   customEffectValue2: 0
   customEffectDuration: 3
   replacementWeapon: {fileID: 0}

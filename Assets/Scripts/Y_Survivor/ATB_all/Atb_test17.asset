@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
-  m_Name: Atb_test14
+  m_Name: Atb_test17
   m_EditorClassIdentifier: 
-  cardName: "\u6765\u771F\u7684"
-  description: "*2  \u66B4\u51FB\u4F24\u5BB3\n\u6084\u6084\u80CC\u8D77\u4E86\u884C\u56CA"
-  cardIcon: {fileID: 21300000, guid: 39ee3ac9649b9b2419a63604352a75be, type: 3}
-  rarity: 3
+  cardName: "\u8D81\u70ED\u6253\u94C1"
+  description: "*2  \u79FB\u901F\n\u66F4\u597D\u7528\u7684\u5BB6\u4F19"
+  cardIcon: {fileID: 21300000, guid: aba444af6401a4a4b82174c1af9df4c1, type: 3}
+  rarity: 2
   modifiers:
   - targetProperty: 200
-    modifierType: 1
-    value: -5
+    modifierType: 3
+    value: 2
     priority: 2
   - targetProperty: 106
     modifierType: 3
@@ -30,5 +30,5 @@ MonoBehaviour:
   customEffectValue: 0
   customEffectValue2: 0
   customEffectDuration: 6
-  replacementWeapon: {fileID: 11400000, guid: a09426a82fc107e46aede9436dc2af09, type: 2}
+  replacementWeapon: {fileID: 11400000, guid: 7902be00dca9e2e42bb6f96e22b7f94c, type: 2}
   randomAudioClips: []

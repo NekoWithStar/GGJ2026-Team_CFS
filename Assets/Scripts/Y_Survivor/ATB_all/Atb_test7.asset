@@ -25,6 +25,10 @@ MonoBehaviour:
     modifierType: 3
     value: 4
     priority: 2
+  - targetProperty: 302
+    modifierType: 3
+    value: 2
+    priority: 2
   hasCustomEffect: 1
   customEffectType: 3
   customEffectValue: 0
@@ -33,4 +37,6 @@ MonoBehaviour:
   replacementWeapon: {fileID: 0}
   randomAudioClips:
   - {fileID: 8300000, guid: e150928e046836f48b64b3062c8ff676, type: 3}
-  - {fileID: 8300000, guid: 235b3464907ff5947b0c9d70f53d7a96, type: 3}
+  - {fileID: 8300000, guid: e91491cbfda6f0041900399c781b75e0, type: 3}
+  - {fileID: 8300000, guid: 4fd18ac973717944da65ffada9cde5ed, type: 3}
+  - {fileID: 8300000, guid: e8a958b2c819c264b991f7ed39348c74, type: 3}

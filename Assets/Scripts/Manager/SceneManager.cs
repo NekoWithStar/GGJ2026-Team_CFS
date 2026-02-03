@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Y_Survivor;
 
 public class SceneManager : MonoBehaviour
 {
@@ -91,6 +92,28 @@ public class SceneManager : MonoBehaviour
 
         // 确保恢复游戏时间（防止暂停状态保留）
         Time.timeScale = 1f;
+
+        // 重置金币系统配置到初始状态
+        if (CoinSystemConfig.Instance != null)
+        {
+            CoinSystemConfig.Instance.ResetToInitialState();
+        }
+
+        // 清理玩家属性管理器的已应用卡牌状态
+        if (PlayerPropertyManager.Instance != null)
+        {
+            PlayerPropertyManager.Instance.ClearAllCards();
+        }
+
+        // 清理所有自定义效果
+        var customEffectHandlers = FindObjectsByType<CustomEffectHandler>(FindObjectsSortMode.None);
+        foreach (var handler in customEffectHandlers)
+        {
+            if (handler != null)
+            {
+                handler.ClearAllEffects();
+            }
+        }
 
         // 直接同步加载当前场景，避免使用异步过渡时发生卡住（某些情况下 LoadSceneAsync 的 allowSceneActivation=false
         // 会导致 progress 无法推进到 0.9，从而卡住重载流程）。

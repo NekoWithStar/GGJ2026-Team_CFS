@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
   m_Name: Atb_test16
   m_EditorClassIdentifier: 
-  cardName: "\u52A0\u50B7\u5BB3\u7684"
-  description: "\u653B\u901F+150%"
-  cardIcon: {fileID: 21300000, guid: aba444af6401a4a4b82174c1af9df4c1, type: 3}
+  cardName: "\u52A0\u4F24\u5BB3\u7684"
+  description: "\u653B\u901F+150%\n\u5C0F\u578B\u654C\u4EBA\u66F4\u5FEB\u4E86"
+  cardIcon: {fileID: 21300000, guid: deab8829baebb2748946dffa42564810, type: 3}
   rarity: 3
   modifiers:
   - targetProperty: 101

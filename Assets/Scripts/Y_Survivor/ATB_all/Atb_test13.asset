@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd585767344f56a4da21083901e4ff2e, type: 3}
   m_Name: Atb_test13
   m_EditorClassIdentifier: 
-  cardName: "\u5341\u5B57\u7130"
-  description: "+20  HP\n\u8BF7\u51C6\u65F6\u9001\u8FBE"
+  cardName: "\u4E1A\u52A1\u7E41\u5FD9"
+  description: "+20  HP\n+5  \u79FB\u52A8\u901F\u5EA6\n\u65B0\u8BA2\u5355\u8BF7\u51C6\u65F6\u9001\u8FBE"
   cardIcon: {fileID: 21300000, guid: 5861b4e29f472ab449a63c582fc71c87, type: 3}
   rarity: 2
   modifiers:
@@ -25,7 +25,11 @@ MonoBehaviour:
     modifierType: 3
     value: 20
     priority: 1
-  hasCustomEffect: 1
+  - targetProperty: 201
+    modifierType: 1
+    value: 20
+    priority: 1
+  hasCustomEffect: 0
   customEffectType: 5
   customEffectValue: 0
   customEffectValue2: 0

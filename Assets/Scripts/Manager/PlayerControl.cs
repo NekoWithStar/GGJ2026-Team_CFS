@@ -556,8 +556,7 @@ public class PlayerControl : MonoBehaviour
             return;
         }
         
-        // 更新HUD显示（确保HP显示同步更新）
-        UpdateHUD();
+        // 更新HUD显示（确保HP显示同步更新）- 移除：PlayerPropertyManager.TakeDamage已通过NotifyHud调用UpdateHUD
         
         // 播放受击变红动画
         if (spriteRenderer != null)
@@ -721,7 +720,7 @@ public class PlayerControl : MonoBehaviour
             bool success = CardPoolManager.Instance.ProcessCoinUpgrade(cardsToShowOnLevelUp);
             if (!success)
             {
-                Debug.LogWarning("[PlayerControl] 金币升级流程启动失败，可能是金币不足");
+                //Debug.LogWarning("[PlayerControl] 金币升级流程启动失败，可能是金币不足");
                 // 如果失败，不暂停游戏，直接返回
                 return;
             }
@@ -733,7 +732,7 @@ public class PlayerControl : MonoBehaviour
         }
 
         // 注意：游戏暂停和UI显示现在由CardPoolManager.ProcessCoinUpgrade()处理
-        Debug.Log($"[PlayerControl] ✅ 卡牌选择流程已启动，显示 {cardsToShowOnLevelUp} 张卡牌");
+        //Debug.Log($"[PlayerControl] ✅ 卡牌选择流程已启动，显示 {cardsToShowOnLevelUp} 张卡牌");
     }
 
     /// <summary>

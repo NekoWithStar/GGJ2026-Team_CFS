@@ -27,15 +27,15 @@ MonoBehaviour:
     priority: 0
   - targetProperty: 300
     modifierType: 1
-    value: 2
+    value: 4
     priority: 0
   - targetProperty: 301
     modifierType: 1
-    value: 3
+    value: 6
     priority: 0
   - targetProperty: 302
     modifierType: 1
-    value: 1
+    value: 10
     priority: 0
   hasCustomEffect: 0
   customEffectType: 0

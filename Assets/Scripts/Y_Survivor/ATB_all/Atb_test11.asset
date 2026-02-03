@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: Atb_test11
   m_EditorClassIdentifier: 
   cardName: "\u73A9\u9634\u7684"
-  description: "-5  \u79FB\u901F\n\u5C04\u901F\u4E94\u5398\u7C73"
+  description: "-5  \u79FB\u901F\n+10  HP\n\u5C04\u901F\u4E94\u5398\u7C73"
   cardIcon: {fileID: 21300000, guid: aba444af6401a4a4b82174c1af9df4c1, type: 3}
   rarity: 4
   modifiers:
+  - targetProperty: 200
+    modifierType: 1
+    value: -5
+    priority: 2
   - targetProperty: 200
     modifierType: 1
     value: -5

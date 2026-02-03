@@ -18,6 +18,9 @@ namespace Y_Survivor
         
         [Tooltip("基础当前生命值")]
         public float baseHealth = 100f;
+
+        [Tooltip("是否允许重复使用相同的属性卡牌")]
+        public bool allowCardReuse = true;
         
         // ===== 玩家属性 =====
         public GameProperty MoveSpeed { get; private set; }
@@ -72,7 +75,34 @@ namespace Y_Survivor
         /// <param name="card">要应用的属性卡</param>
         public void ApplyPropertyCard(PropertyCard card)
         {
-            if (card == null || appliedCards.ContainsKey(card)) return;
+            if (card == null) return;
+            
+            // 如果不允许重复使用卡牌，且卡牌已被应用过，则跳过
+            if (!allowCardReuse && appliedCards.ContainsKey(card))
+            {
+                Debug.Log($"[PlayerPropertyManager] 卡牌 {card.cardName} 已被应用过，且不允许重复使用，跳过应用");
+                return;
+            }
+            
+            // 如果允许重复使用，需要先移除之前应用的相同卡牌的效果
+            if (allowCardReuse && appliedCards.ContainsKey(card))
+            {
+                Debug.Log($"[PlayerPropertyManager] 卡牌 {card.cardName} 已被应用过，正在重新应用...");
+                RemovePropertyCard(card);
+            }
+            
+            Debug.Log($"[PlayerPropertyManager] 开始应用属性卡: {card.cardName}");
+            Debug.Log($"[PlayerPropertyManager] 卡牌配置 - hasCustomEffect: {card.hasCustomEffect}, customEffectType: {card.customEffectType}, modifiers数量: {card.modifiers?.Count ?? 0}");
+            
+            if (card.modifiers != null && card.modifiers.Count > 0)
+            {
+                Debug.Log("[PlayerPropertyManager] 卡牌modifiers详情:");
+                for (int i = 0; i < card.modifiers.Count; i++)
+                {
+                    var mod = card.modifiers[i];
+                    Debug.Log($"  [{i}] {mod.targetProperty}: {mod.modifierType} {mod.value}");
+                }
+            }
             
             var appliedModifiers = new List<(PropertyType, IModifier)>();
             
@@ -84,6 +114,7 @@ namespace Y_Survivor
                     // 对“当前血量”做即时变更，避免形成最低血量“卡住”
                     if (element.targetProperty == PropertyType.PlayerHealth)
                     {
+                        Debug.Log($"[PlayerPropertyManager] 应用血量修改: {element.modifierType} {element.value}, 当前血量: {GetCurrentHealth()}");
                         if (element.modifierType == EasyPack.Modifiers.ModifierType.Add)
                         {
                             SetCurrentHealth(GetCurrentHealth() + element.value);
@@ -92,12 +123,18 @@ namespace Y_Survivor
                         {
                             SetCurrentHealth(GetCurrentHealth() * element.value);
                         }
+                        Debug.Log($"[PlayerPropertyManager] 血量修改后: {GetCurrentHealth()}");
                         continue;
                     }
 
                     var modifier = element.CreateModifier();
                     property.AddModifier(modifier);
                     appliedModifiers.Add((element.targetProperty, modifier));
+                    Debug.Log($"[PlayerPropertyManager] 应用属性修改: {element.targetProperty} {element.modifierType} {element.value}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[PlayerPropertyManager] 属性类型 {element.targetProperty} 未找到对应的GameProperty");
                 }
             }
             
@@ -106,7 +143,16 @@ namespace Y_Survivor
             // 处理自定义效果
             if (customEffectHandler != null && card.hasCustomEffect)
             {
+                Debug.Log($"[PlayerPropertyManager] 检测到自定义效果，调用CustomEffectHandler");
                 customEffectHandler.HandleCustomEffect(card);
+            }
+            else if (card.hasCustomEffect && customEffectHandler == null)
+            {
+                Debug.LogWarning($"[PlayerPropertyManager] 卡牌有自定义效果但CustomEffectHandler不存在");
+            }
+            else if (!card.hasCustomEffect)
+            {
+                Debug.Log($"[PlayerPropertyManager] 卡牌没有自定义效果");
             }
 
             // 属性变化后，刷新HUD显示

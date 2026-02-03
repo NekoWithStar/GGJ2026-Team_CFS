@@ -241,6 +241,16 @@ public class CoinSystemConfig : MonoBehaviour
 ";
     }
 
+    /// <summary>
+    /// 重置金币系统配置到初始状态（用于场景重置）
+    /// </summary>
+    public void ResetToInitialState()
+    {
+        countUpgrade = 0;
+        coinCostPerCard = 30; // 重置为初始值
+        Debug.Log("[CoinSystemConfig] 金币系统已重置到初始状态");
+    }
+
 #if UNITY_EDITOR
     private void OnValidate()
     {

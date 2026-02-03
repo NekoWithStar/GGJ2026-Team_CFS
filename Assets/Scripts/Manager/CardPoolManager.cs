@@ -379,8 +379,12 @@ public class CardPoolManager : MonoBehaviour
             cachedPlayer = FindAnyObjectByType<PlayerControl>();
         }
 
-        var cardSelectionManager = FindAnyObjectByType<CardSelectionManager>();
-        if (cardSelectionManager == null)
+        if (cachedCardSelectionManager == null)
+        {
+            cachedCardSelectionManager = FindAnyObjectByType<CardSelectionManager>();
+        }
+
+        if (cachedCardSelectionManager == null)
         {
             Debug.LogError("[CardPoolManager] ❌ ForceCoinUpgrade失败：CardSelectionManager未找到");
             return false;
@@ -389,7 +393,7 @@ public class CardPoolManager : MonoBehaviour
         try
         {
             cachedPlayer.PauseGameForCardSelection();
-            bool uiShown = cardSelectionManager.ShowCardSelection(actualCardCount);
+            bool uiShown = cachedCardSelectionManager.ShowCardSelection(actualCardCount);
             if (!uiShown)
             {
                 Debug.LogError("[CardPoolManager] ❌ 卡牌选择UI未能显示，恢复游戏");

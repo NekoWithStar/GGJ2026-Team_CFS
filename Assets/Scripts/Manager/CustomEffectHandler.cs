@@ -1,6 +1,7 @@
 using UnityEngine;
 using Y_Survivor;
 using System.Collections.Generic;
+using System.Linq;
 
 // 检测Cinemachine命名空间是否存在
 using System;
@@ -22,6 +23,7 @@ public class CustomEffectHandler : MonoBehaviour
     // 猫耳耳机相关
     private Coroutine catEarHeadsetCoroutine;
     private AudioClip currentCatEarClip; // 当前播放的猫耳耳机音频
+    private List<AudioClip> cachedCatEarClips; // 缓存的猫耳耳机音频列表
 
     // 敌人控制相关
     private Dictionary<EnemyControl, (float originalSpeed, float originalDamage)> modifiedEnemies 
@@ -77,8 +79,17 @@ public class CustomEffectHandler : MonoBehaviour
     /// </summary>
     public void HandleCustomEffect(PropertyCard card)
     {
+        Debug.Log($"[CustomEffectHandler] HandleCustomEffect被调用 - card: {card?.cardName ?? "null"}, hasCustomEffect: {card?.hasCustomEffect ?? false}, customEffectType: {card?.customEffectType ?? CustomEffectType.None}");
+
+        if (card == null)
+        {
+            Debug.LogError("[CustomEffectHandler] 卡牌为空，无法处理自定义效果");
+            return;
+        }
+
         if (!card.hasCustomEffect || card.customEffectType == CustomEffectType.None)
         {
+            Debug.Log($"[CustomEffectHandler] 卡牌 {card.cardName} 没有自定义效果或效果类型为None，跳过处理");
             return;
         }
 
@@ -89,11 +100,11 @@ public class CustomEffectHandler : MonoBehaviour
             case CustomEffectType.LimitedVision:
                 ApplyLimitedVision(card);
                 break;
-                
+
             case CustomEffectType.AudioDamage:
                 ApplyAudioDamage(card);
                 break;
-                
+
             case CustomEffectType.CatEarHeadset:
                 ApplyCatEarHeadset(card);
                 break;
@@ -195,33 +206,41 @@ public class CustomEffectHandler : MonoBehaviour
     /// </summary>
     private void ApplyCatEarHeadset(PropertyCard card)
     {
+        Debug.Log($"[CustomEffectHandler] ApplyCatEarHeadset被调用 - audioSource: {(audioSource != null ? "存在" : "不存在")}");
+
         if (audioSource == null)
         {
             Debug.LogWarning("[CustomEffectHandler] 音频源未找到，无法应用猫耳耳机");
             return;
         }
 
-        // 尝试从PropertyCard获取音频列表，如果为空则从Resources加载
+        // 尝试从PropertyCard获取音频列表，如果为空则从缓存或Resources加载
         List<AudioClip> audioClips = card.randomAudioClips;
         if (audioClips == null || audioClips.Count == 0)
         {
-            // "假传入" - 从Resources目录动态加载
-            audioClips = new List<AudioClip>(Resources.LoadAll<AudioClip>("Audio/CatEarHeadset"));
+            // 如果缓存为空，尝试从Resources加载并缓存
+            if (cachedCatEarClips == null || cachedCatEarClips.Count == 0)
+            {
+                cachedCatEarClips = new List<AudioClip>(Resources.LoadAll<AudioClip>("Audio/CatEarHeadset"));
+                Debug.Log($"[CustomEffectHandler] 猫耳耳机: 从Resources加载并缓存 {cachedCatEarClips.Count} 个音频: {string.Join(", ", cachedCatEarClips.Select(c => c.name))}");
+            }
+
+            audioClips = cachedCatEarClips;
 
             if (audioClips.Count == 0)
             {
                 Debug.LogWarning("[CustomEffectHandler] 猫耳耳机: 未在PropertyCard中设置音频列表，也未在Resources/Audio/CatEarHeadset找到音频");
                 return;
             }
-
-            Debug.Log($"[CustomEffectHandler] 猫耳耳机: 从Resources加载 {audioClips.Count} 个音频");
         }
 
         // 如果已经在播放猫耳耳机音乐，停止当前协程准备换歌
         if (catEarHeadsetCoroutine != null)
         {
             StopCoroutine(catEarHeadsetCoroutine);
+            catEarHeadsetCoroutine = null; // 重置协程引用
             audioSource.Stop();
+            audioSource.clip = null; // 清除当前音频
             Debug.Log($"[CustomEffectHandler] 停止当前猫耳耳机音频: {currentCatEarClip?.name ?? "无"}");
         }
 
@@ -230,22 +249,31 @@ public class CustomEffectHandler : MonoBehaviour
 
     private System.Collections.IEnumerator CatEarHeadsetCoroutine(List<AudioClip> audioClips)
     {
-        // 随机选择音频（避免重复播放同一首歌）
-        AudioClip selectedClip;
-        if (audioClips.Count > 1 && currentCatEarClip != null)
+        // 确保有音频可用
+        if (audioClips == null || audioClips.Count == 0)
         {
-            // 如果有多首歌且当前有播放记录，尝试选择不同的歌
-            do
-            {
-                selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
-            } while (selectedClip == currentCatEarClip);
-        }
-        else
-        {
-            selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
+            Debug.LogWarning("[CustomEffectHandler] 猫耳耳机: 音频列表为空，无法播放");
+            yield break;
         }
 
+        Debug.Log($"[CustomEffectHandler] 开始选择音频 - 当前播放: {currentCatEarClip?.name ?? "无"}, 可用音频数量: {audioClips.Count}");
+
+        // 随机选择音频（确保不重复播放同一首，如果有多首歌的话）
+        AudioClip selectedClip;
+        int maxAttempts = audioClips.Count; // 最多尝试次数等于音频数量
+        int attempts = 0;
+
+        do
+        {
+            selectedClip = audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
+            attempts++;
+            Debug.Log($"[CustomEffectHandler] 尝试 {attempts}: 选择了 {selectedClip.name}, 当前播放: {currentCatEarClip?.name ?? "无"}");
+        } while (audioClips.Count > 1 && selectedClip == currentCatEarClip && attempts < maxAttempts);
+
+        // 如果尝试多次还是选到同一首（只有一首歌的情况），就直接使用
         currentCatEarClip = selectedClip;
+
+        Debug.Log($"[CustomEffectHandler] 最终选择音频: {selectedClip.name} (尝试次数: {attempts})");
 
         // 设置循环播放
         audioSource.clip = selectedClip;
@@ -257,6 +285,13 @@ public class CustomEffectHandler : MonoBehaviour
         // 无限循环，等待协程被外部停止
         while (true)
         {
+            // 检查audioSource是否还在播放，如果没有播放则退出协程
+            if (audioSource == null || !audioSource.isPlaying)
+            {
+                Debug.Log($"[CustomEffectHandler] 猫耳耳机音频播放结束或AudioSource丢失，协程退出");
+                catEarHeadsetCoroutine = null;
+                yield break;
+            }
             yield return null;
         }
     }
