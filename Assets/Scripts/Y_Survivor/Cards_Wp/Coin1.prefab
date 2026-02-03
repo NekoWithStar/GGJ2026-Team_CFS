@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3684727246021231504}
   - component: {fileID: 3484038238165499867}
   - component: {fileID: 2595187753844384400}
-  - component: {fileID: -285180381586299929}
+  - component: {fileID: 6176769634634964617}
   m_Layer: 0
   m_Name: Coin1
   m_TagString: Untagged
@@ -77,8 +77,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0.9481132, g: 0.4025009, b: 0.4025009, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 4da9eb1d45c004f489aa3010735738d6, type: 3}
+  m_Color: {r: 0.9622642, g: 0.8578676, b: 0.8578676, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -103,8 +103,9 @@ MonoBehaviour:
   pickupType: Coin
   pickupValue: 5
   maxLifetime: 3
---- !u!70 &-285180381586299929
-CapsuleCollider2D:
+  maxDistanceFromPlayer: 15
+--- !u!61 &6176769634634964617
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -137,6 +138,15 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.21133333}
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
-  m_Direction: 0
+  m_EdgeRadius: 0
