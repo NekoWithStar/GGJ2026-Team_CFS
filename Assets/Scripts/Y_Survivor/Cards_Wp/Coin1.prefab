@@ -103,7 +103,7 @@ MonoBehaviour:
   pickupType: Coin
   pickupValue: 5
   maxLifetime: 3
-  maxDistanceFromPlayer: 15
+  maxDistanceFromPlayer: 5.5
 --- !u!61 &6176769634634964617
 BoxCollider2D:
   m_ObjectHideFlags: 0
